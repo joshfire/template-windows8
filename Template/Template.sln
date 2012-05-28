@@ -1,0 +1,46 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 11
+Project("{262852C6-CD72-467D-83FE-5EEB1973A190}") = "Template", "Template\Template.jsproj", "{B30A4EBB-7565-4B25-9931-9C9C8DEA4E6D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|ARM = Debug|ARM
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|ARM = Release|ARM
+		Release|Any CPU = Release|Any CPU
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B30A4EBB-7565-4B25-9931-9C9C8DEA4E6D}.Debug|ARM.ActiveCfg = Debug|ARM
+		{B30A4EBB-7565-4B25-9931-9C9C8DEA4E6D}.Debug|ARM.Build.0 = Debug|ARM
+		{B30A4EBB-7565-4B25-9931-9C9C8DEA4E6D}.Debug|ARM.Deploy.0 = Debug|ARM
+		{B30A4EBB-7565-4B25-9931-9C9C8DEA4E6D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B30A4EBB-7565-4B25-9931-9C9C8DEA4E6D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B30A4EBB-7565-4B25-9931-9C9C8DEA4E6D}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{B30A4EBB-7565-4B25-9931-9C9C8DEA4E6D}.Debug|x64.ActiveCfg = Debug|x64
+		{B30A4EBB-7565-4B25-9931-9C9C8DEA4E6D}.Debug|x64.Build.0 = Debug|x64
+		{B30A4EBB-7565-4B25-9931-9C9C8DEA4E6D}.Debug|x64.Deploy.0 = Debug|x64
+		{B30A4EBB-7565-4B25-9931-9C9C8DEA4E6D}.Debug|x86.ActiveCfg = Debug|x86
+		{B30A4EBB-7565-4B25-9931-9C9C8DEA4E6D}.Debug|x86.Build.0 = Debug|x86
+		{B30A4EBB-7565-4B25-9931-9C9C8DEA4E6D}.Debug|x86.Deploy.0 = Debug|x86
+		{B30A4EBB-7565-4B25-9931-9C9C8DEA4E6D}.Release|ARM.ActiveCfg = Release|ARM
+		{B30A4EBB-7565-4B25-9931-9C9C8DEA4E6D}.Release|ARM.Build.0 = Release|ARM
+		{B30A4EBB-7565-4B25-9931-9C9C8DEA4E6D}.Release|ARM.Deploy.0 = Release|ARM
+		{B30A4EBB-7565-4B25-9931-9C9C8DEA4E6D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B30A4EBB-7565-4B25-9931-9C9C8DEA4E6D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B30A4EBB-7565-4B25-9931-9C9C8DEA4E6D}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{B30A4EBB-7565-4B25-9931-9C9C8DEA4E6D}.Release|x64.ActiveCfg = Release|x64
+		{B30A4EBB-7565-4B25-9931-9C9C8DEA4E6D}.Release|x64.Build.0 = Release|x64
+		{B30A4EBB-7565-4B25-9931-9C9C8DEA4E6D}.Release|x64.Deploy.0 = Release|x64
+		{B30A4EBB-7565-4B25-9931-9C9C8DEA4E6D}.Release|x86.ActiveCfg = Release|x86
+		{B30A4EBB-7565-4B25-9931-9C9C8DEA4E6D}.Release|x86.Build.0 = Release|x86
+		{B30A4EBB-7565-4B25-9931-9C9C8DEA4E6D}.Release|x86.Deploy.0 = Release|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
