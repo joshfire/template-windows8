@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Package xmlns="http://schemas.microsoft.com/appx/2010/manifest">
+  <Identity Name="cc334e46-990e-466d-b5a7-292e68169853" Version="1.0.0.0" Publisher="CN=Ali" ProcessorArchitecture="neutral" />
+  <Properties>
+    <DisplayName>Template</DisplayName>
+    <Description>Template</Description>
+    <PublisherDisplayName>Ali</PublisherDisplayName>
+    <Logo>images\storelogo.png</Logo>
+  </Properties>
+  <Prerequisites>
+    <OSMinVersion>6.2</OSMinVersion>
+    <OSMaxVersionTested>6.2</OSMaxVersionTested>
+  </Prerequisites>
+  <Resources>
+    <Resource Language="fr-FR" />
+  </Resources>
+  <Applications>
+    <Application Id="App" StartPage="default.html">
+      <VisualElements DisplayName="Template" Logo="images\logo.png" SmallLogo="images\smalllogo.png" Description="Template helps you in building Metro apps easily" ForegroundText="light" BackgroundColor="#000000">
+        <DefaultTile ShowName="allLogos" />
+        <SplashScreen Image="images\splashscreen.png" BackgroundColor="#FF0000" />
+      </VisualElements>
+    </Application>
+  </Applications>
+  <Capabilities>
+    <Capability Name="internetClient" />
+  </Capabilities>
+  <Dependencies>
+    <PackageDependency Name="Microsoft.WinJS.0.6.Debug" MinVersion="0.6.8229.0" />
+  </Dependencies>
+</Package>
