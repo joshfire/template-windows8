@@ -14,12 +14,9 @@
     // Each of these sample groups must have a unique key to be displayed
     // separately.
     var sampleGroups = [
-        { key: "group1", title: "Group Title: 1", subtitle: "Group Subtitle: 1", backgroundImage: darkGray, description: groupDescription },
-        { key: "group2", title: "Group Title: 2", subtitle: "Group Subtitle: 2", backgroundImage: lightGray, description: groupDescription },
-        { key: "group3", title: "Group Title: 3", subtitle: "Group Subtitle: 3", backgroundImage: mediumGray, description: groupDescription },
-        { key: "group4", title: "Group Title: 4", subtitle: "Group Subtitle: 4", backgroundImage: lightGray, description: groupDescription },
-        { key: "group5", title: "Group Title: 5", subtitle: "Group Subtitle: 5", backgroundImage: mediumGray, description: groupDescription },
-        { key: "group6", title: "Group Title: 6", subtitle: "Group Subtitle: 6", backgroundImage: darkGray, description: groupDescription }
+        { key: "main1", title: "Group Title: 1", subtitle: "Group Subtitle: 1", backgroundImage: darkGray, description: groupDescription },
+        { key: "main2", title: "Group Title: 2", subtitle: "Group Subtitle: 2", backgroundImage: lightGray, description: groupDescription },
+        { key: "main3", title: "Group Title: 3", subtitle: "Group Subtitle: 3", backgroundImage: mediumGray, description: groupDescription }
     ];
 
     // Each of these sample items should have a reference to a particular
@@ -90,16 +87,15 @@
     // web cannot be called on a local context
     // http://msdn.microsoft.com/library/windows/apps/Hh452745
     // http://msdn.microsoft.com/library/windows/apps/Hh465373
-    datasources.children[2].find({}, function (err, data) {
+    var dsNb = 1;
+    datasources.children[dsNb].find({}, function (err, data) {
         // Process data entries in data.entries
-        console.log(data.entries);
+        data.entries.forEach(function (item) {
+            item.group = "main" + dsNb;
+            list.push(item);
+        });
     });
 
-    // TODO: Replace the data with your real data.
-    // You can add data from asynchronous sources whenever it becomes available.
-    sampleItems.forEach(function (item) {
-        list.push(item);
-    });
 
     WinJS.Namespace.define("data", {
         items: groupedItems,
