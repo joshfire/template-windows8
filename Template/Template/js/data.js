@@ -82,6 +82,19 @@
     var list = new WinJS.Binding.List();
     var groupedItems = list.createGrouped(groupKeySelector, groupDataSelector);
 
+    // Use Joshfire Factory data sources for the moment.
+    // See http://developer.joshfire.com/doc/dev/develop/datasources
+    // They are defined in the bootstrap.js file
+    var datasources = Joshfire.factory.getDataSource("main");
+
+    // web cannot be called on a local context
+    // http://msdn.microsoft.com/library/windows/apps/Hh452745
+    // http://msdn.microsoft.com/library/windows/apps/Hh465373
+    datasources.children[2].find({}, function (err, data) {
+        // Process data entries in data.entries
+        console.log(data.entries);
+    });
+
     // TODO: Replace the data with your real data.
     // You can add data from asynchronous sources whenever it becomes available.
     sampleItems.forEach(function (item) {

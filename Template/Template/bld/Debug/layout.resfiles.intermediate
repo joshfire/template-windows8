@@ -10,6 +10,7 @@ images\logo.png
 images\smalllogo.png
 images\splashscreen.png
 images\storelogo.png
+js\bootstrap.js
 js\data.js
 js\default.js
 js\groupDetailPage.js
