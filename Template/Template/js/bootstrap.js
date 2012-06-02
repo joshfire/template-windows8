@@ -1,43 +1,3394 @@
-﻿(function () {
-    /* This bootstrap script is documented at http://developer.joshfire.com/ */
-    var Joshfire = window.Joshfire || {};
-    Joshfire.factory = {
-        globalConfig: { "DATAVERSION": "1", "DATAHOSTPORT": "api.datajs.com", "STATSHOSTPORT": "stats.joshfirefactory.com", "HOSTPORT": "factory.joshfire.com" },
-        config: { "app": { "id": "4fc36bfca35b3d0100001b70", "icon": null, "logo": null, "name": "Metro template", "version": "1.0" }, "template": { "id": "4fb647273428930100003768", "name": "sleek", "version": "1.0.9", "options": { "color": "gray" } } },
-        device: { "type": "desktop" },
-        plugins: {}
-    };
-    Joshfire.factory.config.deploy = { "env": "dev", "type": "preview", "id": "" };
-    Joshfire.factory.config.datasources = { "main": [{ "name": "Feed", "db": "feed", "col": "rss", "query": { "filter": { "url": "blog.steren.fr" } }, "runatclient": false, "missingKeys": [], "outputType": "BlogPosting" }, { "name": "Flickr", "db": "flickr", "col": "photos", "query": { "filter": { "search": "bemyapp" } }, "runatclient": true, "missingKeys": ["api_key"], "outputType": "ImageObject" }, { "name": "Youtube", "db": "youtube", "col": "videos", "query": { "filter": { "search": "bemyapp" } }, "runatclient": true, "missingKeys": [], "outputType": "VideoObject" }] };
-    window.Joshfire = Joshfire;
+﻿(function() {
+  /* This bootstrap script is documented at http://developer.joshfire.com/ */
+  var Joshfire = window.Joshfire || {};
+  Joshfire.factory = {
+    globalConfig: {"DATAVERSION":"1","DATAHOSTPORT":"localhost:40020","STATSHOSTPORT":"localhost:40023","HOSTPORT":"localhost:40021"},
+    config: {"app":{"id":"4fc9d6120767864406000069","icon":null,"logo":null,"name":"Metro","version":"1.0"},"template":{"id":"4f9668187c4553dd8e00023a","name":"sleek","version":"0.1.3","options":{"color":"gray"}}},
+    device: {"type":"phone"},
+    plugins: {}
+  };
+  Joshfire.factory.config.deploy = {"env":"dev","type":"preview","id":""};
+  Joshfire.factory.config.datasources = {"main":[{"name":"Feed","db":"feed","col":"rss","query":{"filter":{"url":"http://blog.steren.fr/feed"}},"runatclient":false,"missingKeys":[],"outputType":"BlogPosting"},{"name":"Youtube","db":"youtube","col":"videos","query":{"filter":{"search":"bemyapp"}},"runatclient":true,"missingKeys":[],"outputType":"VideoObject"},{"name":"Flickr","db":"flickr","col":"photos","query":{"filter":{"search":"bemyapp"}},"runatclient":true,"missingKeys":["api_key"],"outputType":"ImageObject"}]};
+  window.Joshfire = Joshfire;
 
 })();
+(function () { (function(J) {
+
+  J.factory.deviceReady = false;
+  var callbacks = [];
+  J.factory.onDeviceReady = function(f) {
+    if (J.factory.deviceReady) return f();
+    callbacks.push(f);
+  };
+
+  var addLoadListener = function(func) {
+    if (typeof PhoneGap!="undefined") {
+      document.addEventListener("deviceready", func, false);
+    } else if (window.addEventListener) {
+      window.addEventListener("load", func, false);
+    } else if (document.addEventListener) {
+      document.addEventListener("load", func, false);
+    } else if (window.attachEvent) {
+      window.attachEvent("onload", func);
+    } else if (typeof window.onload != "function") {
+      window.onload = func;
+    } else {
+      var oldonload = window.onload;
+      window.onload = function() {
+        oldonload();
+        func();
+      };
+    }
+  };
+
+  addLoadListener(function() {
+    J.factory.deviceReady=true;
+    for (var i=0,l=callbacks.length;i<l;i++) {
+      callbacks.pop()();
+    }
+  }, false);
+
+})(Joshfire);(function(document, window, F) {
+
+	var endpoint = "http://"+F.globalConfig.STATSHOSTPORT;
+
+	var _void = function() { return; };
+
+	var track = function(params) {
+		var p = [];
+		for (var k in params) {
+			if (params.hasOwnProperty(k)) {
+				p.push(k+"="+encodeURIComponent(params[k]));
+			}
+		}
+		var i = new Image(1, 1);
+		i.src = endpoint+"/pixel.gif?"+p.join("&");
+		i.onload = function() { _void(); };	
+	};
+
+	var getDefaultParams = function() {
+		return {
+			"tz":(new Date()).getTimezoneOffset(),
+			"url":window.location.toString(),
+			"ref":document.referrer,
+			"app":F.config.app.id,
+			"appv":F.config.app.version,
+			"tpl":F.config.template.id,
+			"dev":F.device.type,
+			"env":(F.config.deploy||{}).env||"preview",
+			"dp":(F.config.deploy||{}).id,
+			"dpr":(F.config.deploy||{}).type,
+			"id":"" //Disabled because of Apple's new UDID policy (typeof(DeviceInfo) == 'object' && DeviceInfo.uuid)?"d"+DeviceInfo.uuid:""
+		};
+	};
+
+	F.stats = {};
+	F.stats.event = function(ev) {
+		var params=getDefaultParams();
+		params.type=ev;
+		track(params);
+	};
+
+	F.stats.event("open");
+
+	if (document.addEventListener) {
+		document.addEventListener("resume", function() {
+			F.stats.event("resume");
+		}, false);
+	}
+
+
+})(document, window, Joshfire.factory);
+/**
+ * almond 0.0.3 Copyright (c) 2011, The Dojo Foundation All Rights Reserved.
+ * Available via the MIT or new BSD license.
+ * see: http://github.com/jrburke/almond for details
+ */
+/*jslint strict: false, plusplus: false */
+/*global setTimeout: false */
+
+var requirejs, require, define;
+(function (undef) {
+
+    var defined = {},
+        waiting = {},
+        aps = [].slice,
+        main, req;
+
+    if (typeof define === "function") {
+        //If a define is already in play via another AMD loader,
+        //do not overwrite.
+        return;
+    }
+
+    /**
+     * Given a relative module name, like ./something, normalize it to
+     * a real name that can be mapped to a path.
+     * @param {String} name the relative name
+     * @param {String} baseName a real name that the name arg is relative
+     * to.
+     * @returns {String} normalized name
+     */
+    function normalize(name, baseName) {
+        //Adjust any relative paths.
+        if (name && name.charAt(0) === ".") {
+            //If have a base name, try to normalize against it,
+            //otherwise, assume it is a top-level require that will
+            //be relative to baseUrl in the end.
+            if (baseName) {
+                //Convert baseName to array, and lop off the last part,
+                //so that . matches that "directory" and not name of the baseName's
+                //module. For instance, baseName of "one/two/three", maps to
+                //"one/two/three.js", but we want the directory, "one/two" for
+                //this normalization.
+                baseName = baseName.split("/");
+                baseName = baseName.slice(0, baseName.length - 1);
+
+                name = baseName.concat(name.split("/"));
+
+                //start trimDots
+                var i, part;
+                for (i = 0; (part = name[i]); i++) {
+                    if (part === ".") {
+                        name.splice(i, 1);
+                        i -= 1;
+                    } else if (part === "..") {
+                        if (i === 1 && (name[2] === '..' || name[0] === '..')) {
+                            //End of the line. Keep at least one non-dot
+                            //path segment at the front so it can be mapped
+                            //correctly to disk. Otherwise, there is likely
+                            //no path mapping for a path starting with '..'.
+                            //This can still fail, but catches the most reasonable
+                            //uses of ..
+                            break;
+                        } else if (i > 0) {
+                            name.splice(i - 1, 2);
+                            i -= 2;
+                        }
+                    }
+                }
+                //end trimDots
+
+                name = name.join("/");
+            }
+        }
+        return name;
+    }
+
+    function makeRequire(relName, forceSync) {
+        return function () {
+            //A version of a require function that passes a moduleName
+            //value for items that may need to
+            //look up paths relative to the moduleName
+            return req.apply(undef, aps.call(arguments, 0).concat([relName, forceSync]));
+        };
+    }
+
+    function makeNormalize(relName) {
+        return function (name) {
+            return normalize(name, relName);
+        };
+    }
+
+    function makeLoad(depName) {
+        return function (value) {
+            defined[depName] = value;
+        };
+    }
+
+    function callDep(name) {
+        if (waiting.hasOwnProperty(name)) {
+            var args = waiting[name];
+            delete waiting[name];
+            main.apply(undef, args);
+        }
+        return defined[name];
+    }
+
+    /**
+     * Makes a name map, normalizing the name, and using a plugin
+     * for normalization if necessary. Grabs a ref to plugin
+     * too, as an optimization.
+     */
+    function makeMap(name, relName) {
+        var prefix, plugin,
+            index = name.indexOf('!');
+
+        if (index !== -1) {
+            prefix = normalize(name.slice(0, index), relName);
+            name = name.slice(index + 1);
+            plugin = callDep(prefix);
+
+            //Normalize according
+            if (plugin && plugin.normalize) {
+                name = plugin.normalize(name, makeNormalize(relName));
+            } else {
+                name = normalize(name, relName);
+            }
+        } else {
+            name = normalize(name, relName);
+        }
+
+        //Using ridiculous property names for space reasons
+        return {
+            f: prefix ? prefix + '!' + name : name, //fullName
+            n: name,
+            p: plugin
+        };
+    }
+
+    main = function (name, deps, callback, relName) {
+        var args = [],
+            usingExports,
+            cjsModule, depName, i, ret, map;
+
+        //Use name if no relName
+        if (!relName) {
+            relName = name;
+        }
+
+        //Call the callback to define the module, if necessary.
+        if (typeof callback === 'function') {
+
+            //Default to require, exports, module if no deps if
+            //the factory arg has any arguments specified.
+            if (!deps.length && callback.length) {
+                deps = ['require', 'exports', 'module'];
+            }
+
+            //Pull out the defined dependencies and pass the ordered
+            //values to the callback.
+            for (i = 0; i < deps.length; i++) {
+                map = makeMap(deps[i], relName);
+                depName = map.f;
+
+                //Fast path CommonJS standard dependencies.
+                if (depName === "require") {
+                    args[i] = makeRequire(name);
+                } else if (depName === "exports") {
+                    //CommonJS module spec 1.1
+                    args[i] = defined[name] = {};
+                    usingExports = true;
+                } else if (depName === "module") {
+                    //CommonJS module spec 1.1
+                    cjsModule = args[i] = {
+                        id: name,
+                        uri: '',
+                        exports: defined[name]
+                    };
+                } else if (defined.hasOwnProperty(depName) || waiting.hasOwnProperty(depName)) {
+                    args[i] = callDep(depName);
+                } else if (map.p) {
+                    map.p.load(map.n, makeRequire(relName, true), makeLoad(depName), {});
+                    args[i] = defined[depName];
+                } else {
+                    throw name + ' missing ' + depName;
+                }
+            }
+
+            ret = callback.apply(defined[name], args);
+
+            if (name) {
+                //If setting exports via "module" is in play,
+                //favor that over return value and exports. After that,
+                //favor a non-undefined return value over exports use.
+                if (cjsModule && cjsModule.exports !== undef) {
+                    defined[name] = cjsModule.exports;
+                } else if (!usingExports) {
+                    //Use the return value from the function.
+                    defined[name] = ret;
+                }
+            }
+        } else if (name) {
+            //May just be an object definition for the module. Only
+            //worry about defining if have a module name.
+            defined[name] = callback;
+        }
+    };
+
+    requirejs = req = function (deps, callback, relName, forceSync) {
+        if (typeof deps === "string") {
+
+            //Just return the module wanted. In this scenario, the
+            //deps arg is the module name, and second arg (if passed)
+            //is just the relName.
+            //Normalize module name, if it contains . or ..
+            return callDep(makeMap(deps, callback).f);
+        } else if (!deps.splice) {
+            //deps is a config object, not an array.
+            //Drop the config stuff on the ground.
+            if (callback.splice) {
+                //callback is an array, which means it is a dependency list.
+                //Adjust args if there are dependencies
+                deps = callback;
+                callback = arguments[2];
+            } else {
+                deps = [];
+            }
+        }
+
+        //Simulate async callback;
+        if (forceSync) {
+            main(undef, deps, callback, relName);
+        } else {
+            setTimeout(function () {
+                main(undef, deps, callback, relName);
+            }, 15);
+        }
+
+        return req;
+    };
+
+    /**
+     * Just drops the config on the floor, but returns req in case
+     * the config return value is used.
+     */
+    req.config = function () {
+        return req;
+    };
+
+    /**
+     * Export require as a global, but only if it does not already exist.
+     */
+    if (!require) {
+        require = req;
+    }
+
+    define = function (name, deps, callback) {
+
+        //This module may not have dependencies
+        if (!deps.splice) {
+            //deps is not an array, so probably means
+            //an object literal or factory function for
+            //the value. Adjust args.
+            callback = deps;
+            deps = [];
+        }
+
+        if (define.unordered) {
+            waiting[name] = [name, deps, callback];
+        } else {
+            main(name, deps, callback);
+        }
+    };
+
+    define.amd = {
+        jQuery: true
+    };
+}());
+define("runtime/nodejs/almond", function(){});
+
+/* RequireJS plugin */
+define('datajslib',{
+    normalize: function (name, normalize) {
+        if (!(typeof module !== 'undefined' && module.exports)) {
+            //Special case for libs with special AMD implementation
+            if (name=="jquery"/* || name=="underscore"*/) return name;
+        }
+        return normalize("runtime-browser/"+name);
+    },
+    load: function (name, req, load, config) {
+        //req has the same API as require().
+        req([name], function (value) {
+            load(value);
+        });
+    }
+});
+/**
+ * @fileoverview The JSON Form "defaults" library exposes a setDefaultValues
+ * method that extends the object passed as argument so that it includes
+ * values for all required fields of the JSON schema it is to follow that
+ * define a default value.
+ *
+ * The library is called to complete the configuration settings of a template in
+ * the Factory and to complete datasource settings.
+ *
+ * The library is useless if the settings have already been validated against the
+ * schema using the JSON schema validator (typically, provided the validator is
+ * loaded, submitting the form created from the schema will raise an error when
+ * required properties are missing).
+ *
+ * Note the library does not validate the created object, it merely sets missing
+ * values to the default values specified in the schema. All other values may
+ * be invalid.
+ *
+ * Nota Bene:
+ * - in data-joshfire, the runtime/nodejs/lib/jsonform-defaults.js file is a
+ * symbolic link to the jsonform submodule in deps/jsonform
+ * - in platform-joshfire, the server/public/js/libs/jsonform-defaults.js file
+ * is a symbolic link to the jsonform submodule in deps/jsonform
+ */
+
 (function () {
-    (function (a) { a.factory.deviceReady = !1; var b = []; a.factory.onDeviceReady = function (c) { if (a.factory.deviceReady) return c(); b.push(c) }; var c = function (a) { if (typeof PhoneGap != "undefined") document.addEventListener("deviceready", a, !1); else if (window.addEventListener) window.addEventListener("load", a, !1); else if (document.addEventListener) document.addEventListener("load", a, !1); else if (window.attachEvent) window.attachEvent("onload", a); else if (typeof window.onload != "function") window.onload = a; else { var b = window.onload; window.onload = function () { b(), a() } } }; c(function () { a.factory.deviceReady = !0; for (var c = 0, d = b.length; c < d; c++) b.pop()() }, !1) })(Joshfire);
-    (function (a, b, c) { var d = "http://" + c.globalConfig.STATSHOSTPORT, e = function () { return }, f = function (a) { var b = []; for (var c in a) a.hasOwnProperty(c) && b.push(c + "=" + encodeURIComponent(a[c])); var f = new Image(1, 1); f.src = d + "/pixel.gif?" + b.join("&"), f.onload = function () { e() } }, g = function () { return { tz: (new Date).getTimezoneOffset(), url: b.location.toString(), ref: a.referrer, app: c.config.app.id, appv: c.config.app.version, tpl: c.config.template.id, dev: c.device.type, env: (c.config.deploy || {}).env || "preview", dp: (c.config.deploy || {}).id, dpr: (c.config.deploy || {}).type, id: "" } }; c.stats = {}, c.stats.event = function (a) { var b = g(); b.type = a, f(b) }, c.stats.event("open"), a.addEventListener && a.addEventListener("resume", function () { c.stats.event("resume") }, !1) })(document, window, Joshfire.factory);
-    /*!
- * jQuery JavaScript Library v1.7.1
- * http://jquery.com/
+  // Establish the root object:
+  // that's "window" in the browser, "global" in node.js
+  var root = this;
+
+  /**
+   * Sets default values, ensuring that fields defined as "required" in the
+   * schema appear in the object. If missing, the hierarchy that leads to
+   * a required key is automatically created.
+   *
+   * @function
+   * @param {Object} obj The object to complete with default values according
+   *  to the schema
+   * @param {Object} schema The JSON schema that the object follows
+   * @param {boolean} includeOptionalValues Include default values for fields
+   *  that are not "required"
+   * @return {Object} The completed object (same instance as obj)
+   */
+  var setDefaultValues = function (obj, schema, includeOptionalValues) {
+    if (!obj || !schema) return obj;
+
+    // Inner function that parses the schema recursively to build a flat
+    // list of defaults
+    var defaults = {};
+    var extractDefaultValues = function (schemaItem, path) {
+      var properties = null;
+      var child = null;
+
+      if (!schemaItem || (schemaItem !== Object(schemaItem))) return null;
+
+      if (schemaItem.required) {
+        // Item is required
+        if (schemaItem['default']) {
+          // Item defines a default value, let's use it,
+          // no need to continue in that case, we have the default value
+          // for the whole subtree starting at schemaItem.
+          defaults[path] = schemaItem['default'];
+          return;
+        }
+        else if ((schemaItem.type === 'object') || schemaItem.properties) {
+          // Item is a required object
+          defaults[path] = {};
+        }
+        else if ((schemaItem.type === 'array') || schemaItem.items) {
+          // Item is a required array
+          defaults[path] = [];
+        }
+        else if (schemaItem.type === 'string') {
+          defaults[path] = '';
+        }
+        else if ((schemaItem.type === 'number') || (schemaItem.type === 'integer')) {
+          defaults[path] = 0;
+        }
+        else if (schemaItem.type === 'boolean') {
+          defaults[path] = false;
+        }
+        else {
+          // Unknown type, use an empty object by default
+          defaults[path] = {};
+        }
+      }
+      else if (schemaItem['default'] && includeOptionalValues) {
+        // Item is not required but defines a default value and the
+        // include optional values flag is set, so let's use it.
+        // No need to continue in that case, we have the default value
+        // for the whole subtree starting at schemaItem.
+        defaults[path] = schemaItem['default'];
+        return;
+      }
+
+      // Parse schema item's properties recursively
+      properties = schemaItem.properties;
+      if (properties) {
+        for (var key in properties) {
+          if (properties.hasOwnProperty(key)) {
+            extractDefaultValues(properties[key], path + '.' + key);
+          }
+        }
+      }
+
+      // Parse schema item's children recursively
+      if (schemaItem.items) {
+        // Items may be a single item or an array composed of only one item
+        child = schemaItem.items;
+        if (_isArray(child)) {
+          child = child[0];
+        }
+
+        extractDefaultValues(child, path + '[]');
+      }
+    };
+
+    // Build a flat list of default values
+    extractDefaultValues(schema, '');
+
+    // Ensure the object's default values are correctly set
+    for (var key in defaults) {
+      if (defaults.hasOwnProperty(key)) {
+        setObjKey(obj, key, defaults[key]);
+      }
+    }
+  };
+
+
+  /**
+   * Sets the key identified by a path selector to the given value.
+   *
+   * Levels in the path are separated by a dot. Array items are marked
+   * with []. For instance:
+   *  foo.bar[].baz
+   *
+   * The hierarchy is automatically created if it does not exist yet.
+   *
+   * Default values are added to all array items. Array items are not
+   * automatically created if they do not exist (in particular, the
+   * minItems constraint is not enforced)
+   *
+   * @function
+   * @param {Object} obj The object to build
+   * @param {String} key The path to the key to set where each level
+   *  is separated by a dot, and array items are flagged with [x].
+   * @param {Object} value The value to set, may be of any type.
+   */
+  var setObjKey = function (obj, key, value) {
+    var keyparts = key.split('.');
+
+    // Recursive version of setObjKey
+    var recSetObjKey = function (obj, keyparts, value) {
+      var arrayMatch = null;
+      var reArray = /\[([0-9]*)\]$/;
+      var subkey = keyparts.shift();
+      var idx = 0;
+
+      if (keyparts.length > 0) {
+        // Not the end yet, build the hierarchy
+        arrayMatch = subkey.match(reArray);
+        if (arrayMatch) {
+          // Subkey is part of an array, check all existing array items
+          // (no array item created if they do not exist)
+          subkey = subkey.replace(reArray, '');
+          obj = obj[subkey];
+          if (!obj || !_isArray(obj)) {
+            return;
+          }
+          for (var k = 0; k < obj.length; k++) {
+            recSetObjKey(obj[k], keyparts, value);
+          }
+          return;
+        }
+        else {
+          // "Normal" subkey
+          if (typeof obj[subkey] !== 'object') {
+            obj[subkey] = {};
+          }
+          obj = obj[subkey];
+          recSetObjKey(obj, keyparts, value);
+        }
+      }
+      else {
+        // Last key, time to set the value, unless already defined
+        arrayMatch = subkey.match(reArray);
+        if (arrayMatch) {
+          subkey = subkey.replace(reArray, '');
+          if (!_isArray(obj[subkey])) {
+            obj[subkey] = [];
+          }
+          idx = parseInt(arrayMatch[1], 10);
+          if (!obj[subkey][idx]) {
+            obj[subkey][idx] = value;
+          }
+        }
+        else if (!obj[subkey]) {
+          obj[subkey] = value;
+        }
+      }
+    };
+
+    // Skip first item if empty (key starts with a '.')
+    if (!keyparts[0]) {
+      keyparts.shift();
+    }
+    recSetObjKey(obj, keyparts, value);
+  };
+
+  // Taken from Underscore.js (not included to save bytes)
+  var _isArray = Array.isArray || function (obj) {
+    return Object.prototype.toString.call(obj) == '[object Array]';
+  };
+
+
+  // Export the code as:
+  //  1. an AMD module (the "define" method exists in that case), or
+  //  2. a node.js module ("module.exports" is defined in that case), or
+  //  3. a global JSONForm object (using "root")
+  if (typeof define !== 'undefined') {
+    // AMD module
+    define('runtime-browser/jsonform-defaults',[], function () {
+      return {
+        setDefaultValues: setDefaultValues
+      };
+    });
+  }
+  else if ((typeof module !== 'undefined') && module.exports) {
+    // Node.js module
+    module.exports = {
+      setDefaultValues: setDefaultValues
+    };
+  }
+  else {
+    // Export the function to the global context, using a "string" for
+    // Google Closure Compiler "advanced" mode
+    // (not sure why it's needed, done by Underscore)
+    root['JSONForm'] = root['JSONForm'] || {};
+    root['JSONForm'].setDefaultValues = setDefaultValues;
+  }
+})();
+//     Underscore.js 1.2.3
+//     (c) 2009-2011 Jeremy Ashkenas, DocumentCloud Inc.
+//     Underscore is freely distributable under the MIT license.
+//     Portions of Underscore are inspired or borrowed from Prototype,
+//     Oliver Steele's Functional, and John Resig's Micro-Templating.
+//     For all details and documentation:
+//     http://documentcloud.github.com/underscore
+
+(function() {
+
+  // Baseline setup
+  // --------------
+
+  // Establish the root object, `window` in the browser, or `global` on the server.
+  var root = this;
+
+  // Save the previous value of the `_` variable.
+  var previousUnderscore = root._;
+
+  // Establish the object that gets returned to break out of a loop iteration.
+  var breaker = {};
+
+  // Save bytes in the minified (but not gzipped) version:
+  var ArrayProto = Array.prototype, ObjProto = Object.prototype, FuncProto = Function.prototype;
+
+  // Create quick reference variables for speed access to core prototypes.
+  var slice            = ArrayProto.slice,
+      concat           = ArrayProto.concat,
+      unshift          = ArrayProto.unshift,
+      toString         = ObjProto.toString,
+      hasOwnProperty   = ObjProto.hasOwnProperty;
+
+  // All **ECMAScript 5** native function implementations that we hope to use
+  // are declared here.
+  var
+    nativeForEach      = ArrayProto.forEach,
+    nativeMap          = ArrayProto.map,
+    nativeReduce       = ArrayProto.reduce,
+    nativeReduceRight  = ArrayProto.reduceRight,
+    nativeFilter       = ArrayProto.filter,
+    nativeEvery        = ArrayProto.every,
+    nativeSome         = ArrayProto.some,
+    nativeIndexOf      = ArrayProto.indexOf,
+    nativeLastIndexOf  = ArrayProto.lastIndexOf,
+    nativeIsArray      = Array.isArray,
+    nativeKeys         = Object.keys,
+    nativeBind         = FuncProto.bind;
+
+  // Create a safe reference to the Underscore object for use below.
+  var _ = function(obj) { return new wrapper(obj); };
+
+  // Export the Underscore object for **Node.js** and **"CommonJS"**, with
+  // backwards-compatibility for the old `require()` API. If we're not in
+  // CommonJS, add `_` to the global object.
+  if (typeof exports !== 'undefined') {
+    if (typeof module !== 'undefined' && module.exports) {
+      exports = module.exports = _;
+    }
+    exports._ = _;
+  } else if (typeof define === 'function' && define.amd) {
+    // Register as a named module with AMD.
+    define('runtime-browser/underscore',[], function() {
+      return _;
+    });
+  } else {
+    // Exported as a string, for Closure Compiler "advanced" mode.
+    root['_'] = _;
+  }
+
+  // Current version.
+  _.VERSION = '1.2.3';
+
+  // Collection Functions
+  // --------------------
+
+  // The cornerstone, an `each` implementation, aka `forEach`.
+  // Handles objects with the built-in `forEach`, arrays, and raw objects.
+  // Delegates to **ECMAScript 5**'s native `forEach` if available.
+  var each = _.each = _.forEach = function(obj, iterator, context) {
+    if (obj == null) return;
+    if (nativeForEach && obj.forEach === nativeForEach) {
+      obj.forEach(iterator, context);
+    } else if (obj.length === +obj.length) {
+      for (var i = 0, l = obj.length; i < l; i++) {
+        if (i in obj && iterator.call(context, obj[i], i, obj) === breaker) return;
+      }
+    } else {
+      for (var key in obj) {
+        if (hasOwnProperty.call(obj, key)) {
+          if (iterator.call(context, obj[key], key, obj) === breaker) return;
+        }
+      }
+    }
+  };
+
+  // Return the results of applying the iterator to each element.
+  // Delegates to **ECMAScript 5**'s native `map` if available.
+  _.map = function(obj, iterator, context) {
+    var results = [];
+    if (obj == null) return results;
+    if (nativeMap && obj.map === nativeMap) return obj.map(iterator, context);
+    each(obj, function(value, index, list) {
+      results[results.length] = iterator.call(context, value, index, list);
+    });
+    return results;
+  };
+
+  // **Reduce** builds up a single result from a list of values, aka `inject`,
+  // or `foldl`. Delegates to **ECMAScript 5**'s native `reduce` if available.
+  _.reduce = _.foldl = _.inject = function(obj, iterator, memo, context) {
+    var initial = arguments.length > 2;
+    if (obj == null) obj = [];
+    if (nativeReduce && obj.reduce === nativeReduce) {
+      if (context) iterator = _.bind(iterator, context);
+      return initial ? obj.reduce(iterator, memo) : obj.reduce(iterator);
+    }
+    each(obj, function(value, index, list) {
+      if (!initial) {
+        memo = value;
+        initial = true;
+      } else {
+        memo = iterator.call(context, memo, value, index, list);
+      }
+    });
+    if (!initial) throw new TypeError('Reduce of empty array with no initial value');
+    return memo;
+  };
+
+  // The right-associative version of reduce, also known as `foldr`.
+  // Delegates to **ECMAScript 5**'s native `reduceRight` if available.
+  _.reduceRight = _.foldr = function(obj, iterator, memo, context) {
+    var initial = arguments.length > 2;
+    if (obj == null) obj = [];
+    if (nativeReduceRight && obj.reduceRight === nativeReduceRight) {
+      if (context) iterator = _.bind(iterator, context);
+      return initial ? obj.reduceRight(iterator, memo) : obj.reduceRight(iterator);
+    }
+    var reversed = _.toArray(obj).reverse();
+    if (context && !initial) iterator = _.bind(iterator, context);
+    return initial ? _.reduce(reversed, iterator, memo, context) : _.reduce(reversed, iterator);
+  };
+
+  // Return the first value which passes a truth test. Aliased as `detect`.
+  _.find = _.detect = function(obj, iterator, context) {
+    var result;
+    any(obj, function(value, index, list) {
+      if (iterator.call(context, value, index, list)) {
+        result = value;
+        return true;
+      }
+    });
+    return result;
+  };
+
+  // Return all the elements that pass a truth test.
+  // Delegates to **ECMAScript 5**'s native `filter` if available.
+  // Aliased as `select`.
+  _.filter = _.select = function(obj, iterator, context) {
+    var results = [];
+    if (obj == null) return results;
+    if (nativeFilter && obj.filter === nativeFilter) return obj.filter(iterator, context);
+    each(obj, function(value, index, list) {
+      if (iterator.call(context, value, index, list)) results[results.length] = value;
+    });
+    return results;
+  };
+
+  // Return all the elements for which a truth test fails.
+  _.reject = function(obj, iterator, context) {
+    var results = [];
+    if (obj == null) return results;
+    each(obj, function(value, index, list) {
+      if (!iterator.call(context, value, index, list)) results[results.length] = value;
+    });
+    return results;
+  };
+
+  // Determine whether all of the elements match a truth test.
+  // Delegates to **ECMAScript 5**'s native `every` if available.
+  // Aliased as `all`.
+  _.every = _.all = function(obj, iterator, context) {
+    var result = true;
+    if (obj == null) return result;
+    if (nativeEvery && obj.every === nativeEvery) return obj.every(iterator, context);
+    each(obj, function(value, index, list) {
+      if (!(result = result && iterator.call(context, value, index, list))) return breaker;
+    });
+    return result;
+  };
+
+  // Determine if at least one element in the object matches a truth test.
+  // Delegates to **ECMAScript 5**'s native `some` if available.
+  // Aliased as `any`.
+  var any = _.some = _.any = function(obj, iterator, context) {
+    iterator || (iterator = _.identity);
+    var result = false;
+    if (obj == null) return result;
+    if (nativeSome && obj.some === nativeSome) return obj.some(iterator, context);
+    each(obj, function(value, index, list) {
+      if (result || (result = iterator.call(context, value, index, list))) return breaker;
+    });
+    return !!result;
+  };
+
+  // Determine if a given value is included in the array or object using `===`.
+  // Aliased as `contains`.
+  _.include = _.contains = function(obj, target) {
+    var found = false;
+    if (obj == null) return found;
+    if (nativeIndexOf && obj.indexOf === nativeIndexOf) return obj.indexOf(target) != -1;
+    found = any(obj, function(value) {
+      return value === target;
+    });
+    return found;
+  };
+
+  // Invoke a method (with arguments) on every item in a collection.
+  _.invoke = function(obj, method) {
+    var args = slice.call(arguments, 2);
+    return _.map(obj, function(value) {
+      return (method.call ? method || value : value[method]).apply(value, args);
+    });
+  };
+
+  // Convenience version of a common use case of `map`: fetching a property.
+  _.pluck = function(obj, key) {
+    return _.map(obj, function(value){ return value[key]; });
+  };
+
+  // Return the maximum element or (element-based computation).
+  _.max = function(obj, iterator, context) {
+    if (!iterator && _.isArray(obj)) return Math.max.apply(Math, obj);
+    if (!iterator && _.isEmpty(obj)) return -Infinity;
+    var result = {computed : -Infinity};
+    each(obj, function(value, index, list) {
+      var computed = iterator ? iterator.call(context, value, index, list) : value;
+      computed >= result.computed && (result = {value : value, computed : computed});
+    });
+    return result.value;
+  };
+
+  // Return the minimum element (or element-based computation).
+  _.min = function(obj, iterator, context) {
+    if (!iterator && _.isArray(obj)) return Math.min.apply(Math, obj);
+    if (!iterator && _.isEmpty(obj)) return Infinity;
+    var result = {computed : Infinity};
+    each(obj, function(value, index, list) {
+      var computed = iterator ? iterator.call(context, value, index, list) : value;
+      computed < result.computed && (result = {value : value, computed : computed});
+    });
+    return result.value;
+  };
+
+  // Shuffle an array.
+  _.shuffle = function(obj) {
+    var shuffled = [], rand;
+    each(obj, function(value, index, list) {
+      if (index == 0) {
+        shuffled[0] = value;
+      } else {
+        rand = Math.floor(Math.random() * (index + 1));
+        shuffled[index] = shuffled[rand];
+        shuffled[rand] = value;
+      }
+    });
+    return shuffled;
+  };
+
+  // Sort the object's values by a criterion produced by an iterator.
+  _.sortBy = function(obj, iterator, context) {
+    return _.pluck(_.map(obj, function(value, index, list) {
+      return {
+        value : value,
+        criteria : iterator.call(context, value, index, list)
+      };
+    }).sort(function(left, right) {
+      var a = left.criteria, b = right.criteria;
+      return a < b ? -1 : a > b ? 1 : 0;
+    }), 'value');
+  };
+
+  // Groups the object's values by a criterion. Pass either a string attribute
+  // to group by, or a function that returns the criterion.
+  _.groupBy = function(obj, val) {
+    var result = {};
+    var iterator = _.isFunction(val) ? val : function(obj) { return obj[val]; };
+    each(obj, function(value, index) {
+      var key = iterator(value, index);
+      (result[key] || (result[key] = [])).push(value);
+    });
+    return result;
+  };
+
+  // Use a comparator function to figure out at what index an object should
+  // be inserted so as to maintain order. Uses binary search.
+  _.sortedIndex = function(array, obj, iterator) {
+    iterator || (iterator = _.identity);
+    var low = 0, high = array.length;
+    while (low < high) {
+      var mid = (low + high) >> 1;
+      iterator(array[mid]) < iterator(obj) ? low = mid + 1 : high = mid;
+    }
+    return low;
+  };
+
+  // Safely convert anything iterable into a real, live array.
+  _.toArray = function(iterable) {
+    if (!iterable)                return [];
+    if (iterable.toArray)         return iterable.toArray();
+    if (_.isArray(iterable))      return slice.call(iterable);
+    if (_.isArguments(iterable))  return slice.call(iterable);
+    return _.values(iterable);
+  };
+
+  // Return the number of elements in an object.
+  _.size = function(obj) {
+    return _.toArray(obj).length;
+  };
+
+  // Array Functions
+  // ---------------
+
+  // Get the first element of an array. Passing **n** will return the first N
+  // values in the array. Aliased as `head`. The **guard** check allows it to work
+  // with `_.map`.
+  _.first = _.head = function(array, n, guard) {
+    return (n != null) && !guard ? slice.call(array, 0, n) : array[0];
+  };
+
+  // Returns everything but the last entry of the array. Especcialy useful on
+  // the arguments object. Passing **n** will return all the values in
+  // the array, excluding the last N. The **guard** check allows it to work with
+  // `_.map`.
+  _.initial = function(array, n, guard) {
+    return slice.call(array, 0, array.length - ((n == null) || guard ? 1 : n));
+  };
+
+  // Get the last element of an array. Passing **n** will return the last N
+  // values in the array. The **guard** check allows it to work with `_.map`.
+  _.last = function(array, n, guard) {
+    if ((n != null) && !guard) {
+      return slice.call(array, Math.max(array.length - n, 0));
+    } else {
+      return array[array.length - 1];
+    }
+  };
+
+  // Returns everything but the first entry of the array. Aliased as `tail`.
+  // Especially useful on the arguments object. Passing an **index** will return
+  // the rest of the values in the array from that index onward. The **guard**
+  // check allows it to work with `_.map`.
+  _.rest = _.tail = function(array, index, guard) {
+    return slice.call(array, (index == null) || guard ? 1 : index);
+  };
+
+  // Trim out all falsy values from an array.
+  _.compact = function(array) {
+    return _.filter(array, function(value){ return !!value; });
+  };
+
+  // Return a completely flattened version of an array.
+  _.flatten = function(array, shallow) {
+    return _.reduce(array, function(memo, value) {
+      if (_.isArray(value)) return memo.concat(shallow ? value : _.flatten(value));
+      memo[memo.length] = value;
+      return memo;
+    }, []);
+  };
+
+  // Return a version of the array that does not contain the specified value(s).
+  _.without = function(array) {
+    return _.difference(array, slice.call(arguments, 1));
+  };
+
+  // Produce a duplicate-free version of the array. If the array has already
+  // been sorted, you have the option of using a faster algorithm.
+  // Aliased as `unique`.
+  _.uniq = _.unique = function(array, isSorted, iterator) {
+    var initial = iterator ? _.map(array, iterator) : array;
+    var result = [];
+    _.reduce(initial, function(memo, el, i) {
+      if (0 == i || (isSorted === true ? _.last(memo) != el : !_.include(memo, el))) {
+        memo[memo.length] = el;
+        result[result.length] = array[i];
+      }
+      return memo;
+    }, []);
+    return result;
+  };
+
+  // Produce an array that contains the union: each distinct element from all of
+  // the passed-in arrays.
+  _.union = function() {
+    return _.uniq(_.flatten(arguments, true));
+  };
+
+  // Produce an array that contains every item shared between all the
+  // passed-in arrays. (Aliased as "intersect" for back-compat.)
+  _.intersection = _.intersect = function(array) {
+    var rest = slice.call(arguments, 1);
+    return _.filter(_.uniq(array), function(item) {
+      return _.every(rest, function(other) {
+        return _.indexOf(other, item) >= 0;
+      });
+    });
+  };
+
+  // Take the difference between one array and a number of other arrays.
+  // Only the elements present in just the first array will remain.
+  _.difference = function(array) {
+    var rest = _.flatten(slice.call(arguments, 1));
+    return _.filter(array, function(value){ return !_.include(rest, value); });
+  };
+
+  // Zip together multiple lists into a single array -- elements that share
+  // an index go together.
+  _.zip = function() {
+    var args = slice.call(arguments);
+    var length = _.max(_.pluck(args, 'length'));
+    var results = new Array(length);
+    for (var i = 0; i < length; i++) results[i] = _.pluck(args, "" + i);
+    return results;
+  };
+
+  // If the browser doesn't supply us with indexOf (I'm looking at you, **MSIE**),
+  // we need this function. Return the position of the first occurrence of an
+  // item in an array, or -1 if the item is not included in the array.
+  // Delegates to **ECMAScript 5**'s native `indexOf` if available.
+  // If the array is large and already in sort order, pass `true`
+  // for **isSorted** to use binary search.
+  _.indexOf = function(array, item, isSorted) {
+    if (array == null) return -1;
+    var i, l;
+    if (isSorted) {
+      i = _.sortedIndex(array, item);
+      return array[i] === item ? i : -1;
+    }
+    if (nativeIndexOf && array.indexOf === nativeIndexOf) return array.indexOf(item);
+    for (i = 0, l = array.length; i < l; i++) if (i in array && array[i] === item) return i;
+    return -1;
+  };
+
+  // Delegates to **ECMAScript 5**'s native `lastIndexOf` if available.
+  _.lastIndexOf = function(array, item) {
+    if (array == null) return -1;
+    if (nativeLastIndexOf && array.lastIndexOf === nativeLastIndexOf) return array.lastIndexOf(item);
+    var i = array.length;
+    while (i--) if (i in array && array[i] === item) return i;
+    return -1;
+  };
+
+  // Generate an integer Array containing an arithmetic progression. A port of
+  // the native Python `range()` function. See
+  // [the Python documentation](http://docs.python.org/library/functions.html#range).
+  _.range = function(start, stop, step) {
+    if (arguments.length <= 1) {
+      stop = start || 0;
+      start = 0;
+    }
+    step = arguments[2] || 1;
+
+    var len = Math.max(Math.ceil((stop - start) / step), 0);
+    var idx = 0;
+    var range = new Array(len);
+
+    while(idx < len) {
+      range[idx++] = start;
+      start += step;
+    }
+
+    return range;
+  };
+
+  // Function (ahem) Functions
+  // ------------------
+
+  // Reusable constructor function for prototype setting.
+  var ctor = function(){};
+
+  // Create a function bound to a given object (assigning `this`, and arguments,
+  // optionally). Binding with arguments is also known as `curry`.
+  // Delegates to **ECMAScript 5**'s native `Function.bind` if available.
+  // We check for `func.bind` first, to fail fast when `func` is undefined.
+  _.bind = function bind(func, context) {
+    var bound, args;
+    if (func.bind === nativeBind && nativeBind) return nativeBind.apply(func, slice.call(arguments, 1));
+    if (!_.isFunction(func)) throw new TypeError;
+    args = slice.call(arguments, 2);
+    return bound = function() {
+      if (!(this instanceof bound)) return func.apply(context, args.concat(slice.call(arguments)));
+      ctor.prototype = func.prototype;
+      var self = new ctor;
+      var result = func.apply(self, args.concat(slice.call(arguments)));
+      if (Object(result) === result) return result;
+      return self;
+    };
+  };
+
+  // Bind all of an object's methods to that object. Useful for ensuring that
+  // all callbacks defined on an object belong to it.
+  _.bindAll = function(obj) {
+    var funcs = slice.call(arguments, 1);
+    if (funcs.length == 0) funcs = _.functions(obj);
+    each(funcs, function(f) { obj[f] = _.bind(obj[f], obj); });
+    return obj;
+  };
+
+  // Memoize an expensive function by storing its results.
+  _.memoize = function(func, hasher) {
+    var memo = {};
+    hasher || (hasher = _.identity);
+    return function() {
+      var key = hasher.apply(this, arguments);
+      return hasOwnProperty.call(memo, key) ? memo[key] : (memo[key] = func.apply(this, arguments));
+    };
+  };
+
+  // Delays a function for the given number of milliseconds, and then calls
+  // it with the arguments supplied.
+  _.delay = function(func, wait) {
+    var args = slice.call(arguments, 2);
+    return setTimeout(function(){ return func.apply(func, args); }, wait);
+  };
+
+  // Defers a function, scheduling it to run after the current call stack has
+  // cleared.
+  _.defer = function(func) {
+    return _.delay.apply(_, [func, 1].concat(slice.call(arguments, 1)));
+  };
+
+  // Returns a function, that, when invoked, will only be triggered at most once
+  // during a given window of time.
+  _.throttle = function(func, wait) {
+    var context, args, timeout, throttling, more;
+    var whenDone = _.debounce(function(){ more = throttling = false; }, wait);
+    return function() {
+      context = this; args = arguments;
+      var later = function() {
+        timeout = null;
+        if (more) func.apply(context, args);
+        whenDone();
+      };
+      if (!timeout) timeout = setTimeout(later, wait);
+      if (throttling) {
+        more = true;
+      } else {
+        func.apply(context, args);
+      }
+      whenDone();
+      throttling = true;
+    };
+  };
+
+  // Returns a function, that, as long as it continues to be invoked, will not
+  // be triggered. The function will be called after it stops being called for
+  // N milliseconds.
+  _.debounce = function(func, wait) {
+    var timeout;
+    return function() {
+      var context = this, args = arguments;
+      var later = function() {
+        timeout = null;
+        func.apply(context, args);
+      };
+      clearTimeout(timeout);
+      timeout = setTimeout(later, wait);
+    };
+  };
+
+  // Returns a function that will be executed at most one time, no matter how
+  // often you call it. Useful for lazy initialization.
+  _.once = function(func) {
+    var ran = false, memo;
+    return function() {
+      if (ran) return memo;
+      ran = true;
+      return memo = func.apply(this, arguments);
+    };
+  };
+
+  // Returns the first function passed as an argument to the second,
+  // allowing you to adjust arguments, run code before and after, and
+  // conditionally execute the original function.
+  _.wrap = function(func, wrapper) {
+    return function() {
+      var args = concat.apply([func], arguments);
+      return wrapper.apply(this, args);
+    };
+  };
+
+  // Returns a function that is the composition of a list of functions, each
+  // consuming the return value of the function that follows.
+  _.compose = function() {
+    var funcs = arguments;
+    return function() {
+      var args = arguments;
+      for (var i = funcs.length - 1; i >= 0; i--) {
+        args = [funcs[i].apply(this, args)];
+      }
+      return args[0];
+    };
+  };
+
+  // Returns a function that will only be executed after being called N times.
+  _.after = function(times, func) {
+    if (times <= 0) return func();
+    return function() {
+      if (--times < 1) { return func.apply(this, arguments); }
+    };
+  };
+
+  // Object Functions
+  // ----------------
+
+  // Retrieve the names of an object's properties.
+  // Delegates to **ECMAScript 5**'s native `Object.keys`
+  _.keys = nativeKeys || function(obj) {
+    if (obj !== Object(obj)) throw new TypeError('Invalid object');
+    var keys = [];
+    for (var key in obj) if (hasOwnProperty.call(obj, key)) keys[keys.length] = key;
+    return keys;
+  };
+
+  // Retrieve the values of an object's properties.
+  _.values = function(obj) {
+    return _.map(obj, _.identity);
+  };
+
+  // Return a sorted list of the function names available on the object.
+  // Aliased as `methods`
+  _.functions = _.methods = function(obj) {
+    var names = [];
+    for (var key in obj) {
+      if (_.isFunction(obj[key])) names.push(key);
+    }
+    return names.sort();
+  };
+
+  // Extend a given object with all the properties in passed-in object(s).
+  _.extend = function(obj) {
+    each(slice.call(arguments, 1), function(source) {
+      for (var prop in source) {
+        if (source[prop] !== void 0) obj[prop] = source[prop];
+      }
+    });
+    return obj;
+  };
+
+  // Fill in a given object with default properties.
+  _.defaults = function(obj) {
+    each(slice.call(arguments, 1), function(source) {
+      for (var prop in source) {
+        if (obj[prop] == null) obj[prop] = source[prop];
+      }
+    });
+    return obj;
+  };
+
+  // Create a (shallow-cloned) duplicate of an object.
+  _.clone = function(obj) {
+    if (!_.isObject(obj)) return obj;
+    return _.isArray(obj) ? obj.slice() : _.extend({}, obj);
+  };
+
+  // Invokes interceptor with the obj, and then returns obj.
+  // The primary purpose of this method is to "tap into" a method chain, in
+  // order to perform operations on intermediate results within the chain.
+  _.tap = function(obj, interceptor) {
+    interceptor(obj);
+    return obj;
+  };
+
+  // Internal recursive comparison function.
+  function eq(a, b, stack) {
+    // Identical objects are equal. `0 === -0`, but they aren't identical.
+    // See the Harmony `egal` proposal: http://wiki.ecmascript.org/doku.php?id=harmony:egal.
+    if (a === b) return a !== 0 || 1 / a == 1 / b;
+    // A strict comparison is necessary because `null == undefined`.
+    if (a == null || b == null) return a === b;
+    // Unwrap any wrapped objects.
+    if (a._chain) a = a._wrapped;
+    if (b._chain) b = b._wrapped;
+    // Invoke a custom `isEqual` method if one is provided.
+    if (a.isEqual && _.isFunction(a.isEqual)) return a.isEqual(b);
+    if (b.isEqual && _.isFunction(b.isEqual)) return b.isEqual(a);
+    // Compare `[[Class]]` names.
+    var className = toString.call(a);
+    if (className != toString.call(b)) return false;
+    switch (className) {
+      // Strings, numbers, dates, and booleans are compared by value.
+      case '[object String]':
+        // Primitives and their corresponding object wrappers are equivalent; thus, `"5"` is
+        // equivalent to `new String("5")`.
+        return a == String(b);
+      case '[object Number]':
+        // `NaN`s are equivalent, but non-reflexive. An `egal` comparison is performed for
+        // other numeric values.
+        return a != +a ? b != +b : (a == 0 ? 1 / a == 1 / b : a == +b);
+      case '[object Date]':
+      case '[object Boolean]':
+        // Coerce dates and booleans to numeric primitive values. Dates are compared by their
+        // millisecond representations. Note that invalid dates with millisecond representations
+        // of `NaN` are not equivalent.
+        return +a == +b;
+      // RegExps are compared by their source patterns and flags.
+      case '[object RegExp]':
+        return a.source == b.source &&
+               a.global == b.global &&
+               a.multiline == b.multiline &&
+               a.ignoreCase == b.ignoreCase;
+    }
+    if (typeof a != 'object' || typeof b != 'object') return false;
+    // Assume equality for cyclic structures. The algorithm for detecting cyclic
+    // structures is adapted from ES 5.1 section 15.12.3, abstract operation `JO`.
+    var length = stack.length;
+    while (length--) {
+      // Linear search. Performance is inversely proportional to the number of
+      // unique nested structures.
+      if (stack[length] == a) return true;
+    }
+    // Add the first object to the stack of traversed objects.
+    stack.push(a);
+    var size = 0, result = true;
+    // Recursively compare objects and arrays.
+    if (className == '[object Array]') {
+      // Compare array lengths to determine if a deep comparison is necessary.
+      size = a.length;
+      result = size == b.length;
+      if (result) {
+        // Deep compare the contents, ignoring non-numeric properties.
+        while (size--) {
+          // Ensure commutative equality for sparse arrays.
+          if (!(result = size in a == size in b && eq(a[size], b[size], stack))) break;
+        }
+      }
+    } else {
+      // Objects with different constructors are not equivalent.
+      if ('constructor' in a != 'constructor' in b || a.constructor != b.constructor) return false;
+      // Deep compare objects.
+      for (var key in a) {
+        if (hasOwnProperty.call(a, key)) {
+          // Count the expected number of properties.
+          size++;
+          // Deep compare each member.
+          if (!(result = hasOwnProperty.call(b, key) && eq(a[key], b[key], stack))) break;
+        }
+      }
+      // Ensure that both objects contain the same number of properties.
+      if (result) {
+        for (key in b) {
+          if (hasOwnProperty.call(b, key) && !(size--)) break;
+        }
+        result = !size;
+      }
+    }
+    // Remove the first object from the stack of traversed objects.
+    stack.pop();
+    return result;
+  }
+
+  // Perform a deep comparison to check if two objects are equal.
+  _.isEqual = function(a, b) {
+    return eq(a, b, []);
+  };
+
+  // Is a given array, string, or object empty?
+  // An "empty" object has no enumerable own-properties.
+  _.isEmpty = function(obj) {
+    if (_.isArray(obj) || _.isString(obj)) return obj.length === 0;
+    for (var key in obj) if (hasOwnProperty.call(obj, key)) return false;
+    return true;
+  };
+
+  // Is a given value a DOM element?
+  _.isElement = function(obj) {
+    return !!(obj && obj.nodeType == 1);
+  };
+
+  // Is a given value an array?
+  // Delegates to ECMA5's native Array.isArray
+  _.isArray = nativeIsArray || function(obj) {
+    return toString.call(obj) == '[object Array]';
+  };
+
+  // Is a given variable an object?
+  _.isObject = function(obj) {
+    return obj === Object(obj);
+  };
+
+  // Is a given variable an arguments object?
+  _.isArguments = function(obj) {
+    return toString.call(obj) == '[object Arguments]';
+  };
+  if (!_.isArguments(arguments)) {
+    _.isArguments = function(obj) {
+      return !!(obj && hasOwnProperty.call(obj, 'callee'));
+    };
+  }
+
+  // Is a given value a function?
+  _.isFunction = function(obj) {
+    return toString.call(obj) == '[object Function]';
+  };
+
+  // Is a given value a string?
+  _.isString = function(obj) {
+    return toString.call(obj) == '[object String]';
+  };
+
+  // Is a given value a number?
+  _.isNumber = function(obj) {
+    return toString.call(obj) == '[object Number]';
+  };
+
+  // Is the given value `NaN`?
+  _.isNaN = function(obj) {
+    // `NaN` is the only value for which `===` is not reflexive.
+    return obj !== obj;
+  };
+
+  // Is a given value a boolean?
+  _.isBoolean = function(obj) {
+    return obj === true || obj === false || toString.call(obj) == '[object Boolean]';
+  };
+
+  // Is a given value a date?
+  _.isDate = function(obj) {
+    return toString.call(obj) == '[object Date]';
+  };
+
+  // Is the given value a regular expression?
+  _.isRegExp = function(obj) {
+    return toString.call(obj) == '[object RegExp]';
+  };
+
+  // Is a given value equal to null?
+  _.isNull = function(obj) {
+    return obj === null;
+  };
+
+  // Is a given variable undefined?
+  _.isUndefined = function(obj) {
+    return obj === void 0;
+  };
+
+  // Utility Functions
+  // -----------------
+
+  // Run Underscore.js in *noConflict* mode, returning the `_` variable to its
+  // previous owner. Returns a reference to the Underscore object.
+  _.noConflict = function() {
+    root._ = previousUnderscore;
+    return this;
+  };
+
+  // Keep the identity function around for default iterators.
+  _.identity = function(value) {
+    return value;
+  };
+
+  // Run a function **n** times.
+  _.times = function (n, iterator, context) {
+    for (var i = 0; i < n; i++) iterator.call(context, i);
+  };
+
+  // Escape a string for HTML interpolation.
+  _.escape = function(string) {
+    return (''+string).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#x27;').replace(/\//g,'&#x2F;');
+  };
+
+  // Add your own custom functions to the Underscore object, ensuring that
+  // they're correctly added to the OOP wrapper as well.
+  _.mixin = function(obj) {
+    each(_.functions(obj), function(name){
+      addToWrapper(name, _[name] = obj[name]);
+    });
+  };
+
+  // Generate a unique integer id (unique within the entire client session).
+  // Useful for temporary DOM ids.
+  var idCounter = 0;
+  _.uniqueId = function(prefix) {
+    var id = idCounter++;
+    return prefix ? prefix + id : id;
+  };
+
+  // By default, Underscore uses ERB-style template delimiters, change the
+  // following template settings to use alternative delimiters.
+  _.templateSettings = {
+    evaluate    : /<%([\s\S]+?)%>/g,
+    interpolate : /<%=([\s\S]+?)%>/g,
+    escape      : /<%-([\s\S]+?)%>/g
+  };
+
+  // JavaScript micro-templating, similar to John Resig's implementation.
+  // Underscore templating handles arbitrary delimiters, preserves whitespace,
+  // and correctly escapes quotes within interpolated code.
+  _.template = function(str, data) {
+    var c  = _.templateSettings;
+    var tmpl = 'var __p=[],print=function(){__p.push.apply(__p,arguments);};' +
+      'with(obj||{}){__p.push(\'' +
+      str.replace(/\\/g, '\\\\')
+         .replace(/'/g, "\\'")
+         .replace(c.escape, function(match, code) {
+           return "',_.escape(" + code.replace(/\\'/g, "'") + "),'";
+         })
+         .replace(c.interpolate, function(match, code) {
+           return "'," + code.replace(/\\'/g, "'") + ",'";
+         })
+         .replace(c.evaluate || null, function(match, code) {
+           return "');" + code.replace(/\\'/g, "'")
+                              .replace(/[\r\n\t]/g, ' ') + ";__p.push('";
+         })
+         .replace(/\r/g, '\\r')
+         .replace(/\n/g, '\\n')
+         .replace(/\t/g, '\\t')
+         + "');}return __p.join('');";
+    var func = new Function('obj', '_', tmpl);
+    if (data) return func(data, _);
+    return function(data) {
+      return func.call(this, data, _);
+    };
+  };
+
+  // The OOP Wrapper
+  // ---------------
+
+  // If Underscore is called as a function, it returns a wrapped object that
+  // can be used OO-style. This wrapper holds altered versions of all the
+  // underscore functions. Wrapped objects may be chained.
+  var wrapper = function(obj) { this._wrapped = obj; };
+
+  // Expose `wrapper.prototype` as `_.prototype`
+  _.prototype = wrapper.prototype;
+
+  // Helper function to continue chaining intermediate results.
+  var result = function(obj, chain) {
+    return chain ? _(obj).chain() : obj;
+  };
+
+  // A method to easily add functions to the OOP wrapper.
+  var addToWrapper = function(name, func) {
+    wrapper.prototype[name] = function() {
+      var args = slice.call(arguments);
+      unshift.call(args, this._wrapped);
+      return result(func.apply(_, args), this._chain);
+    };
+  };
+
+  // Add all of the Underscore functions to the wrapper object.
+  _.mixin(_);
+
+  // Add all mutator Array functions to the wrapper.
+  each(['pop', 'push', 'reverse', 'shift', 'sort', 'splice', 'unshift'], function(name) {
+    var method = ArrayProto[name];
+    wrapper.prototype[name] = function() {
+      method.apply(this._wrapped, arguments);
+      return result(this._wrapped, this._chain);
+    };
+  });
+
+  // Add all accessor Array functions to the wrapper.
+  each(['concat', 'join', 'slice'], function(name) {
+    var method = ArrayProto[name];
+    wrapper.prototype[name] = function() {
+      return result(method.apply(this._wrapped, arguments), this._chain);
+    };
+  });
+
+  // Start chaining a wrapped Underscore object.
+  wrapper.prototype.chain = function() {
+    this._chain = true;
+    return this;
+  };
+
+  // Extracts the result from a wrapped and chained object.
+  wrapper.prototype.value = function() {
+    return this._wrapped;
+  };
+
+}).call(this);
+/**
+ * @fileoverview ISO8601 conversion functions.
  *
- * Copyright 2011, John Resig
- * Dual licensed under the MIT or GPL Version 2 licenses.
- * http://jquery.org/license
+ * Original code from http://webcloud.se/log/JavaScript-and-ISO-8601/
  *
- * Includes Sizzle.js
- * http://sizzlejs.com/
- * Copyright 2011, The Dojo Foundation
- * Released under the MIT, BSD, and GPL Licenses.
- *
- * Date: Mon Nov 21 21:11:03 2011 -0500
+ * The code has been largely re-written because it did not parse local/UTC
+ * dates quite well. In particular, strings such as "2012-02-10T00:00:00Z"
+ * were parsed as local dates.
  */
-    /*!
- * Sizzle CSS Selector Engine
- *  Copyright 2011, The Dojo Foundation
- *  Released under the MIT, BSD, and GPL Licenses.
- *  More information: http://sizzlejs.com/
+define('runtime-browser/iso8601',[],function() {
+
+  /**
+   * Regular expression that matches an ISO8601 date
+   * @private
+   */
+  var reDate = /^([0-9]{4})(\-([0-9]{2})(\-([0-9]{2})(T([0-9]{2}):([0-9]{2})(:([0-9]{2})(\.([0-9]+))?)?(Z|(([\-+])([0-9]{2}):([0-9]{2})))?)?)?)?$/;
+
+  /**
+   * Regular expression that matches an ISO8601 duration
+   * @private
+   */
+  var reDuration = /^PT([0-9]+)H([0-9]+)M([0-9]+)S$/;
+
+
+  //from http://webcloud.se/log/JavaScript-and-ISO-8601/
+  return {
+    /**
+     * Returns a Date object that matches the given ISO8601 string.
+     *
+     * If the string only specifies a day but not time, the string is
+     * interpreted as a local date whose time is midnight. That is
+     * consistent with the way dates are parsed in JavaScript:
+     * https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Date/parse
+     *
+     * @function
+     * @param {string} string The ISO8601 string to parse
+     * @return {Date} The date object that matches the given string,
+     *  null if the incoming string is not a valid date
+     */
+    toDate: function (string) {
+      var d = null,
+        offset = 0,
+        date = null,
+        time = null;
+      
+      if (!string) {
+        return null;
+      }
+
+      // Parse the string
+      d = string.trim().match(reDate);
+      if (!d) {
+        // Not a valid date
+        return null;
+      }
+      //console.log(d);
+
+      // If "Z" or a timezone is specified, construct the date as a UTC date,
+      // and apply the specified timezone as necessary.
+      // If not, the date is to be understood as a local date, where "local"
+      // means local to the system that runs the function.
+      // Note that a date without time is interpreted as a UTC date whose
+      // time is midnight.
+      date = new Date(2010, 0, 1);
+      if (d[13]) {
+        // No time specified, or there's a "Z" or a timezone
+        date.setUTCFullYear(d[1], 0, 1);
+        date.setUTCHours(0, 0, 0, 0);
+        if (d[3]) { date.setUTCMonth(d[3] - 1); }
+        if (d[5]) { date.setUTCDate(d[5]); }
+
+        if (d[7]) { date.setUTCHours(d[7]); }
+        if (d[8]) { date.setUTCMinutes(d[8]); }
+        if (d[10]) { date.setUTCSeconds(d[10]); }
+        if (d[12]) { date.setUTCMilliseconds(Number("0." + d[12]) * 1000); }
+
+        if (d[14]) {
+          // Some timezone specified, apply the offset
+          // and generate the new date
+          offset = (Number(d[16]) * 60) + Number(d[17]);
+          offset *= ((d[15] == '-') ? 1 : -1);
+
+          time = date.getTime() + (offset * 60 * 1000);
+          date.setTime(time);
+        }
+      }
+      else {
+        // No time, or time but no timezone, interpret the date as a local date
+        date.setFullYear(d[1], 0, 1, 0, 0, 0, 0);
+        if (d[3]) { date.setMonth(d[3] - 1); }
+        if (d[5]) { date.setDate(d[5]); }
+        if (d[7]) { date.setHours(d[7]); }
+        if (d[8]) { date.setMinutes(d[8]); }
+        if (d[10]) { date.setSeconds(d[10]); }
+        if (d[12]) { date.setMilliseconds(Number("0." + d[12]) * 1000); }
+      }
+
+      return date;
+    },
+
+    /**
+     * Returns the ISO8601 string representation of the date, given as a string.
+     * The method supports the following formats for the given date string:
+     * - RFC822
+     * - ISO8601, regardless of whether the code is run under JavaScript v1.8.5+
+     * or not.
+     *
+     * @function
+     * @param {string} string The date string to convert to an ISO8601 string
+     * @returns {string} The ISO8601 string representation for this date, an
+     *  empty string if the string could not be parsed.
+     */
+    fromString: function (string) {
+      var date = null;
+
+      if (!string) {
+        return '';
+      }
+
+      date = new Date(string);
+      if (isNaN(date.getTime())) {
+        // The date could not be parsed by the Date object, try to parse the
+        // string as ISO8601 (this won't change anything if the underlying
+        // JavaScript engine already supports that format, but won't be harmful
+        // either).
+        date = this.toDate(string);
+      }
+
+      // Convert the final date
+      return this.fromDate(date);
+    },
+
+
+    /**
+     * Returns the ISO8601 string representation of the given date.
+     *
+     * Milliseconds are only returned when different from 0.
+     *
+     * @function
+     * @param {Date} d The date object to convert
+     * @returns {string} The ISO8601 string representation for this date
+     */
+    fromDate: function (d) {
+      var pad = function (n) {
+        return (n < 10) ? '0' + n : n;
+      };
+      var padms = function (n) {
+        if (n < 10) {
+          return '00' + n;
+        }
+        else if (n < 100) {
+          return '0' + n;
+        }
+        else {
+          return n;
+        }
+      };
+
+      if (!d || !(d instanceof Date) || isNaN(d.getTime())) {
+        return "";
+      }
+
+      return d.getUTCFullYear() +
+        '-' + pad(d.getUTCMonth() + 1) +
+        '-' + pad(d.getUTCDate()) +
+        'T' + pad(d.getUTCHours()) +
+        ':' + pad(d.getUTCMinutes()) +
+        ':' + pad(d.getUTCSeconds()) +
+        ((d.getUTCMilliseconds() !== 0) ? '.' + padms(d.getUTCMilliseconds()) : '') +
+        'Z';
+    },
+
+
+    /**
+     * Returns the ISO8601 string representation of the given date,
+     * omitting the time part.
+     *
+     * The method outputs the local day when the local time evaluates to zero
+     * The method outputs the UTC day otherwise. This apparently weird rule
+     * allows to stick to the "right" day if the author created the date with:
+     *  new Date("21 Apr 1997");
+     *
+     * This method should only really be used with dates created without time
+     * counterpart.
+     *
+     * @function
+     * @param {Date} d The date object to convert
+     * @return {string} The ISO8601 string representation for this date
+     */
+    fromDateNoTime: function (d) {
+      var pad = function (n) {
+        return (n < 10) ? '0' + n : n;
+      };
+
+      if (!d || !(d instanceof Date) || isNaN(d.getTime())) {
+        return "";
+      }
+
+      if (!d || isNaN(d.getTime())) {
+        return "";
+      }
+
+      if ((d.getHours() === 0) &&
+        (d.getMinutes() === 0) &&
+        (d.getSeconds() === 0) &&
+        (d.getMilliseconds() === 0)) {
+        // Local time evaluates to 0, return local day
+        return d.getFullYear() +
+          '-' + pad(d.getMonth() + 1) +
+          '-' + pad(d.getDate());
+      }
+      else {
+        // Return UTC day
+        return d.getUTCFullYear() +
+          '-' + pad(d.getUTCMonth() + 1) +
+          '-' + pad(d.getUTCDate());
+      }
+    },
+
+
+    /**
+     * Returns the number of milliseconds that correspond to the given ISO8601 duration.
+     * Note the function is restricted to durations of the form "PTnnHnnMnnS" for the time being.
+     * @function
+     * @param {string} string The ISO8601 string that represents a duration
+     * @return {number} The duration in milliseconds
+     */
+    toDuration: function (string) {
+      if (!string) {
+        return 0;
+      }
+
+      var d = string.match(reDuration);
+      if (!d) {
+        return 0;
+      }
+       
+      var ms = 0;
+      if (d[2]) { ms += Number(d[2]) * 3600 * 1000; }
+      if (d[3]) { ms += Number(d[3]) * 60 * 1000; }
+      if (d[4]) { ms += Number(d[4]) * 1000; }
+
+      return ms;
+    },
+
+
+    /**
+     * Returns the ISO8601 representation of the given duration.
+     * The function is not fully generic and only generates durations in the form "PTnnHnnMnnS"
+     * (no year, month or day)
+     * @function
+     * @param {number} ms The duration to convert in milliseconds
+     * @return {string} The ISO8601 representation of the duration
+     */
+    fromDuration: function (ms) {
+      var seconds = Math.round(ms / 1000);
+      var hours = Math.floor(seconds / 3600);
+      var minutes = 0;
+
+      seconds = seconds - hours * 3600;
+      minutes = Math.floor(seconds / 60);
+
+      seconds = seconds - minutes * 60;
+
+      return "PT" +
+        hours + "H" +
+        minutes + "M" +
+        seconds + "S";
+    }
+  };
+
+
+});
+// Windows 8 style
+define('runtime-browser/http',[], function () {
+
+  // Used to generate unique number for JSON callback function name
+  var callbackSeed = (new Date()).getTime();
+  
+  return {
+    "request": function (params, callback) {
+      // Ensure parameters are correct
+      if (!params || !params.url) {
+        return callback("No URI to request");
+      }
+
+      // Ensure URL starts with http:// or https://
+      if (params.url.search(/^http(s?)\:\/\//i) === -1) {
+        return callback("URI to request does not start with 'http://' or 'https://'.");
+      }
+
+      // Setting callback parameter when JSONP requested,
+      // using user-defined parameters or default conventions
+      // (the hash mimics the one generated in jQuery)
+      if (params.dataType === 'jsonp') {
+        var jsonp = params.jsonp || "callback";
+        var jsonCallback = params.jsonCallback ||
+          "datajslib_" + (Math.random().toString()).replace(/\D/g, "") + ( callbackSeed++ );
+        params.url += (/\?/.test(params.url) ? "&" : "?") + jsonp + "=" + jsonCallback;
+      }
+
+      WinJS.xhr(params).then(
+        // success
+        function(ret) {
+          var body = ret.responseText;
+
+          if (params.dataType == 'json' ||
+            params.dataType == 'text json' ||
+            params.dataType == 'jsonp') {
+            var tmp_json;
+
+            try {
+              // Strip out JSONP function
+              if (params.dataType === "jsonp") {
+                // replace the last parenthethis
+                body = body.replace(/\)$/,"").replace(/\)\;$/,"");
+                // replace before the first patenthethis
+                body = body.replace(/^[^\(]+\(/,"");
+              }
+              tmp_json = JSON.parse(body);
+            } catch (e) {
+              // console.warn('Invalid JSON received: ', body);
+              return callback("Could not parse the response received as JSON.\n" +
+                "Possible causes:\n" +
+                "- the provider did not wrap the object in a JSONP function" +
+                " (ensure the jsonp parameter is the right one)\n" +
+                "- the JSON is invalid (not much to do in that case)\n" +
+                "Exception triggered: " + e);
+            }
+            return callback(null, tmp_json);
+          } else {
+            return callback(null, body);
+          }
+        },
+        // error
+        function(err) {
+         callback(err);
+       });
+
+      return true;
+    }
+  };
+
+});
+
+define('databases/youtube/lib/api',['datajslib!http', 'datajslib!underscore'], function(http, _) {
+
+  var api = {};
+
+
+  // Options: handle mongo's like options
+
+  api.options = function(query) {
+    var list = {
+      skip:  'start-index',
+      limit: 'max-results'
+    };
+
+    var result = {};
+    for (var opt in query.options)
+      if (typeof list[opt] !== 'undefined')
+        result[list[opt]] = query.options[opt];
+    if (result['start-index']) {
+      try {
+        result['start-index'] = parseInt(result['start-index'], 10) + 1;
+      }
+      catch (e) {
+      }
+    }
+    return result;
+  };
+
+
+  // Generate final URL 
+
+  api.generateUrl = function(url, params) {
+    for (var param in params) {
+      var newUrl = url.replace(new RegExp(':'+ param), params[param]);
+      if (newUrl != url)
+        url = newUrl;
+      else
+        url += ((url.indexOf('?') == -1) ? '?' : '&') + param + (params[param] ? ('='+ params[param]) : '');
+    }
+    return url;
+  };
+
+
+  // Call API 
+
+  api.request = function(url, cb) {
+
+    var baseUrl = 'http://gdata.youtube.com/feeds/api/';
+
+    // We add default parameter
+    url = baseUrl + api.generateUrl(url, { alt:'json-in-script', v:2 });
+
+    http.request({
+      'url': url,
+      'dataType': 'jsonp'
+    }, cb);
+  };
+    
+
+  // Export --------------------------------------------------------------------
+
+  return api;
+
+});
+
+define('databases/youtube/videos',[
+  './lib/api',
+  'datajslib!underscore',
+  'datajslib!iso8601'
+], function (api, _, iso8601) {
+
+  return {
+    /**
+     * Description of the datasource for the factory
+     */
+    desc : {
+      "options": {
+        "schema": {
+          "playlist": {
+            "type": "string",
+            "title": "Playlist URL",
+            "description": "You may also enter the ID of the playlist"
+          },
+          "search": {
+            "type": "string",
+            "title": "Search text",
+            "description": "Keep in mind that the list of videos featured in the final app will be the results of the search when the app is run. Consider using playlists if you need more consistent results."
+          },
+          "feed": {
+            "type": "string",
+            "title": "Feed",
+            "enum": [
+              "",
+              "top_rated",
+              "most_viewed",
+              "most_shared",
+              "most_popular",
+              "most_recent",
+              "most_discussed",
+              "most_responded",
+              "recently_featured",
+              "on_the_web"
+            ]
+          },
+          "user": {
+            "type": "string",
+            "title": "Username",
+            "description": "Filter results by username"
+          }
+        },
+        "form": [
+          {
+            "type": "selectfieldset",
+            "title": "Search by",
+            "items": [
+              {
+                "type": "optionfieldset",
+                "legend": "Text",
+                "items": [
+                  "search"
+                ]
+              },
+              {
+                "type": "optionfieldset",
+                "legend": "Playlist",
+                "items": [
+                  "playlist"
+                ]
+              },
+              {
+                "type": "optionfieldset",
+                "legend": "Username",
+                "items": [
+                  "user"
+                ]
+              },
+              {
+                "type": "optionfieldset",
+                "legend": "Feed",
+                "items": [
+                  "feed"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "runAtClient": "force",
+      "outputType" : "VideoObject"
+    },
+
+
+    /**
+     * Fetches feed items from the source provider.
+     * @function
+     * @param {Object} query Query parameters. Must define a 'filter' property
+     *   with a 'url' property that contains the absolute URL to the page.
+     * @param {function(Object, Object)} callback Callback function.
+     *   Returns a text.
+     */
+    fetch: function (query, callback) {
+      // See Youtube API at http://code.google.com/apis/youtube/2.0/reference.html
+      var filter = (query && query.filter) ? query.filter : {};
+      var validFeed = this.desc.options.schema.feed["enum"];
+      var url = null;
+
+      if (filter.search) {
+        url = 'videos';
+        filter = _.extend({ q:encodeURI(filter.search) }, filter.user ? { author:filter.user } : {});
+      }
+      else if (filter.feed) {
+        url = 'standardfeeds/:feed';
+        if (_.indexOf(validFeed, filter.feed) == -1) return callback('Invalid feed type "'+ filter.feed +'".');
+        filter = _.extend({ feed:filter.feed }, filter.user ? { author:filter.user } : {});
+      }
+      else if (filter.playlist) {
+        url = 'playlists/:playlist';
+
+        /* Playlist should be 16-char String
+          Clean up user input : often PL{playlistId} or http://youtube.com/xxxxx
+          */
+        //console.warn('playlist ?','input', filter.playlist);
+        if (filter.playlist.length>16){
+          //full url ?
+          var matches= filter.playlist.match(/http(s?):\/\/(www\.?)(youtube\.com\/playlist\?).*(list=)([A-Z0-9]*)/i);
+          if (matches.length){
+            filter.playlist=matches.pop();
+          }
+          if (filter.playlist.length>16){
+            //strip heading PL ... and any further arguments
+            filter.playlist=filter.playlist.replace(/^PL/, '').substring(0,16);
+          }
+          //console.warn('playlist !','output', filter.playlist);
+        }
+
+        filter = _.extend({ playlist:filter.playlist }, filter.user ? { author:filter.user } : {});
+      }
+      else if (filter.user) {
+        url = 'users/:user/uploads';
+      }
+      else { // if nothing was specified
+        return callback(null, null);
+      }
+      // use url = 'videos'; to display most popular videos
+
+      url = api.generateUrl(url, _.extend({}, filter, api.options(query)));
+
+      api.request(url, function(err, data) {
+        return callback(err, data);
+      });
+    },
+
+    /**
+     * Normalizes the data received from the source provider.
+     * @function
+     * @param {Object} data The data that was received
+     *(typically the object given to the callback method at the end of a "fetch")
+     * @param {Object} query Query parameters (which could include filtering options)
+     * @param {function(Object, Object)} callback Callback function.
+     *   The second argument of the callback is an object with an "entries" property
+     *   that contains the list of items normalized according to the schema.org hierarchy.
+     */
+    process: function (data, query, callback) {
+      if (!data || !data.feed || !data.feed.entry) {
+        return callback(null, {"entries":[]});
+      }
+      var videos = data.feed.entry;
+      var point = null;
+      var id = null;
+
+      for (var i = 0, l = videos.length; i < l; i++) {
+        var vid = videos[i];
+
+        if(vid.media$group && vid.media$group.media$content) {
+          var url = vid.media$group.media$content[0].url;
+
+          var match = url.match(/^https?:\/\/(www\.)?youtube\.com\/v\/([a-z0-9_\-]+).*$/i);
+
+          if(match) {
+            id = match[2];
+          }
+        }
+
+
+        videos[i] = {
+          '@type': 'VideoObject',
+          'itemType': 'VideoObject',
+          'url': vid.link[0].href.replace(/\&.*$/, ''), // to remove the extra parameters (&feature=youtube_gdata)
+          'name': vid.title.$t,
+          'playerType': id ? 'iframe' : null,
+          'embedURL': id ? 'http://www.youtube-nocookie.com/embed/' + id + '?rel=0' : null,
+          'publisher': {
+            '@type': 'Organization',
+            'itemType': 'Organization',
+            'url': 'http://www.youtube.com',
+            'name': 'Youtube'
+          },
+          'description': (vid.media$group && vid.media$group.media$description) ? vid.media$group.media$description.$t :'',
+          'author': [],
+          'genre': (vid.media$group && vid.media$group.media$category && vid.media$group.media$category.$t) ? vid.media$group.media$category.$t : '',
+          'thumbnail': [],
+          'datePublished': vid.published ? vid.published.$t : (vid.media$group && vid.media$group.yt$uploaded ? vid.media$group.yt$uploaded.$t : ''),
+          'uploadDate': (vid.media$group && vid.media$group.yt$uploaded) ? vid.media$group.yt$uploaded.$t : '',
+          'duration': (vid.media$group && vid.media$group.yt$duration) ? iso8601.fromDuration(Number(vid.media$group.yt$duration.seconds) * 1000) : ''
+        };
+        // Other possibilities: keywords, license when defined in schema.org.
+        // Add ",'meta': vid" to the above code snipped to view all the information returned by Youtube
+        // Note that vid.updated always returns the current date which is not particularly useful, discarded here.
+
+        // Complete the list of authors
+        if (vid.author) {
+          for (var k=0, kl = vid.author.length; k < kl; k++) {
+            if (vid.author[k].uri && vid.author[k].name) {
+              videos[i].author.push({
+                '@type': 'Person',
+                'itemType': 'Person',
+                'url': vid.author[k].uri.$t,
+                'name': vid.author[k].name.$t
+              });
+            }
+          }
+        }
+
+        // Complete the list of thumbnails
+        if (vid.media$group && vid.media$group.media$thumbnail) {
+          for (var k2=0, kl2 = vid.media$group.media$thumbnail.length; k2 < kl2; k2++) {
+            var thumbnail = vid.media$group.media$thumbnail[k2];
+            videos[i].thumbnail.push({
+              '@type': 'ImageObject',
+              'itemType': 'ImageObject',
+              'url': thumbnail.url,
+              'name': thumbnail.yt$name,
+              'contentURL': thumbnail.url,
+              'width': thumbnail.width,
+              'height': thumbnail.height
+            });
+          }
+          if (videos[i].thumbnail[0]) {
+            videos[i].image = _.clone(videos[i].thumbnail[0]);
+          }
+        }
+
+        // Location
+        if (vid.georss$where &&
+          vid.georss$where.gml$Point &&
+          vid.georss$where.gml$Point.gml$pos &&
+          vid.georss$where.gml$Point.gml$pos.$t) {
+          point = vid.georss$where.gml$Point.gml$pos.$t.split(' ');
+          if (point.length === 2) {
+            videos[i].contentLocation = {
+              '@type': 'Place',
+              'itemType': 'Place',
+              'geo': {
+                '@type': 'GeoCoordinates',
+                'itemType': 'GeoCoordinates',
+                'latitude': parseFloat(point[0], 10),
+                'longitude': parseFloat(point[1], 10)
+              }
+            };
+          }
+        }
+        if (vid.yt$location && vid.yt$location.$t) {
+          if (!videos[i].contentLocation) {
+            videos[i].contentLocation = {
+              '@type': 'Place',
+              'itemType': 'Place'
+            };
+          }
+          videos[i].contentLocation.name = vid.yt$location.$t;
+        }
+
+        // Aspect ratio
+        // (remains in Youtube namespace since not a standard property)
+        if (vid.media$group &&
+          vid.media$group.yt$aspectRatio &&
+          vid.media$group.yt$aspectRatio.$t) {
+          videos[i]['yt:aspectRatio'] = vid.media$group.yt$aspectRatio.$t;
+        }
+      }
+
+      callback(null, {"entries": videos});
+    },
+
+
+    /**
+     * Fetches and normalizes the data.
+     * @function
+     * @param {Object} query Query parameters. Feed specific object.
+     * @param {function(Object, Object)} callback Callback function.
+     *   receives the error or the normalized feed.
+     */
+    find: function (query, callback) {
+      // Implementation note: same code as example/news
+      var self = this;
+      self.fetch(query, function (err, data) {
+        if (err) {
+          return callback(err, null);
+        }
+        else {
+          self.process(data, query, function (err, convertedData) {
+            return callback(err, convertedData);
+          });
+        }
+      });
+    }
+  };
+});
+
+define('databases/flickr/photos',[
+  'datajslib!http',
+  'datajslib!underscore',
+  'datajslib!iso8601'
+], function (http, _, iso8601) {
+
+  return {
+    /**
+     * Description of the datasource for the factory
+     */
+    desc: {
+      "options": {
+        "schema": {
+          "search": {
+            "type": "string",
+            "title": "Search text",
+            "description": "Latest items are returned first. Keep in mind that the list of photos featured in the final app will be the results of the search when the app is run. Consider using photo sets if you need more consistent results."
+          },
+          "set": {
+            "type": "string",
+            "title": "Photo set URL",
+            "description": "You may also directly enter a photo set ID, e.g. 72157628064679334" // also accept photo set ID
+          },
+          "api_key" : {
+            "type": "string",
+            "title": "API key",
+            "description": "Enter your Flickr API key here. The key is optional to preview your app but required at deployment stage. Follow the instructions on <a href='http://www.flickr.com/services/api/misc.api_keys.html' target='_blank'>Flickr's Web site</a> to obtain an API key.",
+            "joshfire:requiredFor": ["deploy"]
+          }
+        },
+        "form": [
+          {
+            "type": "selectfieldset",
+            "title": "Search by",
+            "items": [
+              {
+                "type": "optionfieldset",
+                "legend": "Text",
+                "items": [
+                  "search"
+                ]
+              },
+              {
+                "type": "optionfieldset",
+                "legend": "Photo set",
+                "items": [
+                  "set"
+                ]
+              }
+            ]
+          },
+          {
+            "type": "authfieldset",
+            "items": [
+              "api_key"
+            ]
+          }
+        ]
+      },
+      "runAtClient": "force",
+      "outputType" : "ImageObject"
+    },
+
+
+    /**
+     * Fetches feed items from the source provider.
+     * @function
+     * @param {Object} query Query parameters. Must define a 'filter' property
+     *   with a 'url' property that contains the absolute URL to the page.
+     * @param {function(Object, Object)} callback Callback function.
+     *   Returns a text.
+     */
+    fetch: function (query, callback) {
+      // See Flickr API at: http://www.flickr.com/services/api/
+      // We'll use Joshfire's key if no API key is specified
+      var filter = query.filter || {};
+      var api_key = filter.api_key || '5c7b0ae951c10171dc18f69f6572c537';
+      var url = null;
+      var searchText = null;
+      var setId = null;
+      var extract = null;
+
+      // List of extra fields to return, see extras parameter in:
+      // http://www.flickr.com/services/api/flickr.photos.search.html
+      // Note that there are a couple of others not listed here such as license
+      var extras = 'description,date_upload,date_taken,owner_name,icon_server,' +
+        'last_update,geo,tags,url_sq,url_t,url_s,url_m,url_z,url_l';
+
+      if (filter.search) {
+        searchText = encodeURIComponent(filter.search);
+        url = 'http://api.flickr.com/services/rest/?method=flickr.photos.search' +
+          '&api_key=' + api_key +
+          '&text=' + searchText +
+          '&extras=' + extras +
+          '&format=json&jsoncallback=_callback';
+      }
+      else if (filter.set) {
+        // Can we extract ID from a potential URL ?
+        extract = filter.set.match(/(?:www\.)?flickr\.com\/photos\/[^\/]+\/sets\/([^\/]+)/); 
+        if (extract) {
+          // The URL looks like:
+          // http://www.flickr.com/photos/siliconmaniacs/sets/72157626989709433/with/5901439714/
+          setId = extract[1];
+        }
+        else if (filter.set.match(/^[a-z0-9]+$/i)) {
+          // if not an URL, is it an ID ? 
+          setId = filter.set;
+        } else {
+          // TODO: notify the client that the set ID is not correct
+          return callback(null, null);
+        }
+        url = 'http://api.flickr.com/services/rest/?method=flickr.photosets.getPhotos' +
+          '&api_key=' + api_key +
+          '&photoset_id=' + setId +
+          '&extras=' + extras +
+          '&format=json';
+      }
+      else {
+        // TODO: notify the client that a parameter should be given
+        return callback(null, null);
+      }
+
+      http.request({
+        'url': url,
+        'jsonp': 'jsoncallback',
+        'dataType': 'jsonp'
+      }, function (err, data) {
+        return callback(err, data);
+      });
+    },
+
+
+    /**
+     * Normalizes the data received from the source provider.
+     * @function
+     * @param {Object} data The data that was received
+     *(typically the object given to the callback method at the end of a "fetch")
+     * @param {Object} query Query parameters (which could include filtering options)
+     * @param {function(Object, Object)} callback Callback function.
+     *   The second argument of the callback is an object with an "entries" property
+     *   that contains the list of items normalized according to the schema.org hierarchy.
+     */
+    process: function (data, query, callback) {
+      var filter = query ? query.filter : null;
+      var dataphotos = null;
+      var owner = null;
+      var ownername = null;
+      var date = null;
+      var photos = [];
+      var pic = null;
+      var photo = null;
+      var purl = null;
+
+      if (!data) {
+        return callback(null, {"entries": []});
+      }
+
+      if (data.stat == 'fail') {
+        if (data.message) {
+          return callback(data.message, data);
+        }
+        else {
+          return callback("Source provider complained about something", data);
+        }
+      }
+
+      // depending on the URL called, extract the photo objects
+      if (filter) {
+        if (filter.search) {
+          // Results of a search
+          dataphotos = data.photos.photo;
+        }
+        else if (filter.set) {
+          // Photos in a set.
+          // The owner's NSID is defined at the root level and not repeated
+          // at the photo level.
+          dataphotos = data.photoset.photo;
+          owner = data.photoset.owner;
+          ownername = data.photoset.ownername;
+        }
+      }
+      if (!dataphotos) {
+        callback("Filter search or set ID must be defined.", null);
+      }
+
+      // store the re-formatted photo objects
+      
+
+      // TODO: The list of thumbnails is typically useless without the dimensions
+      // of the images, but Flickr only says that the largest size of the image
+      // is 240, 640 or 1024 depending on the suffix. In particular, we don't
+      // know whether the image is in portrait or landscape mode.
+      // Info about URL generation for buddyicon available at:
+      // http://www.flickr.com/services/api/misc.buddyicons.html
+      for (var i = 0; i < dataphotos.length; i++) {
+        pic = dataphotos[i];
+        if (pic.url_l) {
+          purl = {
+            'contentURL': pic.url_l,
+            'width': parseInt(pic.width_l, 10),
+            'height': parseInt(pic.height_l, 10)
+          };
+        }
+        else if (pic.url_z) {
+          purl = {
+            'contentURL': pic.url_z,
+            'width': parseInt(pic.width_z, 10),
+            'height': parseInt(pic.height_z, 10)
+          };
+        }
+        else {
+          purl = {
+            'contentURL': pic.url_m,
+            'width': parseInt(pic.width_m, 10),
+            'height': parseInt(pic.height_m, 10)
+          };
+        }
+        photo = {
+          '@type': 'ImageObject',
+          'itemType': 'ImageObject',
+          'url': 'http://www.flickr.com/photos' +
+            '/'+ (pic.owner || owner) +
+            '/' + pic.id,
+          'name': pic.title,
+          'contentURL': purl.contentURL,
+          'width': purl.width,
+          'height': purl.height,
+          'image': {
+            '@type': 'ImageObject',
+            'itemType': 'ImageObject',
+            'contentURL': pic.url_s,
+            'width': parseInt(pic.width_s, 10),
+            'height': parseInt(pic.height_s, 10)
+          },
+          'author': [{
+            '@type': 'Person',
+            'itemType': 'Person',
+            'name': pic.ownername || ownername
+          }],
+          'thumbnail': [
+            {
+              '@type': 'ImageObject',
+              'itemType': 'ImageObject',
+              'contentURL': pic.url_sq,
+              'width': parseInt(pic.width_sq, 10),
+              'height': parseInt(pic.height_sq, 10)
+            },
+            {
+              '@type': 'ImageObject',
+              'itemType': 'ImageObject',
+              'contentURL': pic.url_t,
+              'width': parseInt(pic.width_t, 10),
+              'height': parseInt(pic.height_t, 10)
+            },
+            {
+              '@type': 'ImageObject',
+              'itemType': 'ImageObject',
+              'contentURL': pic.url_s,
+              'width': parseInt(pic.width_s, 10),
+              'height': parseInt(pic.height_s, 10)
+            },
+            {
+              '@type': 'ImageObject',
+              'itemType': 'ImageObject',
+              'contentURL': pic.url_m,
+              'width': parseInt(pic.width_m, 10),
+              'height': parseInt(pic.height_m, 10)
+            }
+          ],
+          'publisher': {
+            '@type': 'Organization',
+            'itemType': 'Organization',
+            'url': 'http://www.flickr.com',
+            'name': 'flickr'
+          }
+        };
+
+        if (pic.url_z) {
+          photo.thumbnail.push({
+            '@type': 'ImageObject',
+            'itemType': 'ImageObject',
+            'contentURL': pic.url_z,
+            'width': parseInt(pic.width_z, 10),
+            'height': parseInt(pic.height_z, 10)
+          });
+        }
+
+        if (pic.iconfarm > 0) {
+          photo.author[0].image = {
+            '@type': 'ImageObject',
+            'itemType': 'ImageObject',
+            'contentURL': 'http://farm' + pic.iconfarm + '.static.flickr.com' +
+              '/' + pic.iconserver +
+              '/buddyicons/' + (pic.owner || owner) +
+              '.jpg',
+            'width': 48,
+            'height': 48
+          };
+        }
+
+        if (pic.latitude && pic.longitude && pic.accuracy) {
+          // Photo contains geo information
+          // (note the accuracy gets lost during the conversion)
+          photo.contentLocation = {
+            '@type': 'Place',
+            'itemType': 'Place',
+            'geo': {
+              '@type': 'GeoCoordinates',
+              'itemType': 'GeoCoordinates',
+              'latitude': pic.latitude,
+              'longitude': pic.longitude
+            }
+          };
+        }
+
+        if (pic.description && pic.description._content) {
+          photo.description = pic.description._content;
+        }
+
+        if (pic.tags) {
+          photo.keywords = pic.tags;
+        }
+
+        if (pic.datetaken) {
+          photo.dateCreated = pic.datetaken.replace(/ /, "T") + "Z";
+        }
+        if (pic.lastupdate) {
+          date = new Date(parseInt(pic.lastupdate, 10) * 1000);
+          photo.dateModified = iso8601.fromDate(date);
+        }
+        if (pic.dateupload) {
+          date = new Date(parseInt(pic.dateupload, 10) * 1000);
+          photo.datePublished = iso8601.fromDate(date);
+        }
+        else if (photo.dateModified) {
+          photo.datePublished = photos[i].dateModified;
+        }
+        else if (photo.dateCreated) {
+          photo.datePublished = photos[i].dateCreated;
+        }
+
+        photos.push(photo);
+      }
+
+      return callback(null, {'entries' : photos});
+    },
+
+
+    /**
+     * Fetches and normalizes the data.
+     * @function
+     * @param {Object} query Query parameters. Feed specific object.
+     * @param {function(Object, Object)} callback Callback function.
+     *   receives the error or the normalized feed.
+     */
+    find: function (query, callback) {
+      // Implementation note: same code as example/news
+      var self = this;
+      self.fetch(query, function (err, data) {
+        if (err) {
+          return callback(err, null);
+        }
+        else {
+          self.process(data, query, function (err, convertedData) {
+            return callback(err, convertedData);
+          });
+        }
+      });
+    }
+  };
+});;
+;/**
+ * @fileoverview Client-side API to retrieve datasource feeds
+ * from the Joshfire's data proxy.
+ *
+ * The file exposes a global Joshfire.datajs.proxy object.
+ *
+ * The file expects Joshfire.factory.globalConfig and
+ * Joshfire.factory.config to be defined and to contain
+ * actual configuration settings.
+ *
+ * TODO: move timeout to factory configuration setting? (30s used right now)
  */
-    var requirejs, require, define; (function (a) { function g(a, b) { if (a && a.charAt(0) === "." && b) { b = b.split("/"), b = b.slice(0, b.length - 1), a = b.concat(a.split("/")); var c, d; for (c = 0; d = a[c]; c++) if (d === ".") a.splice(c, 1), c -= 1; else if (d === "..") if (c !== 1 || a[2] !== ".." && a[0] !== "..") c > 0 && (a.splice(c - 1, 2), c -= 2); else break; a = a.join("/") } return a } function h(b, c) { return function () { return f.apply(a, d.call(arguments, 0).concat([b, c])) } } function i(a) { return function (b) { return g(b, a) } } function j(a) { return function (c) { b[a] = c } } function k(d) { if (c.hasOwnProperty(d)) { var f = c[d]; delete c[d], e.apply(a, f) } return b[d] } function l(a, b) { var c, d, e = a.indexOf("!"); return e !== -1 ? (c = g(a.slice(0, e), b), a = a.slice(e + 1), d = k(c), d && d.normalize ? a = d.normalize(a, i(b)) : a = g(a, b)) : a = g(a, b), { f: c ? c + "!" + a : a, n: a, p: d } } var b = {}, c = {}, d = [].slice, e, f; if (typeof define == "function") return; e = function (d, e, f, g) { var i = [], m, n, o, p, q, r; g || (g = d); if (typeof f == "function") { !e.length && f.length && (e = ["require", "exports", "module"]); for (p = 0; p < e.length; p++) { r = l(e[p], g), o = r.f; if (o === "require") i[p] = h(d); else if (o === "exports") i[p] = b[d] = {}, m = !0; else if (o === "module") n = i[p] = { id: d, uri: "", exports: b[d] }; else if (b.hasOwnProperty(o) || c.hasOwnProperty(o)) i[p] = k(o); else if (r.p) r.p.load(r.n, h(g, !0), j(o), {}), i[p] = b[o]; else throw d + " missing " + o } q = f.apply(b[d], i), d && (n && n.exports !== a ? b[d] = n.exports : m || (b[d] = q)) } else d && (b[d] = f) }, requirejs = f = function (b, c, d, g) { return typeof b == "string" ? k(l(b, c).f) : (b.splice || (c.splice ? (b = c, c = arguments[2]) : b = []), g ? e(a, b, c, d) : setTimeout(function () { e(a, b, c, d) }, 15), f) }, f.config = function () { return f }, require || (require = f), define = function (a, b, d) { b.splice || (d = b, b = []), define.unordered ? c[a] = [a, b, d] : e(a, b, d) }, define.amd = { jQuery: !0 } })(), define("runtime/nodejs/almond", function () { }), define("datajslib", { normalize: function (a, b) { if (typeof module == "undefined" || !module.exports) if (a == "jquery") return a; return b("runtime-browser/" + a) }, load: function (a, b, c, d) { b([a], function (a) { c(a) }) } }), function () { var a = this, b = function (a, b, e) { if (!a || !b) return a; var f = {}, g = function (a, b) { var c = null, h = null; if (!a || a !== Object(a)) return null; if (a.required) { if (a["default"]) { f[b] = a["default"]; return } a.type === "object" || a.properties ? f[b] = {} : a.type === "array" || a.items ? f[b] = [] : a.type === "string" ? f[b] = "" : a.type === "number" || a.type === "integer" ? f[b] = 0 : a.type === "boolean" ? f[b] = !1 : f[b] = {} } else if (a["default"] && e) { f[b] = a["default"]; return } c = a.properties; if (c) for (var i in c) c.hasOwnProperty(i) && g(c[i], b + "." + i); a.items && (h = a.items, d(h) && (h = h[0]), g(h, b + "[]")) }; g(b, ""); for (var h in f) f.hasOwnProperty(h) && c(a, h, f[h]) }, c = function (a, b, c) { var e = b.split("."), f = function (a, b, c) { var e = null, g = /\[([0-9]*)\]$/, h = b.shift(), i = 0; if (b.length > 0) { e = h.match(g); if (e) { h = h.replace(g, ""), a = a[h]; if (!a || !d(a)) return; for (var j = 0; j < a.length; j++) f(a[j], b, c); return } typeof a[h] != "object" && (a[h] = {}), a = a[h], f(a, b, c) } else e = h.match(g), e ? (h = h.replace(g, ""), d(a[h]) || (a[h] = []), i = parseInt(e[1], 10), a[h][i] || (a[h][i] = c)) : a[h] || (a[h] = c) }; e[0] || e.shift(), f(a, e, c) }, d = Array.isArray || function (a) { return Object.prototype.toString.call(a) == "[object Array]" }; typeof define != "undefined" ? define("runtime-browser/jsonform-defaults", [], function () { return { setDefaultValues: b } }) : typeof module != "undefined" && module.exports ? module.exports = { setDefaultValues: b } : (a.JSONForm = a.JSONForm || {}, a.JSONForm.setDefaultValues = b) }(), function (a, b) { function h(a) { var b = g[a] = {}, c, d; a = a.split(/\s+/); for (c = 0, d = a.length; c < d; c++) b[a[c]] = !0; return b } function l(a, c, d) { if (d === b && a.nodeType === 1) { var e = "data-" + c.replace(k, "-$1").toLowerCase(); d = a.getAttribute(e); if (typeof d == "string") { try { d = d === "true" ? !0 : d === "false" ? !1 : d === "null" ? null : f.isNumeric(d) ? parseFloat(d) : j.test(d) ? f.parseJSON(d) : d } catch (g) { } f.data(a, c, d) } else d = b } return d } function m(a) { for (var b in a) { if (b === "data" && f.isEmptyObject(a[b])) continue; if (b !== "toJSON") return !1 } return !0 } function n(a, b, c) { var d = b + "defer", e = b + "queue", g = b + "mark", h = f._data(a, d); h && (c === "queue" || !f._data(a, e)) && (c === "mark" || !f._data(a, g)) && setTimeout(function () { !f._data(a, e) && !f._data(a, g) && (f.removeData(a, d, !0), h.fire()) }, 0) } function J() { return !1 } function K() { return !0 } function S(a) { return !a || !a.parentNode || a.parentNode.nodeType === 11 } function T(a, b, c) { b = b || 0; if (f.isFunction(b)) return f.grep(a, function (a, d) { var e = !!b.call(a, d, a); return e === c }); if (b.nodeType) return f.grep(a, function (a, d) { return a === b === c }); if (typeof b == "string") { var d = f.grep(a, function (a) { return a.nodeType === 1 }); if (O.test(b)) return f.filter(b, d, !c); b = f.filter(b, d) } return f.grep(a, function (a, d) { return f.inArray(a, b) >= 0 === c }) } function U(a) { var b = V.split("|"), c = a.createDocumentFragment(); if (c.createElement) while (b.length) c.createElement(b.pop()); return c } function bi(a, b) { return f.nodeName(a, "table") ? a.getElementsByTagName("tbody")[0] || a.appendChild(a.ownerDocument.createElement("tbody")) : a } function bj(a, b) { if (b.nodeType !== 1 || !f.hasData(a)) return; var c, d, e, g = f._data(a), h = f._data(b, g), i = g.events; if (i) { delete h.handle, h.events = {}; for (c in i) for (d = 0, e = i[c].length; d < e; d++) f.event.add(b, c + (i[c][d].namespace ? "." : "") + i[c][d].namespace, i[c][d], i[c][d].data) } h.data && (h.data = f.extend({}, h.data)) } function bk(a, b) { var c; if (b.nodeType !== 1) return; b.clearAttributes && b.clearAttributes(), b.mergeAttributes && b.mergeAttributes(a), c = b.nodeName.toLowerCase(); if (c === "object") b.outerHTML = a.outerHTML; else if (c !== "input" || a.type !== "checkbox" && a.type !== "radio") { if (c === "option") b.selected = a.defaultSelected; else if (c === "input" || c === "textarea") b.defaultValue = a.defaultValue } else a.checked && (b.defaultChecked = b.checked = a.checked), b.value !== a.value && (b.value = a.value); b.removeAttribute(f.expando) } function bl(a) { return typeof a.getElementsByTagName != "undefined" ? a.getElementsByTagName("*") : typeof a.querySelectorAll != "undefined" ? a.querySelectorAll("*") : [] } function bm(a) { if (a.type === "checkbox" || a.type === "radio") a.defaultChecked = a.checked } function bn(a) { var b = (a.nodeName || "").toLowerCase(); b === "input" ? bm(a) : b !== "script" && typeof a.getElementsByTagName != "undefined" && f.grep(a.getElementsByTagName("input"), bm) } function bo(a) { var b = c.createElement("div"); return bh.appendChild(b), b.innerHTML = a.outerHTML, b.firstChild } function bp(a, b) { b.src ? f.ajax({ url: b.src, async: !1, dataType: "script" }) : f.globalEval((b.text || b.textContent || b.innerHTML || "").replace(bf, "/*$0*/")), b.parentNode && b.parentNode.removeChild(b) } function bC(a, b, c) { var d = b === "width" ? a.offsetWidth : a.offsetHeight, e = b === "width" ? bx : by, g = 0, h = e.length; if (d > 0) { if (c !== "border") for (; g < h; g++) c || (d -= parseFloat(f.css(a, "padding" + e[g])) || 0), c === "margin" ? d += parseFloat(f.css(a, c + e[g])) || 0 : d -= parseFloat(f.css(a, "border" + e[g] + "Width")) || 0; return d + "px" } d = bz(a, b, b); if (d < 0 || d == null) d = a.style[b] || 0; d = parseFloat(d) || 0; if (c) for (; g < h; g++) d += parseFloat(f.css(a, "padding" + e[g])) || 0, c !== "padding" && (d += parseFloat(f.css(a, "border" + e[g] + "Width")) || 0), c === "margin" && (d += parseFloat(f.css(a, c + e[g])) || 0); return d + "px" } function bZ(a) { return function (b, c) { typeof b != "string" && (c = b, b = "*"); if (f.isFunction(c)) { var d = b.toLowerCase().split(bP), e = 0, g = d.length, h, i, j; for (; e < g; e++) h = d[e], j = /^\+/.test(h), j && (h = h.substr(1) || "*"), i = a[h] = a[h] || [], i[j ? "unshift" : "push"](c) } } } function b$(a, c, d, e, f, g) { f = f || c.dataTypes[0], g = g || {}, g[f] = !0; var h = a[f], i = 0, j = h ? h.length : 0, k = a === bT, l; for (; i < j && (k || !l) ; i++) l = h[i](c, d, e), typeof l == "string" && (!k || g[l] ? l = b : (c.dataTypes.unshift(l), l = b$(a, c, d, e, l, g))); return (k || !l) && !g["*"] && (l = b$(a, c, d, e, "*", g)), l } function b_(a, c) { var d, e, g = f.ajaxSettings.flatOptions || {}; for (d in c) c[d] !== b && ((g[d] ? a : e || (e = {}))[d] = c[d]); e && f.extend(!0, a, e) } function ca(a, b, c, d) { if (f.isArray(b)) f.each(b, function (b, e) { c || bE.test(a) ? d(a, e) : ca(a + "[" + (typeof e == "object" || f.isArray(e) ? b : "") + "]", e, c, d) }); else if (!c && b != null && typeof b == "object") for (var e in b) ca(a + "[" + e + "]", b[e], c, d); else d(a, b) } function cb(a, c, d) { var e = a.contents, f = a.dataTypes, g = a.responseFields, h, i, j, k; for (i in g) i in d && (c[g[i]] = d[i]); while (f[0] === "*") f.shift(), h === b && (h = a.mimeType || c.getResponseHeader("content-type")); if (h) for (i in e) if (e[i] && e[i].test(h)) { f.unshift(i); break } if (f[0] in d) j = f[0]; else { for (i in d) { if (!f[0] || a.converters[i + " " + f[0]]) { j = i; break } k || (k = i) } j = j || k } if (j) return j !== f[0] && f.unshift(j), d[j] } function cc(a, c) { a.dataFilter && (c = a.dataFilter(c, a.dataType)); var d = a.dataTypes, e = {}, g, h, i = d.length, j, k = d[0], l, m, n, o, p; for (g = 1; g < i; g++) { if (g === 1) for (h in a.converters) typeof h == "string" && (e[h.toLowerCase()] = a.converters[h]); l = k, k = d[g]; if (k === "*") k = l; else if (l !== "*" && l !== k) { m = l + " " + k, n = e[m] || e["* " + k]; if (!n) { p = b; for (o in e) { j = o.split(" "); if (j[0] === l || j[0] === "*") { p = e[j[1] + " " + k]; if (p) { o = e[o], o === !0 ? n = p : p === !0 && (n = o); break } } } } !n && !p && f.error("No conversion from " + m.replace(" ", " to ")), n !== !0 && (c = n ? n(c) : p(o(c))) } } return c } function ci() { try { return new a.XMLHttpRequest } catch (b) { } } function cj() { try { return new a.ActiveXObject("Microsoft.XMLHTTP") } catch (b) { } } function cs() { return setTimeout(ct, 0), cr = f.now() } function ct() { cr = b } function cu(a, b) { var c = {}; return f.each(cq.concat.apply([], cq.slice(0, b)), function () { c[this] = a }), c } function cv(a) { if (!ck[a]) { var b = c.body, d = f("<" + a + ">").appendTo(b), e = d.css("display"); d.remove(); if (e === "none" || e === "") { cl || (cl = c.createElement("iframe"), cl.frameBorder = cl.width = cl.height = 0), b.appendChild(cl); if (!cm || !cl.createElement) cm = (cl.contentWindow || cl.contentDocument).document, cm.write((c.compatMode === "CSS1Compat" ? "<!doctype html>" : "") + "<html><body>"), cm.close(); d = cm.createElement(a), cm.body.appendChild(d), e = f.css(d, "display"), b.removeChild(cl) } ck[a] = e } return ck[a] } function cy(a) { return f.isWindow(a) ? a : a.nodeType === 9 ? a.defaultView || a.parentWindow : !1 } var c = a.document, d = a.navigator, e = a.location, f = function () { function J() { if (e.isReady) return; try { c.documentElement.doScroll("left") } catch (a) { setTimeout(J, 1); return } e.ready() } var e = function (a, b) { return new e.fn.init(a, b, h) }, f = a.jQuery, g = a.$, h, i = /^(?:[^#<]*(<[\w\W]+>)[^>]*$|#([\w\-]*)$)/, j = /\S/, k = /^\s+/, l = /\s+$/, m = /^<(\w+)\s*\/?>(?:<\/\1>)?$/, n = /^[\],:{}\s]*$/, o = /\\(?:["\\\/bfnrt]|u[0-9a-fA-F]{4})/g, p = /"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g, q = /(?:^|:|,)(?:\s*\[)+/g, r = /(webkit)[ \/]([\w.]+)/, s = /(opera)(?:.*version)?[ \/]([\w.]+)/, t = /(msie) ([\w.]+)/, u = /(mozilla)(?:.*? rv:([\w.]+))?/, v = /-([a-z]|[0-9])/ig, w = /^-ms-/, x = function (a, b) { return (b + "").toUpperCase() }, y = d.userAgent, z, A, B, C = Object.prototype.toString, D = Object.prototype.hasOwnProperty, E = Array.prototype.push, F = Array.prototype.slice, G = String.prototype.trim, H = Array.prototype.indexOf, I = {}; return e.fn = e.prototype = { constructor: e, init: function (a, d, f) { var g, h, j, k; if (!a) return this; if (a.nodeType) return this.context = this[0] = a, this.length = 1, this; if (a === "body" && !d && c.body) return this.context = c, this[0] = c.body, this.selector = a, this.length = 1, this; if (typeof a == "string") { a.charAt(0) !== "<" || a.charAt(a.length - 1) !== ">" || a.length < 3 ? g = i.exec(a) : g = [null, a, null]; if (g && (g[1] || !d)) { if (g[1]) return d = d instanceof e ? d[0] : d, k = d ? d.ownerDocument || d : c, j = m.exec(a), j ? e.isPlainObject(d) ? (a = [c.createElement(j[1])], e.fn.attr.call(a, d, !0)) : a = [k.createElement(j[1])] : (j = e.buildFragment([g[1]], [k]), a = (j.cacheable ? e.clone(j.fragment) : j.fragment).childNodes), e.merge(this, a); h = c.getElementById(g[2]); if (h && h.parentNode) { if (h.id !== g[2]) return f.find(a); this.length = 1, this[0] = h } return this.context = c, this.selector = a, this } return !d || d.jquery ? (d || f).find(a) : this.constructor(d).find(a) } return e.isFunction(a) ? f.ready(a) : (a.selector !== b && (this.selector = a.selector, this.context = a.context), e.makeArray(a, this)) }, selector: "", jquery: "1.7.1", length: 0, size: function () { return this.length }, toArray: function () { return F.call(this, 0) }, get: function (a) { return a == null ? this.toArray() : a < 0 ? this[this.length + a] : this[a] }, pushStack: function (a, b, c) { var d = this.constructor(); return e.isArray(a) ? E.apply(d, a) : e.merge(d, a), d.prevObject = this, d.context = this.context, b === "find" ? d.selector = this.selector + (this.selector ? " " : "") + c : b && (d.selector = this.selector + "." + b + "(" + c + ")"), d }, each: function (a, b) { return e.each(this, a, b) }, ready: function (a) { return e.bindReady(), A.add(a), this }, eq: function (a) { return a = +a, a === -1 ? this.slice(a) : this.slice(a, a + 1) }, first: function () { return this.eq(0) }, last: function () { return this.eq(-1) }, slice: function () { return this.pushStack(F.apply(this, arguments), "slice", F.call(arguments).join(",")) }, map: function (a) { return this.pushStack(e.map(this, function (b, c) { return a.call(b, c, b) })) }, end: function () { return this.prevObject || this.constructor(null) }, push: E, sort: [].sort, splice: [].splice }, e.fn.init.prototype = e.fn, e.extend = e.fn.extend = function () { var a, c, d, f, g, h, i = arguments[0] || {}, j = 1, k = arguments.length, l = !1; typeof i == "boolean" && (l = i, i = arguments[1] || {}, j = 2), typeof i != "object" && !e.isFunction(i) && (i = {}), k === j && (i = this, --j); for (; j < k; j++) if ((a = arguments[j]) != null) for (c in a) { d = i[c], f = a[c]; if (i === f) continue; l && f && (e.isPlainObject(f) || (g = e.isArray(f))) ? (g ? (g = !1, h = d && e.isArray(d) ? d : []) : h = d && e.isPlainObject(d) ? d : {}, i[c] = e.extend(l, h, f)) : f !== b && (i[c] = f) } return i }, e.extend({ noConflict: function (b) { return a.$ === e && (a.$ = g), b && a.jQuery === e && (a.jQuery = f), e }, isReady: !1, readyWait: 1, holdReady: function (a) { a ? e.readyWait++ : e.ready(!0) }, ready: function (a) { if (a === !0 && !--e.readyWait || a !== !0 && !e.isReady) { if (!c.body) return setTimeout(e.ready, 1); e.isReady = !0; if (a !== !0 && --e.readyWait > 0) return; A.fireWith(c, [e]), e.fn.trigger && e(c).trigger("ready").off("ready") } }, bindReady: function () { if (A) return; A = e.Callbacks("once memory"); if (c.readyState === "complete") return setTimeout(e.ready, 1); if (c.addEventListener) c.addEventListener("DOMContentLoaded", B, !1), a.addEventListener("load", e.ready, !1); else if (c.attachEvent) { c.attachEvent("onreadystatechange", B), a.attachEvent("onload", e.ready); var b = !1; try { b = a.frameElement == null } catch (d) { } c.documentElement.doScroll && b && J() } }, isFunction: function (a) { return e.type(a) === "function" }, isArray: Array.isArray || function (a) { return e.type(a) === "array" }, isWindow: function (a) { return a && typeof a == "object" && "setInterval" in a }, isNumeric: function (a) { return !isNaN(parseFloat(a)) && isFinite(a) }, type: function (a) { return a == null ? String(a) : I[C.call(a)] || "object" }, isPlainObject: function (a) { if (!a || e.type(a) !== "object" || a.nodeType || e.isWindow(a)) return !1; try { if (a.constructor && !D.call(a, "constructor") && !D.call(a.constructor.prototype, "isPrototypeOf")) return !1 } catch (c) { return !1 } var d; for (d in a); return d === b || D.call(a, d) }, isEmptyObject: function (a) { for (var b in a) return !1; return !0 }, error: function (a) { throw new Error(a) }, parseJSON: function (b) { if (typeof b != "string" || !b) return null; b = e.trim(b); if (a.JSON && a.JSON.parse) return a.JSON.parse(b); if (n.test(b.replace(o, "@").replace(p, "]").replace(q, ""))) return (new Function("return " + b))(); e.error("Invalid JSON: " + b) }, parseXML: function (c) { var d, f; try { a.DOMParser ? (f = new DOMParser, d = f.parseFromString(c, "text/xml")) : (d = new ActiveXObject("Microsoft.XMLDOM"), d.async = "false", d.loadXML(c)) } catch (g) { d = b } return (!d || !d.documentElement || d.getElementsByTagName("parsererror").length) && e.error("Invalid XML: " + c), d }, noop: function () { }, globalEval: function (b) { b && j.test(b) && (a.execScript || function (b) { a.eval.call(a, b) })(b) }, camelCase: function (a) { return a.replace(w, "ms-").replace(v, x) }, nodeName: function (a, b) { return a.nodeName && a.nodeName.toUpperCase() === b.toUpperCase() }, each: function (a, c, d) { var f, g = 0, h = a.length, i = h === b || e.isFunction(a); if (d) { if (i) { for (f in a) if (c.apply(a[f], d) === !1) break } else for (; g < h;) if (c.apply(a[g++], d) === !1) break } else if (i) { for (f in a) if (c.call(a[f], f, a[f]) === !1) break } else for (; g < h;) if (c.call(a[g], g, a[g++]) === !1) break; return a }, trim: G ? function (a) { return a == null ? "" : G.call(a) } : function (a) { return a == null ? "" : a.toString().replace(k, "").replace(l, "") }, makeArray: function (a, b) { var c = b || []; if (a != null) { var d = e.type(a); a.length == null || d === "string" || d === "function" || d === "regexp" || e.isWindow(a) ? E.call(c, a) : e.merge(c, a) } return c }, inArray: function (a, b, c) { var d; if (b) { if (H) return H.call(b, a, c); d = b.length, c = c ? c < 0 ? Math.max(0, d + c) : c : 0; for (; c < d; c++) if (c in b && b[c] === a) return c } return -1 }, merge: function (a, c) { var d = a.length, e = 0; if (typeof c.length == "number") for (var f = c.length; e < f; e++) a[d++] = c[e]; else while (c[e] !== b) a[d++] = c[e++]; return a.length = d, a }, grep: function (a, b, c) { var d = [], e; c = !!c; for (var f = 0, g = a.length; f < g; f++) e = !!b(a[f], f), c !== e && d.push(a[f]); return d }, map: function (a, c, d) { var f, g, h = [], i = 0, j = a.length, k = a instanceof e || j !== b && typeof j == "number" && (j > 0 && a[0] && a[j - 1] || j === 0 || e.isArray(a)); if (k) for (; i < j; i++) f = c(a[i], i, d), f != null && (h[h.length] = f); else for (g in a) f = c(a[g], g, d), f != null && (h[h.length] = f); return h.concat.apply([], h) }, guid: 1, proxy: function (a, c) { if (typeof c == "string") { var d = a[c]; c = a, a = d } if (!e.isFunction(a)) return b; var f = F.call(arguments, 2), g = function () { return a.apply(c, f.concat(F.call(arguments))) }; return g.guid = a.guid = a.guid || g.guid || e.guid++, g }, access: function (a, c, d, f, g, h) { var i = a.length; if (typeof c == "object") { for (var j in c) e.access(a, j, c[j], f, g, d); return a } if (d !== b) { f = !h && f && e.isFunction(d); for (var k = 0; k < i; k++) g(a[k], c, f ? d.call(a[k], k, g(a[k], c)) : d, h); return a } return i ? g(a[0], c) : b }, now: function () { return (new Date).getTime() }, uaMatch: function (a) { a = a.toLowerCase(); var b = r.exec(a) || s.exec(a) || t.exec(a) || a.indexOf("compatible") < 0 && u.exec(a) || []; return { browser: b[1] || "", version: b[2] || "0" } }, sub: function () { function a(b, c) { return new a.fn.init(b, c) } e.extend(!0, a, this), a.superclass = this, a.fn = a.prototype = this(), a.fn.constructor = a, a.sub = this.sub, a.fn.init = function d(c, d) { return d && d instanceof e && !(d instanceof a) && (d = a(d)), e.fn.init.call(this, c, d, b) }, a.fn.init.prototype = a.fn; var b = a(c); return a }, browser: {} }), e.each("Boolean Number String Function Array Date RegExp Object".split(" "), function (a, b) { I["[object " + b + "]"] = b.toLowerCase() }), z = e.uaMatch(y), z.browser && (e.browser[z.browser] = !0, e.browser.version = z.version), e.browser.webkit && (e.browser.safari = !0), j.test(" ") && (k = /^[\s\xA0]+/, l = /[\s\xA0]+$/), h = e(c), c.addEventListener ? B = function () { c.removeEventListener("DOMContentLoaded", B, !1), e.ready() } : c.attachEvent && (B = function () { c.readyState === "complete" && (c.detachEvent("onreadystatechange", B), e.ready()) }), e }(), g = {}; f.Callbacks = function (a) { a = a ? g[a] || h(a) : {}; var c = [], d = [], e, i, j, k, l, m = function (b) { var d, e, g, h, i; for (d = 0, e = b.length; d < e; d++) g = b[d], h = f.type(g), h === "array" ? m(g) : h === "function" && (!a.unique || !o.has(g)) && c.push(g) }, n = function (b, f) { f = f || [], e = !a.memory || [b, f], i = !0, l = j || 0, j = 0, k = c.length; for (; c && l < k; l++) if (c[l].apply(b, f) === !1 && a.stopOnFalse) { e = !0; break } i = !1, c && (a.once ? e === !0 ? o.disable() : c = [] : d && d.length && (e = d.shift(), o.fireWith(e[0], e[1]))) }, o = { add: function () { if (c) { var a = c.length; m(arguments), i ? k = c.length : e && e !== !0 && (j = a, n(e[0], e[1])) } return this }, remove: function () { if (c) { var b = arguments, d = 0, e = b.length; for (; d < e; d++) for (var f = 0; f < c.length; f++) if (b[d] === c[f]) { i && f <= k && (k--, f <= l && l--), c.splice(f--, 1); if (a.unique) break } } return this }, has: function (a) { if (c) { var b = 0, d = c.length; for (; b < d; b++) if (a === c[b]) return !0 } return !1 }, empty: function () { return c = [], this }, disable: function () { return c = d = e = b, this }, disabled: function () { return !c }, lock: function () { return d = b, (!e || e === !0) && o.disable(), this }, locked: function () { return !d }, fireWith: function (b, c) { return d && (i ? a.once || d.push([b, c]) : (!a.once || !e) && n(b, c)), this }, fire: function () { return o.fireWith(this, arguments), this }, fired: function () { return !!e } }; return o }; var i = [].slice; f.extend({ Deferred: function (a) { var b = f.Callbacks("once memory"), c = f.Callbacks("once memory"), d = f.Callbacks("memory"), e = "pending", g = { resolve: b, reject: c, notify: d }, h = { done: b.add, fail: c.add, progress: d.add, state: function () { return e }, isResolved: b.fired, isRejected: c.fired, then: function (a, b, c) { return i.done(a).fail(b).progress(c), this }, always: function () { return i.done.apply(i, arguments).fail.apply(i, arguments), this }, pipe: function (a, b, c) { return f.Deferred(function (d) { f.each({ done: [a, "resolve"], fail: [b, "reject"], progress: [c, "notify"] }, function (a, b) { var c = b[0], e = b[1], g; f.isFunction(c) ? i[a](function () { g = c.apply(this, arguments), g && f.isFunction(g.promise) ? g.promise().then(d.resolve, d.reject, d.notify) : d[e + "With"](this === i ? d : this, [g]) }) : i[a](d[e]) }) }).promise() }, promise: function (a) { if (a == null) a = h; else for (var b in h) a[b] = h[b]; return a } }, i = h.promise({}), j; for (j in g) i[j] = g[j].fire, i[j + "With"] = g[j].fireWith; return i.done(function () { e = "resolved" }, c.disable, d.lock).fail(function () { e = "rejected" }, b.disable, d.lock), a && a.call(i, i), i }, when: function (a) { function l(a) { return function (c) { b[a] = arguments.length > 1 ? i.call(arguments, 0) : c, --g || j.resolveWith(j, b) } } function m(a) { return function (b) { e[a] = arguments.length > 1 ? i.call(arguments, 0) : b, j.notifyWith(k, e) } } var b = i.call(arguments, 0), c = 0, d = b.length, e = new Array(d), g = d, h = d, j = d <= 1 && a && f.isFunction(a.promise) ? a : f.Deferred(), k = j.promise(); if (d > 1) { for (; c < d; c++) b[c] && b[c].promise && f.isFunction(b[c].promise) ? b[c].promise().then(l(c), j.reject, m(c)) : --g; g || j.resolveWith(j, b) } else j !== a && j.resolveWith(j, d ? [a] : []); return k } }), f.support = function () { var b, d, e, g, h, i, j, k, l, m, n, o, p, q = c.createElement("div"), r = c.documentElement; q.setAttribute("className", "t"), q.innerHTML = "   <link/><table></table><a href='/a' style='top:1px;float:left;opacity:.55;'>a</a><input type='checkbox'/>", d = q.getElementsByTagName("*"), e = q.getElementsByTagName("a")[0]; if (!d || !d.length || !e) return {}; g = c.createElement("select"), h = g.appendChild(c.createElement("option")), i = q.getElementsByTagName("input")[0], b = { leadingWhitespace: q.firstChild.nodeType === 3, tbody: !q.getElementsByTagName("tbody").length, htmlSerialize: !!q.getElementsByTagName("link").length, style: /top/.test(e.getAttribute("style")), hrefNormalized: e.getAttribute("href") === "/a", opacity: /^0.55/.test(e.style.opacity), cssFloat: !!e.style.cssFloat, checkOn: i.value === "on", optSelected: h.selected, getSetAttribute: q.className !== "t", enctype: !!c.createElement("form").enctype, html5Clone: c.createElement("nav").cloneNode(!0).outerHTML !== "<:nav></:nav>", submitBubbles: !0, changeBubbles: !0, focusinBubbles: !1, deleteExpando: !0, noCloneEvent: !0, inlineBlockNeedsLayout: !1, shrinkWrapBlocks: !1, reliableMarginRight: !0 }, i.checked = !0, b.noCloneChecked = i.cloneNode(!0).checked, g.disabled = !0, b.optDisabled = !h.disabled; try { delete q.test } catch (s) { b.deleteExpando = !1 } !q.addEventListener && q.attachEvent && q.fireEvent && (q.attachEvent("onclick", function () { b.noCloneEvent = !1 }), q.cloneNode(!0).fireEvent("onclick")), i = c.createElement("input"), i.value = "t", i.setAttribute("type", "radio"), b.radioValue = i.value === "t", i.setAttribute("checked", "checked"), q.appendChild(i), k = c.createDocumentFragment(), k.appendChild(q.lastChild), b.checkClone = k.cloneNode(!0).cloneNode(!0).lastChild.checked, b.appendChecked = i.checked, k.removeChild(i), k.appendChild(q), q.innerHTML = "", a.getComputedStyle && (j = c.createElement("div"), j.style.width = "0", j.style.marginRight = "0", q.style.width = "2px", q.appendChild(j), b.reliableMarginRight = (parseInt((a.getComputedStyle(j, null) || { marginRight: 0 }).marginRight, 10) || 0) === 0); if (q.attachEvent) for (o in { submit: 1, change: 1, focusin: 1 }) n = "on" + o, p = n in q, p || (q.setAttribute(n, "return;"), p = typeof q[n] == "function"), b[o + "Bubbles"] = p; return k.removeChild(q), k = g = h = j = q = i = null, f(function () { var a, d, e, g, h, i, j, k, m, n, o, r = c.getElementsByTagName("body")[0]; if (!r) return; j = 1, k = "position:absolute;top:0;left:0;width:1px;height:1px;margin:0;", m = "visibility:hidden;border:0;", n = "style='" + k + "border:5px solid #000;padding:0;'", o = "<div " + n + "><div></div></div>" + "<table " + n + " cellpadding='0' cellspacing='0'>" + "<tr><td></td></tr></table>", a = c.createElement("div"), a.style.cssText = m + "width:0;height:0;position:static;top:0;margin-top:" + j + "px", r.insertBefore(a, r.firstChild), q = c.createElement("div"), a.appendChild(q), q.innerHTML = "<table><tr><td style='padding:0;border:0;display:none'></td><td>t</td></tr></table>", l = q.getElementsByTagName("td"), p = l[0].offsetHeight === 0, l[0].style.display = "", l[1].style.display = "none", b.reliableHiddenOffsets = p && l[0].offsetHeight === 0, q.innerHTML = "", q.style.width = q.style.paddingLeft = "1px", f.boxModel = b.boxModel = q.offsetWidth === 2, typeof q.style.zoom != "undefined" && (q.style.display = "inline", q.style.zoom = 1, b.inlineBlockNeedsLayout = q.offsetWidth === 2, q.style.display = "", q.innerHTML = "<div style='width:4px;'></div>", b.shrinkWrapBlocks = q.offsetWidth !== 2), q.style.cssText = k + m, q.innerHTML = o, d = q.firstChild, e = d.firstChild, h = d.nextSibling.firstChild.firstChild, i = { doesNotAddBorder: e.offsetTop !== 5, doesAddBorderForTableAndCells: h.offsetTop === 5 }, e.style.position = "fixed", e.style.top = "20px", i.fixedPosition = e.offsetTop === 20 || e.offsetTop === 15, e.style.position = e.style.top = "", d.style.overflow = "hidden", d.style.position = "relative", i.subtractsBorderForOverflowNotVisible = e.offsetTop === -5, i.doesNotIncludeMarginInBodyOffset = r.offsetTop !== j, r.removeChild(a), q = a = null, f.extend(b, i) }), b }(); var j = /^(?:\{.*\}|\[.*\])$/, k = /([A-Z])/g; f.extend({ cache: {}, uuid: 0, expando: "jQuery" + (f.fn.jquery + Math.random()).replace(/\D/g, ""), noData: { embed: !0, object: "clsid:D27CDB6E-AE6D-11cf-96B8-444553540000", applet: !0 }, hasData: function (a) { return a = a.nodeType ? f.cache[a[f.expando]] : a[f.expando], !!a && !m(a) }, data: function (a, c, d, e) { if (!f.acceptData(a)) return; var g, h, i, j = f.expando, k = typeof c == "string", l = a.nodeType, m = l ? f.cache : a, n = l ? a[j] : a[j] && j, o = c === "events"; if ((!n || !m[n] || !o && !e && !m[n].data) && k && d === b) return; n || (l ? a[j] = n = ++f.uuid : n = j), m[n] || (m[n] = {}, l || (m[n].toJSON = f.noop)); if (typeof c == "object" || typeof c == "function") e ? m[n] = f.extend(m[n], c) : m[n].data = f.extend(m[n].data, c); return g = h = m[n], e || (h.data || (h.data = {}), h = h.data), d !== b && (h[f.camelCase(c)] = d), o && !h[c] ? g.events : (k ? (i = h[c], i == null && (i = h[f.camelCase(c)])) : i = h, i) }, removeData: function (a, b, c) { if (!f.acceptData(a)) return; var d, e, g, h = f.expando, i = a.nodeType, j = i ? f.cache : a, k = i ? a[h] : h; if (!j[k]) return; if (b) { d = c ? j[k] : j[k].data; if (d) { f.isArray(b) || (b in d ? b = [b] : (b = f.camelCase(b), b in d ? b = [b] : b = b.split(" "))); for (e = 0, g = b.length; e < g; e++) delete d[b[e]]; if (!(c ? m : f.isEmptyObject)(d)) return } } if (!c) { delete j[k].data; if (!m(j[k])) return } f.support.deleteExpando || !j.setInterval ? delete j[k] : j[k] = null, i && (f.support.deleteExpando ? delete a[h] : a.removeAttribute ? a.removeAttribute(h) : a[h] = null) }, _data: function (a, b, c) { return f.data(a, b, c, !0) }, acceptData: function (a) { if (a.nodeName) { var b = f.noData[a.nodeName.toLowerCase()]; if (b) return b !== !0 && a.getAttribute("classid") === b } return !0 } }), f.fn.extend({ data: function (a, c) { var d, e, g, h = null; if (typeof a == "undefined") { if (this.length) { h = f.data(this[0]); if (this[0].nodeType === 1 && !f._data(this[0], "parsedAttrs")) { e = this[0].attributes; for (var i = 0, j = e.length; i < j; i++) g = e[i].name, g.indexOf("data-") === 0 && (g = f.camelCase(g.substring(5)), l(this[0], g, h[g])); f._data(this[0], "parsedAttrs", !0) } } return h } return typeof a == "object" ? this.each(function () { f.data(this, a) }) : (d = a.split("."), d[1] = d[1] ? "." + d[1] : "", c === b ? (h = this.triggerHandler("getData" + d[1] + "!", [d[0]]), h === b && this.length && (h = f.data(this[0], a), h = l(this[0], a, h)), h === b && d[1] ? this.data(d[0]) : h) : this.each(function () { var b = f(this), e = [d[0], c]; b.triggerHandler("setData" + d[1] + "!", e), f.data(this, a, c), b.triggerHandler("changeData" + d[1] + "!", e) })) }, removeData: function (a) { return this.each(function () { f.removeData(this, a) }) } }), f.extend({ _mark: function (a, b) { a && (b = (b || "fx") + "mark", f._data(a, b, (f._data(a, b) || 0) + 1)) }, _unmark: function (a, b, c) { a !== !0 && (c = b, b = a, a = !1); if (b) { c = c || "fx"; var d = c + "mark", e = a ? 0 : (f._data(b, d) || 1) - 1; e ? f._data(b, d, e) : (f.removeData(b, d, !0), n(b, c, "mark")) } }, queue: function (a, b, c) { var d; if (a) return b = (b || "fx") + "queue", d = f._data(a, b), c && (!d || f.isArray(c) ? d = f._data(a, b, f.makeArray(c)) : d.push(c)), d || [] }, dequeue: function (a, b) { b = b || "fx"; var c = f.queue(a, b), d = c.shift(), e = {}; d === "inprogress" && (d = c.shift()), d && (b === "fx" && c.unshift("inprogress"), f._data(a, b + ".run", e), d.call(a, function () { f.dequeue(a, b) }, e)), c.length || (f.removeData(a, b + "queue " + b + ".run", !0), n(a, b, "queue")) } }), f.fn.extend({ queue: function (a, c) { return typeof a != "string" && (c = a, a = "fx"), c === b ? f.queue(this[0], a) : this.each(function () { var b = f.queue(this, a, c); a === "fx" && b[0] !== "inprogress" && f.dequeue(this, a) }) }, dequeue: function (a) { return this.each(function () { f.dequeue(this, a) }) }, delay: function (a, b) { return a = f.fx ? f.fx.speeds[a] || a : a, b = b || "fx", this.queue(b, function (b, c) { var d = setTimeout(b, a); c.stop = function () { clearTimeout(d) } }) }, clearQueue: function (a) { return this.queue(a || "fx", []) }, promise: function (a, c) { function m() { --h || d.resolveWith(e, [e]) } typeof a != "string" && (c = a, a = b), a = a || "fx"; var d = f.Deferred(), e = this, g = e.length, h = 1, i = a + "defer", j = a + "queue", k = a + "mark", l; while (g--) if (l = f.data(e[g], i, b, !0) || (f.data(e[g], j, b, !0) || f.data(e[g], k, b, !0)) && f.data(e[g], i, f.Callbacks("once memory"), !0)) h++, l.add(m); return m(), d.promise() } }); var o = /[\n\t\r]/g, p = /\s+/, q = /\r/g, r = /^(?:button|input)$/i, s = /^(?:button|input|object|select|textarea)$/i, t = /^a(?:rea)?$/i, u = /^(?:autofocus|autoplay|async|checked|controls|defer|disabled|hidden|loop|multiple|open|readonly|required|scoped|selected)$/i, v = f.support.getSetAttribute, w, x, y; f.fn.extend({ attr: function (a, b) { return f.access(this, a, b, !0, f.attr) }, removeAttr: function (a) { return this.each(function () { f.removeAttr(this, a) }) }, prop: function (a, b) { return f.access(this, a, b, !0, f.prop) }, removeProp: function (a) { return a = f.propFix[a] || a, this.each(function () { try { this[a] = b, delete this[a] } catch (c) { } }) }, addClass: function (a) { var b, c, d, e, g, h, i; if (f.isFunction(a)) return this.each(function (b) { f(this).addClass(a.call(this, b, this.className)) }); if (a && typeof a == "string") { b = a.split(p); for (c = 0, d = this.length; c < d; c++) { e = this[c]; if (e.nodeType === 1) if (!e.className && b.length === 1) e.className = a; else { g = " " + e.className + " "; for (h = 0, i = b.length; h < i; h++) ~g.indexOf(" " + b[h] + " ") || (g += b[h] + " "); e.className = f.trim(g) } } } return this }, removeClass: function (a) { var c, d, e, g, h, i, j; if (f.isFunction(a)) return this.each(function (b) { f(this).removeClass(a.call(this, b, this.className)) }); if (a && typeof a == "string" || a === b) { c = (a || "").split(p); for (d = 0, e = this.length; d < e; d++) { g = this[d]; if (g.nodeType === 1 && g.className) if (a) { h = (" " + g.className + " ").replace(o, " "); for (i = 0, j = c.length; i < j; i++) h = h.replace(" " + c[i] + " ", " "); g.className = f.trim(h) } else g.className = "" } } return this }, toggleClass: function (a, b) { var c = typeof a, d = typeof b == "boolean"; return f.isFunction(a) ? this.each(function (c) { f(this).toggleClass(a.call(this, c, this.className, b), b) }) : this.each(function () { if (c === "string") { var e, g = 0, h = f(this), i = b, j = a.split(p); while (e = j[g++]) i = d ? i : !h.hasClass(e), h[i ? "addClass" : "removeClass"](e) } else if (c === "undefined" || c === "boolean") this.className && f._data(this, "__className__", this.className), this.className = this.className || a === !1 ? "" : f._data(this, "__className__") || "" }) }, hasClass: function (a) { var b = " " + a + " ", c = 0, d = this.length; for (; c < d; c++) if (this[c].nodeType === 1 && (" " + this[c].className + " ").replace(o, " ").indexOf(b) > -1) return !0; return !1 }, val: function (a) { var c, d, e, g = this[0]; if (!arguments.length) { if (g) return c = f.valHooks[g.nodeName.toLowerCase()] || f.valHooks[g.type], c && "get" in c && (d = c.get(g, "value")) !== b ? d : (d = g.value, typeof d == "string" ? d.replace(q, "") : d == null ? "" : d); return } return e = f.isFunction(a), this.each(function (d) { var g = f(this), h; if (this.nodeType !== 1) return; e ? h = a.call(this, d, g.val()) : h = a, h == null ? h = "" : typeof h == "number" ? h += "" : f.isArray(h) && (h = f.map(h, function (a) { return a == null ? "" : a + "" })), c = f.valHooks[this.nodeName.toLowerCase()] || f.valHooks[this.type]; if (!c || !("set" in c) || c.set(this, h, "value") === b) this.value = h }) } }), f.extend({ valHooks: { option: { get: function (a) { var b = a.attributes.value; return !b || b.specified ? a.value : a.text } }, select: { get: function (a) { var b, c, d, e, g = a.selectedIndex, h = [], i = a.options, j = a.type === "select-one"; if (g < 0) return null; c = j ? g : 0, d = j ? g + 1 : i.length; for (; c < d; c++) { e = i[c]; if (e.selected && (f.support.optDisabled ? !e.disabled : e.getAttribute("disabled") === null) && (!e.parentNode.disabled || !f.nodeName(e.parentNode, "optgroup"))) { b = f(e).val(); if (j) return b; h.push(b) } } return j && !h.length && i.length ? f(i[g]).val() : h }, set: function (a, b) { var c = f.makeArray(b); return f(a).find("option").each(function () { this.selected = f.inArray(f(this).val(), c) >= 0 }), c.length || (a.selectedIndex = -1), c } } }, attrFn: { val: !0, css: !0, html: !0, text: !0, data: !0, width: !0, height: !0, offset: !0 }, attr: function (a, c, d, e) { var g, h, i, j = a.nodeType; if (!a || j === 3 || j === 8 || j === 2) return; if (e && c in f.attrFn) return f(a)[c](d); if (typeof a.getAttribute == "undefined") return f.prop(a, c, d); i = j !== 1 || !f.isXMLDoc(a), i && (c = c.toLowerCase(), h = f.attrHooks[c] || (u.test(c) ? x : w)); if (d !== b) { if (d === null) { f.removeAttr(a, c); return } return h && "set" in h && i && (g = h.set(a, d, c)) !== b ? g : (a.setAttribute(c, "" + d), d) } return h && "get" in h && i && (g = h.get(a, c)) !== null ? g : (g = a.getAttribute(c), g === null ? b : g) }, removeAttr: function (a, b) { var c, d, e, g, h = 0; if (b && a.nodeType === 1) { d = b.toLowerCase().split(p), g = d.length; for (; h < g; h++) e = d[h], e && (c = f.propFix[e] || e, f.attr(a, e, ""), a.removeAttribute(v ? e : c), u.test(e) && c in a && (a[c] = !1)) } }, attrHooks: { type: { set: function (a, b) { if (r.test(a.nodeName) && a.parentNode) f.error("type property can't be changed"); else if (!f.support.radioValue && b === "radio" && f.nodeName(a, "input")) { var c = a.value; return a.setAttribute("type", b), c && (a.value = c), b } } }, value: { get: function (a, b) { return w && f.nodeName(a, "button") ? w.get(a, b) : b in a ? a.value : null }, set: function (a, b, c) { if (w && f.nodeName(a, "button")) return w.set(a, b, c); a.value = b } } }, propFix: { tabindex: "tabIndex", readonly: "readOnly", "for": "htmlFor", "class": "className", maxlength: "maxLength", cellspacing: "cellSpacing", cellpadding: "cellPadding", rowspan: "rowSpan", colspan: "colSpan", usemap: "useMap", frameborder: "frameBorder", contenteditable: "contentEditable" }, prop: function (a, c, d) { var e, g, h, i = a.nodeType; if (!a || i === 3 || i === 8 || i === 2) return; return h = i !== 1 || !f.isXMLDoc(a), h && (c = f.propFix[c] || c, g = f.propHooks[c]), d !== b ? g && "set" in g && (e = g.set(a, d, c)) !== b ? e : a[c] = d : g && "get" in g && (e = g.get(a, c)) !== null ? e : a[c] }, propHooks: { tabIndex: { get: function (a) { var c = a.getAttributeNode("tabindex"); return c && c.specified ? parseInt(c.value, 10) : s.test(a.nodeName) || t.test(a.nodeName) && a.href ? 0 : b } } } }), f.attrHooks.tabindex = f.propHooks.tabIndex, x = { get: function (a, c) { var d, e = f.prop(a, c); return e === !0 || typeof e != "boolean" && (d = a.getAttributeNode(c)) && d.nodeValue !== !1 ? c.toLowerCase() : b }, set: function (a, b, c) { var d; return b === !1 ? f.removeAttr(a, c) : (d = f.propFix[c] || c, d in a && (a[d] = !0), a.setAttribute(c, c.toLowerCase())), c } }, v || (y = { name: !0, id: !0 }, w = f.valHooks.button = { get: function (a, c) { var d; return d = a.getAttributeNode(c), d && (y[c] ? d.nodeValue !== "" : d.specified) ? d.nodeValue : b }, set: function (a, b, d) { var e = a.getAttributeNode(d); return e || (e = c.createAttribute(d), a.setAttributeNode(e)), e.nodeValue = b + "" } }, f.attrHooks.tabindex.set = w.set, f.each(["width", "height"], function (a, b) { f.attrHooks[b] = f.extend(f.attrHooks[b], { set: function (a, c) { if (c === "") return a.setAttribute(b, "auto"), c } }) }), f.attrHooks.contenteditable = { get: w.get, set: function (a, b, c) { b === "" && (b = "false"), w.set(a, b, c) } }), f.support.hrefNormalized || f.each(["href", "src", "width", "height"], function (a, c) { f.attrHooks[c] = f.extend(f.attrHooks[c], { get: function (a) { var d = a.getAttribute(c, 2); return d === null ? b : d } }) }), f.support.style || (f.attrHooks.style = { get: function (a) { return a.style.cssText.toLowerCase() || b }, set: function (a, b) { return a.style.cssText = "" + b } }), f.support.optSelected || (f.propHooks.selected = f.extend(f.propHooks.selected, { get: function (a) { var b = a.parentNode; return b && (b.selectedIndex, b.parentNode && b.parentNode.selectedIndex), null } })), f.support.enctype || (f.propFix.enctype = "encoding"), f.support.checkOn || f.each(["radio", "checkbox"], function () { f.valHooks[this] = { get: function (a) { return a.getAttribute("value") === null ? "on" : a.value } } }), f.each(["radio", "checkbox"], function () { f.valHooks[this] = f.extend(f.valHooks[this], { set: function (a, b) { if (f.isArray(b)) return a.checked = f.inArray(f(a).val(), b) >= 0 } }) }); var z = /^(?:textarea|input|select)$/i, A = /^([^\.]*)?(?:\.(.+))?$/, B = /\bhover(\.\S+)?\b/, C = /^key/, D = /^(?:mouse|contextmenu)|click/, E = /^(?:focusinfocus|focusoutblur)$/, F = /^(\w*)(?:#([\w\-]+))?(?:\.([\w\-]+))?$/, G = function (a) { var b = F.exec(a); return b && (b[1] = (b[1] || "").toLowerCase(), b[3] = b[3] && new RegExp("(?:^|\\s)" + b[3] + "(?:\\s|$)")), b }, H = function (a, b) { var c = a.attributes || {}; return (!b[1] || a.nodeName.toLowerCase() === b[1]) && (!b[2] || (c.id || {}).value === b[2]) && (!b[3] || b[3].test((c["class"] || {}).value)) }, I = function (a) { return f.event.special.hover ? a : a.replace(B, "mouseenter$1 mouseleave$1") }; f.event = { add: function (a, c, d, e, g) { var h, i, j, k, l, m, n, o, p, q, r, s; if (a.nodeType === 3 || a.nodeType === 8 || !c || !d || !(h = f._data(a))) return; d.handler && (p = d, d = p.handler), d.guid || (d.guid = f.guid++), j = h.events, j || (h.events = j = {}), i = h.handle, i || (h.handle = i = function (a) { return typeof f == "undefined" || !!a && f.event.triggered === a.type ? b : f.event.dispatch.apply(i.elem, arguments) }, i.elem = a), c = f.trim(I(c)).split(" "); for (k = 0; k < c.length; k++) { l = A.exec(c[k]) || [], m = l[1], n = (l[2] || "").split(".").sort(), s = f.event.special[m] || {}, m = (g ? s.delegateType : s.bindType) || m, s = f.event.special[m] || {}, o = f.extend({ type: m, origType: l[1], data: e, handler: d, guid: d.guid, selector: g, quick: G(g), namespace: n.join(".") }, p), r = j[m]; if (!r) { r = j[m] = [], r.delegateCount = 0; if (!s.setup || s.setup.call(a, e, n, i) === !1) a.addEventListener ? a.addEventListener(m, i, !1) : a.attachEvent && a.attachEvent("on" + m, i) } s.add && (s.add.call(a, o), o.handler.guid || (o.handler.guid = d.guid)), g ? r.splice(r.delegateCount++, 0, o) : r.push(o), f.event.global[m] = !0 } a = null }, global: {}, remove: function (a, b, c, d, e) { var g = f.hasData(a) && f._data(a), h, i, j, k, l, m, n, o, p, q, r, s; if (!g || !(o = g.events)) return; b = f.trim(I(b || "")).split(" "); for (h = 0; h < b.length; h++) { i = A.exec(b[h]) || [], j = k = i[1], l = i[2]; if (!j) { for (j in o) f.event.remove(a, j + b[h], c, d, !0); continue } p = f.event.special[j] || {}, j = (d ? p.delegateType : p.bindType) || j, r = o[j] || [], m = r.length, l = l ? new RegExp("(^|\\.)" + l.split(".").sort().join("\\.(?:.*\\.)?") + "(\\.|$)") : null; for (n = 0; n < r.length; n++) s = r[n], (e || k === s.origType) && (!c || c.guid === s.guid) && (!l || l.test(s.namespace)) && (!d || d === s.selector || d === "**" && s.selector) && (r.splice(n--, 1), s.selector && r.delegateCount--, p.remove && p.remove.call(a, s)); r.length === 0 && m !== r.length && ((!p.teardown || p.teardown.call(a, l) === !1) && f.removeEvent(a, j, g.handle), delete o[j]) } f.isEmptyObject(o) && (q = g.handle, q && (q.elem = null), f.removeData(a, ["events", "handle"], !0)) }, customEvent: { getData: !0, setData: !0, changeData: !0 }, trigger: function (c, d, e, g) { if (!e || e.nodeType !== 3 && e.nodeType !== 8) { var h = c.type || c, i = [], j, k, l, m, n, o, p, q, r, s; if (E.test(h + f.event.triggered)) return; h.indexOf("!") >= 0 && (h = h.slice(0, -1), k = !0), h.indexOf(".") >= 0 && (i = h.split("."), h = i.shift(), i.sort()); if ((!e || f.event.customEvent[h]) && !f.event.global[h]) return; c = typeof c == "object" ? c[f.expando] ? c : new f.Event(h, c) : new f.Event(h), c.type = h, c.isTrigger = !0, c.exclusive = k, c.namespace = i.join("."), c.namespace_re = c.namespace ? new RegExp("(^|\\.)" + i.join("\\.(?:.*\\.)?") + "(\\.|$)") : null, o = h.indexOf(":") < 0 ? "on" + h : ""; if (!e) { j = f.cache; for (l in j) j[l].events && j[l].events[h] && f.event.trigger(c, d, j[l].handle.elem, !0); return } c.result = b, c.target || (c.target = e), d = d != null ? f.makeArray(d) : [], d.unshift(c), p = f.event.special[h] || {}; if (p.trigger && p.trigger.apply(e, d) === !1) return; r = [[e, p.bindType || h]]; if (!g && !p.noBubble && !f.isWindow(e)) { s = p.delegateType || h, m = E.test(s + h) ? e : e.parentNode, n = null; for (; m; m = m.parentNode) r.push([m, s]), n = m; n && n === e.ownerDocument && r.push([n.defaultView || n.parentWindow || a, s]) } for (l = 0; l < r.length && !c.isPropagationStopped() ; l++) m = r[l][0], c.type = r[l][1], q = (f._data(m, "events") || {})[c.type] && f._data(m, "handle"), q && q.apply(m, d), q = o && m[o], q && f.acceptData(m) && q.apply(m, d) === !1 && c.preventDefault(); return c.type = h, !g && !c.isDefaultPrevented() && (!p._default || p._default.apply(e.ownerDocument, d) === !1) && (h !== "click" || !f.nodeName(e, "a")) && f.acceptData(e) && o && e[h] && (h !== "focus" && h !== "blur" || c.target.offsetWidth !== 0) && !f.isWindow(e) && (n = e[o], n && (e[o] = null), f.event.triggered = h, e[h](), f.event.triggered = b, n && (e[o] = n)), c.result } return }, dispatch: function (c) { c = f.event.fix(c || a.event); var d = (f._data(this, "events") || {})[c.type] || [], e = d.delegateCount, g = [].slice.call(arguments, 0), h = !c.exclusive && !c.namespace, i = [], j, k, l, m, n, o, p, q, r, s, t; g[0] = c, c.delegateTarget = this; if (e && !c.target.disabled && (!c.button || c.type !== "click")) { m = f(this), m.context = this.ownerDocument || this; for (l = c.target; l != this; l = l.parentNode || this) { o = {}, q = [], m[0] = l; for (j = 0; j < e; j++) r = d[j], s = r.selector, o[s] === b && (o[s] = r.quick ? H(l, r.quick) : m.is(s)), o[s] && q.push(r); q.length && i.push({ elem: l, matches: q }) } } d.length > e && i.push({ elem: this, matches: d.slice(e) }); for (j = 0; j < i.length && !c.isPropagationStopped() ; j++) { p = i[j], c.currentTarget = p.elem; for (k = 0; k < p.matches.length && !c.isImmediatePropagationStopped() ; k++) { r = p.matches[k]; if (h || !c.namespace && !r.namespace || c.namespace_re && c.namespace_re.test(r.namespace)) c.data = r.data, c.handleObj = r, n = ((f.event.special[r.origType] || {}).handle || r.handler).apply(p.elem, g), n !== b && (c.result = n, n === !1 && (c.preventDefault(), c.stopPropagation())) } } return c.result }, props: "attrChange attrName relatedNode srcElement altKey bubbles cancelable ctrlKey currentTarget eventPhase metaKey relatedTarget shiftKey target timeStamp view which".split(" "), fixHooks: {}, keyHooks: { props: "char charCode key keyCode".split(" "), filter: function (a, b) { return a.which == null && (a.which = b.charCode != null ? b.charCode : b.keyCode), a } }, mouseHooks: { props: "button buttons clientX clientY fromElement offsetX offsetY pageX pageY screenX screenY toElement".split(" "), filter: function (a, d) { var e, f, g, h = d.button, i = d.fromElement; return a.pageX == null && d.clientX != null && (e = a.target.ownerDocument || c, f = e.documentElement, g = e.body, a.pageX = d.clientX + (f && f.scrollLeft || g && g.scrollLeft || 0) - (f && f.clientLeft || g && g.clientLeft || 0), a.pageY = d.clientY + (f && f.scrollTop || g && g.scrollTop || 0) - (f && f.clientTop || g && g.clientTop || 0)), !a.relatedTarget && i && (a.relatedTarget = i === a.target ? d.toElement : i), !a.which && h !== b && (a.which = h & 1 ? 1 : h & 2 ? 3 : h & 4 ? 2 : 0), a } }, fix: function (a) { if (a[f.expando]) return a; var d, e, g = a, h = f.event.fixHooks[a.type] || {}, i = h.props ? this.props.concat(h.props) : this.props; a = f.Event(g); for (d = i.length; d;) e = i[--d], a[e] = g[e]; return a.target || (a.target = g.srcElement || c), a.target.nodeType === 3 && (a.target = a.target.parentNode), a.metaKey === b && (a.metaKey = a.ctrlKey), h.filter ? h.filter(a, g) : a }, special: { ready: { setup: f.bindReady }, load: { noBubble: !0 }, focus: { delegateType: "focusin" }, blur: { delegateType: "focusout" }, beforeunload: { setup: function (a, b, c) { f.isWindow(this) && (this.onbeforeunload = c) }, teardown: function (a, b) { this.onbeforeunload === b && (this.onbeforeunload = null) } } }, simulate: function (a, b, c, d) { var e = f.extend(new f.Event, c, { type: a, isSimulated: !0, originalEvent: {} }); d ? f.event.trigger(e, null, b) : f.event.dispatch.call(b, e), e.isDefaultPrevented() && c.preventDefault() } }, f.event.handle = f.event.dispatch, f.removeEvent = c.removeEventListener ? function (a, b, c) { a.removeEventListener && a.removeEventListener(b, c, !1) } : function (a, b, c) { a.detachEvent && a.detachEvent("on" + b, c) }, f.Event = function (a, b) { if (this instanceof f.Event) a && a.type ? (this.originalEvent = a, this.type = a.type, this.isDefaultPrevented = a.defaultPrevented || a.returnValue === !1 || a.getPreventDefault && a.getPreventDefault() ? K : J) : this.type = a, b && f.extend(this, b), this.timeStamp = a && a.timeStamp || f.now(), this[f.expando] = !0; else return new f.Event(a, b) }, f.Event.prototype = { preventDefault: function () { this.isDefaultPrevented = K; var a = this.originalEvent; if (!a) return; a.preventDefault ? a.preventDefault() : a.returnValue = !1 }, stopPropagation: function () { this.isPropagationStopped = K; var a = this.originalEvent; if (!a) return; a.stopPropagation && a.stopPropagation(), a.cancelBubble = !0 }, stopImmediatePropagation: function () { this.isImmediatePropagationStopped = K, this.stopPropagation() }, isDefaultPrevented: J, isPropagationStopped: J, isImmediatePropagationStopped: J }, f.each({ mouseenter: "mouseover", mouseleave: "mouseout" }, function (a, b) { f.event.special[a] = { delegateType: b, bindType: b, handle: function (a) { var c = this, d = a.relatedTarget, e = a.handleObj, g = e.selector, h; if (!d || d !== c && !f.contains(c, d)) a.type = e.origType, h = e.handler.apply(this, arguments), a.type = b; return h } } }), f.support.submitBubbles || (f.event.special.submit = { setup: function () { if (f.nodeName(this, "form")) return !1; f.event.add(this, "click._submit keypress._submit", function (a) { var c = a.target, d = f.nodeName(c, "input") || f.nodeName(c, "button") ? c.form : b; d && !d._submit_attached && (f.event.add(d, "submit._submit", function (a) { this.parentNode && !a.isTrigger && f.event.simulate("submit", this.parentNode, a, !0) }), d._submit_attached = !0) }) }, teardown: function () { if (f.nodeName(this, "form")) return !1; f.event.remove(this, "._submit") } }), f.support.changeBubbles || (f.event.special.change = { setup: function () { if (z.test(this.nodeName)) { if (this.type === "checkbox" || this.type === "radio") f.event.add(this, "propertychange._change", function (a) { a.originalEvent.propertyName === "checked" && (this._just_changed = !0) }), f.event.add(this, "click._change", function (a) { this._just_changed && !a.isTrigger && (this._just_changed = !1, f.event.simulate("change", this, a, !0)) }); return !1 } f.event.add(this, "beforeactivate._change", function (a) { var b = a.target; z.test(b.nodeName) && !b._change_attached && (f.event.add(b, "change._change", function (a) { this.parentNode && !a.isSimulated && !a.isTrigger && f.event.simulate("change", this.parentNode, a, !0) }), b._change_attached = !0) }) }, handle: function (a) { var b = a.target; if (this !== b || a.isSimulated || a.isTrigger || b.type !== "radio" && b.type !== "checkbox") return a.handleObj.handler.apply(this, arguments) }, teardown: function () { return f.event.remove(this, "._change"), z.test(this.nodeName) } }), f.support.focusinBubbles || f.each({ focus: "focusin", blur: "focusout" }, function (a, b) { var d = 0, e = function (a) { f.event.simulate(b, a.target, f.event.fix(a), !0) }; f.event.special[b] = { setup: function () { d++ === 0 && c.addEventListener(a, e, !0) }, teardown: function () { --d === 0 && c.removeEventListener(a, e, !0) } } }), f.fn.extend({ on: function (a, c, d, e, g) { var h, i; if (typeof a == "object") { typeof c != "string" && (d = c, c = b); for (i in a) this.on(i, c, d, a[i], g); return this } d == null && e == null ? (e = c, d = c = b) : e == null && (typeof c == "string" ? (e = d, d = b) : (e = d, d = c, c = b)); if (e === !1) e = J; else if (!e) return this; return g === 1 && (h = e, e = function (a) { return f().off(a), h.apply(this, arguments) }, e.guid = h.guid || (h.guid = f.guid++)), this.each(function () { f.event.add(this, a, e, d, c) }) }, one: function (a, b, c, d) { return this.on.call(this, a, b, c, d, 1) }, off: function (a, c, d) { if (a && a.preventDefault && a.handleObj) { var e = a.handleObj; return f(a.delegateTarget).off(e.namespace ? e.type + "." + e.namespace : e.type, e.selector, e.handler), this } if (typeof a == "object") { for (var g in a) this.off(g, c, a[g]); return this } if (c === !1 || typeof c == "function") d = c, c = b; return d === !1 && (d = J), this.each(function () { f.event.remove(this, a, d, c) }) }, bind: function (a, b, c) { return this.on(a, null, b, c) }, unbind: function (a, b) { return this.off(a, null, b) }, live: function (a, b, c) { return f(this.context).on(a, this.selector, b, c), this }, die: function (a, b) { return f(this.context).off(a, this.selector || "**", b), this }, delegate: function (a, b, c, d) { return this.on(b, a, c, d) }, undelegate: function (a, b, c) { return arguments.length == 1 ? this.off(a, "**") : this.off(b, a, c) }, trigger: function (a, b) { return this.each(function () { f.event.trigger(a, b, this) }) }, triggerHandler: function (a, b) { if (this[0]) return f.event.trigger(a, b, this[0], !0) }, toggle: function (a) { var b = arguments, c = a.guid || f.guid++, d = 0, e = function (c) { var e = (f._data(this, "lastToggle" + a.guid) || 0) % d; return f._data(this, "lastToggle" + a.guid, e + 1), c.preventDefault(), b[e].apply(this, arguments) || !1 }; e.guid = c; while (d < b.length) b[d++].guid = c; return this.click(e) }, hover: function (a, b) { return this.mouseenter(a).mouseleave(b || a) } }), f.each("blur focus focusin focusout load resize scroll unload click dblclick mousedown mouseup mousemove mouseover mouseout mouseenter mouseleave change select submit keydown keypress keyup error contextmenu".split(" "), function (a, b) { f.fn[b] = function (a, c) { return c == null && (c = a, a = null), arguments.length > 0 ? this.on(b, null, a, c) : this.trigger(b) }, f.attrFn && (f.attrFn[b] = !0), C.test(b) && (f.event.fixHooks[b] = f.event.keyHooks), D.test(b) && (f.event.fixHooks[b] = f.event.mouseHooks) }), function () { function w(a, b, c, e, f, g) { for (var h = 0, i = e.length; h < i; h++) { var j = e[h]; if (j) { var k = !1; j = j[a]; while (j) { if (j[d] === c) { k = e[j.sizset]; break } j.nodeType === 1 && !g && (j[d] = c, j.sizset = h); if (j.nodeName.toLowerCase() === b) { k = j; break } j = j[a] } e[h] = k } } } function x(a, b, c, e, f, g) { for (var h = 0, i = e.length; h < i; h++) { var j = e[h]; if (j) { var k = !1; j = j[a]; while (j) { if (j[d] === c) { k = e[j.sizset]; break } if (j.nodeType === 1) { g || (j[d] = c, j.sizset = h); if (typeof b != "string") { if (j === b) { k = !0; break } } else if (m.filter(b, [j]).length > 0) { k = j; break } } j = j[a] } e[h] = k } } } var a = /((?:\((?:\([^()]+\)|[^()]+)+\)|\[(?:\[[^\[\]]*\]|['"][^'"]*['"]|[^\[\]'"]+)+\]|\\.|[^ >+~,(\[\\]+)+|[>+~])(\s*,\s*)?((?:.|\r|\n)*)/g, d = "sizcache" + (Math.random() + "").replace(".", ""), e = 0, g = Object.prototype.toString, h = !1, i = !0, j = /\\/g, k = /\r\n/g, l = /\W/;[0, 0].sort(function () { return i = !1, 0 }); var m = function (b, d, e, f) { e = e || [], d = d || c; var h = d; if (d.nodeType !== 1 && d.nodeType !== 9) return []; if (!b || typeof b != "string") return e; var i, j, k, l, n, q, r, t, u = !0, v = m.isXML(d), w = [], x = b; do { a.exec(""), i = a.exec(x); if (i) { x = i[3], w.push(i[1]); if (i[2]) { l = i[3]; break } } } while (i); if (w.length > 1 && p.exec(b)) if (w.length === 2 && o.relative[w[0]]) j = y(w[0] + w[1], d, f); else { j = o.relative[w[0]] ? [d] : m(w.shift(), d); while (w.length) b = w.shift(), o.relative[b] && (b += w.shift()), j = y(b, j, f) } else { !f && w.length > 1 && d.nodeType === 9 && !v && o.match.ID.test(w[0]) && !o.match.ID.test(w[w.length - 1]) && (n = m.find(w.shift(), d, v), d = n.expr ? m.filter(n.expr, n.set)[0] : n.set[0]); if (d) { n = f ? { expr: w.pop(), set: s(f) } : m.find(w.pop(), w.length !== 1 || w[0] !== "~" && w[0] !== "+" || !d.parentNode ? d : d.parentNode, v), j = n.expr ? m.filter(n.expr, n.set) : n.set, w.length > 0 ? k = s(j) : u = !1; while (w.length) q = w.pop(), r = q, o.relative[q] ? r = w.pop() : q = "", r == null && (r = d), o.relative[q](k, r, v) } else k = w = [] } k || (k = j), k || m.error(q || b); if (g.call(k) === "[object Array]") if (!u) e.push.apply(e, k); else if (d && d.nodeType === 1) for (t = 0; k[t] != null; t++) k[t] && (k[t] === !0 || k[t].nodeType === 1 && m.contains(d, k[t])) && e.push(j[t]); else for (t = 0; k[t] != null; t++) k[t] && k[t].nodeType === 1 && e.push(j[t]); else s(k, e); return l && (m(l, h, e, f), m.uniqueSort(e)), e }; m.uniqueSort = function (a) { if (u) { h = i, a.sort(u); if (h) for (var b = 1; b < a.length; b++) a[b] === a[b - 1] && a.splice(b--, 1) } return a }, m.matches = function (a, b) { return m(a, null, null, b) }, m.matchesSelector = function (a, b) { return m(b, null, null, [a]).length > 0 }, m.find = function (a, b, c) { var d, e, f, g, h, i; if (!a) return []; for (e = 0, f = o.order.length; e < f; e++) { h = o.order[e]; if (g = o.leftMatch[h].exec(a)) { i = g[1], g.splice(1, 1); if (i.substr(i.length - 1) !== "\\") { g[1] = (g[1] || "").replace(j, ""), d = o.find[h](g, b, c); if (d != null) { a = a.replace(o.match[h], ""); break } } } } return d || (d = typeof b.getElementsByTagName != "undefined" ? b.getElementsByTagName("*") : []), { set: d, expr: a } }, m.filter = function (a, c, d, e) { var f, g, h, i, j, k, l, n, p, q = a, r = [], s = c, t = c && c[0] && m.isXML(c[0]); while (a && c.length) { for (h in o.filter) if ((f = o.leftMatch[h].exec(a)) != null && f[2]) { k = o.filter[h], l = f[1], g = !1, f.splice(1, 1); if (l.substr(l.length - 1) === "\\") continue; s === r && (r = []); if (o.preFilter[h]) { f = o.preFilter[h](f, s, d, r, e, t); if (!f) g = i = !0; else if (f === !0) continue } if (f) for (n = 0; (j = s[n]) != null; n++) j && (i = k(j, f, n, s), p = e ^ i, d && i != null ? p ? g = !0 : s[n] = !1 : p && (r.push(j), g = !0)); if (i !== b) { d || (s = r), a = a.replace(o.match[h], ""); if (!g) return []; break } } if (a === q) if (g == null) m.error(a); else break; q = a } return s }, m.error = function (a) { throw new Error("Syntax error, unrecognized expression: " + a) }; var n = m.getText = function (a) { var b, c, d = a.nodeType, e = ""; if (d) { if (d === 1 || d === 9) { if (typeof a.textContent == "string") return a.textContent; if (typeof a.innerText == "string") return a.innerText.replace(k, ""); for (a = a.firstChild; a; a = a.nextSibling) e += n(a) } else if (d === 3 || d === 4) return a.nodeValue } else for (b = 0; c = a[b]; b++) c.nodeType !== 8 && (e += n(c)); return e }, o = m.selectors = { order: ["ID", "NAME", "TAG"], match: { ID: /#((?:[\w\u00c0-\uFFFF\-]|\\.)+)/, CLASS: /\.((?:[\w\u00c0-\uFFFF\-]|\\.)+)/, NAME: /\[name=['"]*((?:[\w\u00c0-\uFFFF\-]|\\.)+)['"]*\]/, ATTR: /\[\s*((?:[\w\u00c0-\uFFFF\-]|\\.)+)\s*(?:(\S?=)\s*(?:(['"])(.*?)\3|(#?(?:[\w\u00c0-\uFFFF\-]|\\.)*)|)|)\s*\]/, TAG: /^((?:[\w\u00c0-\uFFFF\*\-]|\\.)+)/, CHILD: /:(only|nth|last|first)-child(?:\(\s*(even|odd|(?:[+\-]?\d+|(?:[+\-]?\d*)?n\s*(?:[+\-]\s*\d+)?))\s*\))?/, POS: /:(nth|eq|gt|lt|first|last|even|odd)(?:\((\d*)\))?(?=[^\-]|$)/, PSEUDO: /:((?:[\w\u00c0-\uFFFF\-]|\\.)+)(?:\((['"]?)((?:\([^\)]+\)|[^\(\)]*)+)\2\))?/ }, leftMatch: {}, attrMap: { "class": "className", "for": "htmlFor" }, attrHandle: { href: function (a) { return a.getAttribute("href") }, type: function (a) { return a.getAttribute("type") } }, relative: { "+": function (a, b) { var c = typeof b == "string", d = c && !l.test(b), e = c && !d; d && (b = b.toLowerCase()); for (var f = 0, g = a.length, h; f < g; f++) if (h = a[f]) { while ((h = h.previousSibling) && h.nodeType !== 1); a[f] = e || h && h.nodeName.toLowerCase() === b ? h || !1 : h === b } e && m.filter(b, a, !0) }, ">": function (a, b) { var c, d = typeof b == "string", e = 0, f = a.length; if (d && !l.test(b)) { b = b.toLowerCase(); for (; e < f; e++) { c = a[e]; if (c) { var g = c.parentNode; a[e] = g.nodeName.toLowerCase() === b ? g : !1 } } } else { for (; e < f; e++) c = a[e], c && (a[e] = d ? c.parentNode : c.parentNode === b); d && m.filter(b, a, !0) } }, "": function (a, b, c) { var d, f = e++, g = x; typeof b == "string" && !l.test(b) && (b = b.toLowerCase(), d = b, g = w), g("parentNode", b, f, a, d, c) }, "~": function (a, b, c) { var d, f = e++, g = x; typeof b == "string" && !l.test(b) && (b = b.toLowerCase(), d = b, g = w), g("previousSibling", b, f, a, d, c) } }, find: { ID: function (a, b, c) { if (typeof b.getElementById != "undefined" && !c) { var d = b.getElementById(a[1]); return d && d.parentNode ? [d] : [] } }, NAME: function (a, b) { if (typeof b.getElementsByName != "undefined") { var c = [], d = b.getElementsByName(a[1]); for (var e = 0, f = d.length; e < f; e++) d[e].getAttribute("name") === a[1] && c.push(d[e]); return c.length === 0 ? null : c } }, TAG: function (a, b) { if (typeof b.getElementsByTagName != "undefined") return b.getElementsByTagName(a[1]) } }, preFilter: { CLASS: function (a, b, c, d, e, f) { a = " " + a[1].replace(j, "") + " "; if (f) return a; for (var g = 0, h; (h = b[g]) != null; g++) h && (e ^ (h.className && (" " + h.className + " ").replace(/[\t\n\r]/g, " ").indexOf(a) >= 0) ? c || d.push(h) : c && (b[g] = !1)); return !1 }, ID: function (a) { return a[1].replace(j, "") }, TAG: function (a, b) { return a[1].replace(j, "").toLowerCase() }, CHILD: function (a) { if (a[1] === "nth") { a[2] || m.error(a[0]), a[2] = a[2].replace(/^\+|\s*/g, ""); var b = /(-?)(\d*)(?:n([+\-]?\d*))?/.exec(a[2] === "even" && "2n" || a[2] === "odd" && "2n+1" || !/\D/.test(a[2]) && "0n+" + a[2] || a[2]); a[2] = b[1] + (b[2] || 1) - 0, a[3] = b[3] - 0 } else a[2] && m.error(a[0]); return a[0] = e++, a }, ATTR: function (a, b, c, d, e, f) { var g = a[1] = a[1].replace(j, ""); return !f && o.attrMap[g] && (a[1] = o.attrMap[g]), a[4] = (a[4] || a[5] || "").replace(j, ""), a[2] === "~=" && (a[4] = " " + a[4] + " "), a }, PSEUDO: function (b, c, d, e, f) { if (b[1] === "not") if ((a.exec(b[3]) || "").length > 1 || /^\w/.test(b[3])) b[3] = m(b[3], null, null, c); else { var g = m.filter(b[3], c, d, !0 ^ f); return d || e.push.apply(e, g), !1 } else if (o.match.POS.test(b[0]) || o.match.CHILD.test(b[0])) return !0; return b }, POS: function (a) { return a.unshift(!0), a } }, filters: { enabled: function (a) { return a.disabled === !1 && a.type !== "hidden" }, disabled: function (a) { return a.disabled === !0 }, checked: function (a) { return a.checked === !0 }, selected: function (a) { return a.parentNode && a.parentNode.selectedIndex, a.selected === !0 }, parent: function (a) { return !!a.firstChild }, empty: function (a) { return !a.firstChild }, has: function (a, b, c) { return !!m(c[3], a).length }, header: function (a) { return /h\d/i.test(a.nodeName) }, text: function (a) { var b = a.getAttribute("type"), c = a.type; return a.nodeName.toLowerCase() === "input" && "text" === c && (b === c || b === null) }, radio: function (a) { return a.nodeName.toLowerCase() === "input" && "radio" === a.type }, checkbox: function (a) { return a.nodeName.toLowerCase() === "input" && "checkbox" === a.type }, file: function (a) { return a.nodeName.toLowerCase() === "input" && "file" === a.type }, password: function (a) { return a.nodeName.toLowerCase() === "input" && "password" === a.type }, submit: function (a) { var b = a.nodeName.toLowerCase(); return (b === "input" || b === "button") && "submit" === a.type }, image: function (a) { return a.nodeName.toLowerCase() === "input" && "image" === a.type }, reset: function (a) { var b = a.nodeName.toLowerCase(); return (b === "input" || b === "button") && "reset" === a.type }, button: function (a) { var b = a.nodeName.toLowerCase(); return b === "input" && "button" === a.type || b === "button" }, input: function (a) { return /input|select|textarea|button/i.test(a.nodeName) }, focus: function (a) { return a === a.ownerDocument.activeElement } }, setFilters: { first: function (a, b) { return b === 0 }, last: function (a, b, c, d) { return b === d.length - 1 }, even: function (a, b) { return b % 2 === 0 }, odd: function (a, b) { return b % 2 === 1 }, lt: function (a, b, c) { return b < c[3] - 0 }, gt: function (a, b, c) { return b > c[3] - 0 }, nth: function (a, b, c) { return c[3] - 0 === b }, eq: function (a, b, c) { return c[3] - 0 === b } }, filter: { PSEUDO: function (a, b, c, d) { var e = b[1], f = o.filters[e]; if (f) return f(a, c, b, d); if (e === "contains") return (a.textContent || a.innerText || n([a]) || "").indexOf(b[3]) >= 0; if (e === "not") { var g = b[3]; for (var h = 0, i = g.length; h < i; h++) if (g[h] === a) return !1; return !0 } m.error(e) }, CHILD: function (a, b) { var c, e, f, g, h, i, j, k = b[1], l = a; switch (k) { case "only": case "first": while (l = l.previousSibling) if (l.nodeType === 1) return !1; if (k === "first") return !0; l = a; case "last": while (l = l.nextSibling) if (l.nodeType === 1) return !1; return !0; case "nth": c = b[2], e = b[3]; if (c === 1 && e === 0) return !0; f = b[0], g = a.parentNode; if (g && (g[d] !== f || !a.nodeIndex)) { i = 0; for (l = g.firstChild; l; l = l.nextSibling) l.nodeType === 1 && (l.nodeIndex = ++i); g[d] = f } return j = a.nodeIndex - e, c === 0 ? j === 0 : j % c === 0 && j / c >= 0 } }, ID: function (a, b) { return a.nodeType === 1 && a.getAttribute("id") === b }, TAG: function (a, b) { return b === "*" && a.nodeType === 1 || !!a.nodeName && a.nodeName.toLowerCase() === b }, CLASS: function (a, b) { return (" " + (a.className || a.getAttribute("class")) + " ").indexOf(b) > -1 }, ATTR: function (a, b) { var c = b[1], d = m.attr ? m.attr(a, c) : o.attrHandle[c] ? o.attrHandle[c](a) : a[c] != null ? a[c] : a.getAttribute(c), e = d + "", f = b[2], g = b[4]; return d == null ? f === "!=" : !f && m.attr ? d != null : f === "=" ? e === g : f === "*=" ? e.indexOf(g) >= 0 : f === "~=" ? (" " + e + " ").indexOf(g) >= 0 : g ? f === "!=" ? e !== g : f === "^=" ? e.indexOf(g) === 0 : f === "$=" ? e.substr(e.length - g.length) === g : f === "|=" ? e === g || e.substr(0, g.length + 1) === g + "-" : !1 : e && d !== !1 }, POS: function (a, b, c, d) { var e = b[2], f = o.setFilters[e]; if (f) return f(a, c, b, d) } } }, p = o.match.POS, q = function (a, b) { return "\\" + (b - 0 + 1) }; for (var r in o.match) o.match[r] = new RegExp(o.match[r].source + /(?![^\[]*\])(?![^\(]*\))/.source), o.leftMatch[r] = new RegExp(/(^(?:.|\r|\n)*?)/.source + o.match[r].source.replace(/\\(\d+)/g, q)); var s = function (a, b) { return a = Array.prototype.slice.call(a, 0), b ? (b.push.apply(b, a), b) : a }; try { Array.prototype.slice.call(c.documentElement.childNodes, 0)[0].nodeType } catch (t) { s = function (a, b) { var c = 0, d = b || []; if (g.call(a) === "[object Array]") Array.prototype.push.apply(d, a); else if (typeof a.length == "number") for (var e = a.length; c < e; c++) d.push(a[c]); else for (; a[c]; c++) d.push(a[c]); return d } } var u, v; c.documentElement.compareDocumentPosition ? u = function (a, b) { return a === b ? (h = !0, 0) : !a.compareDocumentPosition || !b.compareDocumentPosition ? a.compareDocumentPosition ? -1 : 1 : a.compareDocumentPosition(b) & 4 ? -1 : 1 } : (u = function (a, b) { if (a === b) return h = !0, 0; if (a.sourceIndex && b.sourceIndex) return a.sourceIndex - b.sourceIndex; var c, d, e = [], f = [], g = a.parentNode, i = b.parentNode, j = g; if (g === i) return v(a, b); if (!g) return -1; if (!i) return 1; while (j) e.unshift(j), j = j.parentNode; j = i; while (j) f.unshift(j), j = j.parentNode; c = e.length, d = f.length; for (var k = 0; k < c && k < d; k++) if (e[k] !== f[k]) return v(e[k], f[k]); return k === c ? v(a, f[k], -1) : v(e[k], b, 1) }, v = function (a, b, c) { if (a === b) return c; var d = a.nextSibling; while (d) { if (d === b) return -1; d = d.nextSibling } return 1 }), function () { var a = c.createElement("div"), d = "script" + (new Date).getTime(), e = c.documentElement; a.innerHTML = "<a name='" + d + "'/>", e.insertBefore(a, e.firstChild), c.getElementById(d) && (o.find.ID = function (a, c, d) { if (typeof c.getElementById != "undefined" && !d) { var e = c.getElementById(a[1]); return e ? e.id === a[1] || typeof e.getAttributeNode != "undefined" && e.getAttributeNode("id").nodeValue === a[1] ? [e] : b : [] } }, o.filter.ID = function (a, b) { var c = typeof a.getAttributeNode != "undefined" && a.getAttributeNode("id"); return a.nodeType === 1 && c && c.nodeValue === b }), e.removeChild(a), e = a = null }(), function () { var a = c.createElement("div"); a.appendChild(c.createComment("")), a.getElementsByTagName("*").length > 0 && (o.find.TAG = function (a, b) { var c = b.getElementsByTagName(a[1]); if (a[1] === "*") { var d = []; for (var e = 0; c[e]; e++) c[e].nodeType === 1 && d.push(c[e]); c = d } return c }), a.innerHTML = "<a href='#'></a>", a.firstChild && typeof a.firstChild.getAttribute != "undefined" && a.firstChild.getAttribute("href") !== "#" && (o.attrHandle.href = function (a) { return a.getAttribute("href", 2) }), a = null }(), c.querySelectorAll && function () { var a = m, b = c.createElement("div"), d = "__sizzle__"; b.innerHTML = "<p class='TEST'></p>"; if (b.querySelectorAll && b.querySelectorAll(".TEST").length === 0) return; m = function (b, e, f, g) { e = e || c; if (!g && !m.isXML(e)) { var h = /^(\w+$)|^\.([\w\-]+$)|^#([\w\-]+$)/.exec(b); if (h && (e.nodeType === 1 || e.nodeType === 9)) { if (h[1]) return s(e.getElementsByTagName(b), f); if (h[2] && o.find.CLASS && e.getElementsByClassName) return s(e.getElementsByClassName(h[2]), f) } if (e.nodeType === 9) { if (b === "body" && e.body) return s([e.body], f); if (h && h[3]) { var i = e.getElementById(h[3]); if (!i || !i.parentNode) return s([], f); if (i.id === h[3]) return s([i], f) } try { return s(e.querySelectorAll(b), f) } catch (j) { } } else if (e.nodeType === 1 && e.nodeName.toLowerCase() !== "object") { var k = e, l = e.getAttribute("id"), n = l || d, p = e.parentNode, q = /^\s*[+~]/.test(b); l ? n = n.replace(/'/g, "\\$&") : e.setAttribute("id", n), q && p && (e = e.parentNode); try { if (!q || p) return s(e.querySelectorAll("[id='" + n + "'] " + b), f) } catch (r) { } finally { l || k.removeAttribute("id") } } } return a(b, e, f, g) }; for (var e in a) m[e] = a[e]; b = null }(), function () { var a = c.documentElement, b = a.matchesSelector || a.mozMatchesSelector || a.webkitMatchesSelector || a.msMatchesSelector; if (b) { var d = !b.call(c.createElement("div"), "div"), e = !1; try { b.call(c.documentElement, "[test!='']:sizzle") } catch (f) { e = !0 } m.matchesSelector = function (a, c) { c = c.replace(/\=\s*([^'"\]]*)\s*\]/g, "='$1']"); if (!m.isXML(a)) try { if (e || !o.match.PSEUDO.test(c) && !/!=/.test(c)) { var f = b.call(a, c); if (f || !d || a.document && a.document.nodeType !== 11) return f } } catch (g) { } return m(c, null, null, [a]).length > 0 } } }(), function () { var a = c.createElement("div"); a.innerHTML = "<div class='test e'></div><div class='test'></div>"; if (!a.getElementsByClassName || a.getElementsByClassName("e").length === 0) return; a.lastChild.className = "e"; if (a.getElementsByClassName("e").length === 1) return; o.order.splice(1, 0, "CLASS"), o.find.CLASS = function (a, b, c) { if (typeof b.getElementsByClassName != "undefined" && !c) return b.getElementsByClassName(a[1]) }, a = null }(), c.documentElement.contains ? m.contains = function (a, b) { return a !== b && (a.contains ? a.contains(b) : !0) } : c.documentElement.compareDocumentPosition ? m.contains = function (a, b) { return !!(a.compareDocumentPosition(b) & 16) } : m.contains = function () { return !1 }, m.isXML = function (a) { var b = (a ? a.ownerDocument || a : 0).documentElement; return b ? b.nodeName !== "HTML" : !1 }; var y = function (a, b, c) { var d, e = [], f = "", g = b.nodeType ? [b] : b; while (d = o.match.PSEUDO.exec(a)) f += d[0], a = a.replace(o.match.PSEUDO, ""); a = o.relative[a] ? a + "*" : a; for (var h = 0, i = g.length; h < i; h++) m(a, g[h], e, c); return m.filter(f, e) }; m.attr = f.attr, m.selectors.attrMap = {}, f.find = m, f.expr = m.selectors, f.expr[":"] = f.expr.filters, f.unique = m.uniqueSort, f.text = m.getText, f.isXMLDoc = m.isXML, f.contains = m.contains }(); var L = /Until$/, M = /^(?:parents|prevUntil|prevAll)/, N = /,/, O = /^.[^:#\[\.,]*$/, P = Array.prototype.slice, Q = f.expr.match.POS, R = { children: !0, contents: !0, next: !0, prev: !0 }; f.fn.extend({ find: function (a) { var b = this, c, d; if (typeof a != "string") return f(a).filter(function () { for (c = 0, d = b.length; c < d; c++) if (f.contains(b[c], this)) return !0 }); var e = this.pushStack("", "find", a), g, h, i; for (c = 0, d = this.length; c < d; c++) { g = e.length, f.find(a, this[c], e); if (c > 0) for (h = g; h < e.length; h++) for (i = 0; i < g; i++) if (e[i] === e[h]) { e.splice(h--, 1); break } } return e }, has: function (a) { var b = f(a); return this.filter(function () { for (var a = 0, c = b.length; a < c; a++) if (f.contains(this, b[a])) return !0 }) }, not: function (a) { return this.pushStack(T(this, a, !1), "not", a) }, filter: function (a) { return this.pushStack(T(this, a, !0), "filter", a) }, is: function (a) { return !!a && (typeof a == "string" ? Q.test(a) ? f(a, this.context).index(this[0]) >= 0 : f.filter(a, this).length > 0 : this.filter(a).length > 0) }, closest: function (a, b) { var c = [], d, e, g = this[0]; if (f.isArray(a)) { var h = 1; while (g && g.ownerDocument && g !== b) { for (d = 0; d < a.length; d++) f(g).is(a[d]) && c.push({ selector: a[d], elem: g, level: h }); g = g.parentNode, h++ } return c } var i = Q.test(a) || typeof a != "string" ? f(a, b || this.context) : 0; for (d = 0, e = this.length; d < e; d++) { g = this[d]; while (g) { if (i ? i.index(g) > -1 : f.find.matchesSelector(g, a)) { c.push(g); break } g = g.parentNode; if (!g || !g.ownerDocument || g === b || g.nodeType === 11) break } } return c = c.length > 1 ? f.unique(c) : c, this.pushStack(c, "closest", a) }, index: function (a) { return a ? typeof a == "string" ? f.inArray(this[0], f(a)) : f.inArray(a.jquery ? a[0] : a, this) : this[0] && this[0].parentNode ? this.prevAll().length : -1 }, add: function (a, b) { var c = typeof a == "string" ? f(a, b) : f.makeArray(a && a.nodeType ? [a] : a), d = f.merge(this.get(), c); return this.pushStack(S(c[0]) || S(d[0]) ? d : f.unique(d)) }, andSelf: function () { return this.add(this.prevObject) } }), f.each({ parent: function (a) { var b = a.parentNode; return b && b.nodeType !== 11 ? b : null }, parents: function (a) { return f.dir(a, "parentNode") }, parentsUntil: function (a, b, c) { return f.dir(a, "parentNode", c) }, next: function (a) { return f.nth(a, 2, "nextSibling") }, prev: function (a) { return f.nth(a, 2, "previousSibling") }, nextAll: function (a) { return f.dir(a, "nextSibling") }, prevAll: function (a) { return f.dir(a, "previousSibling") }, nextUntil: function (a, b, c) { return f.dir(a, "nextSibling", c) }, prevUntil: function (a, b, c) { return f.dir(a, "previousSibling", c) }, siblings: function (a) { return f.sibling(a.parentNode.firstChild, a) }, children: function (a) { return f.sibling(a.firstChild) }, contents: function (a) { return f.nodeName(a, "iframe") ? a.contentDocument || a.contentWindow.document : f.makeArray(a.childNodes) } }, function (a, b) { f.fn[a] = function (c, d) { var e = f.map(this, b, c); return L.test(a) || (d = c), d && typeof d == "string" && (e = f.filter(d, e)), e = this.length > 1 && !R[a] ? f.unique(e) : e, (this.length > 1 || N.test(d)) && M.test(a) && (e = e.reverse()), this.pushStack(e, a, P.call(arguments).join(",")) } }), f.extend({ filter: function (a, b, c) { return c && (a = ":not(" + a + ")"), b.length === 1 ? f.find.matchesSelector(b[0], a) ? [b[0]] : [] : f.find.matches(a, b) }, dir: function (a, c, d) { var e = [], g = a[c]; while (g && g.nodeType !== 9 && (d === b || g.nodeType !== 1 || !f(g).is(d))) g.nodeType === 1 && e.push(g), g = g[c]; return e }, nth: function (a, b, c, d) { b = b || 1; var e = 0; for (; a; a = a[c]) if (a.nodeType === 1 && ++e === b) break; return a }, sibling: function (a, b) { var c = []; for (; a; a = a.nextSibling) a.nodeType === 1 && a !== b && c.push(a); return c } }); var V = "abbr|article|aside|audio|canvas|datalist|details|figcaption|figure|footer|header|hgroup|mark|meter|nav|output|progress|section|summary|time|video", W = / jQuery\d+="(?:\d+|null)"/g, X = /^\s+/, Y = /<(?!area|br|col|embed|hr|img|input|link|meta|param)(([\w:]+)[^>]*)\/>/ig, Z = /<([\w:]+)/, $ = /<tbody/i, _ = /<|&#?\w+;/, ba = /<(?:script|style)/i, bb = /<(?:script|object|embed|option|style)/i, bc = new RegExp("<(?:" + V + ")", "i"), bd = /checked\s*(?:[^=]|=\s*.checked.)/i, be = /\/(java|ecma)script/i, bf = /^\s*<!(?:\[CDATA\[|\-\-)/, bg = { option: [1, "<select multiple='multiple'>", "</select>"], legend: [1, "<fieldset>", "</fieldset>"], thead: [1, "<table>", "</table>"], tr: [2, "<table><tbody>", "</tbody></table>"], td: [3, "<table><tbody><tr>", "</tr></tbody></table>"], col: [2, "<table><tbody></tbody><colgroup>", "</colgroup></table>"], area: [1, "<map>", "</map>"], _default: [0, "", ""] }, bh = U(c); bg.optgroup = bg.option, bg.tbody = bg.tfoot = bg.colgroup = bg.caption = bg.thead, bg.th = bg.td, f.support.htmlSerialize || (bg._default = [1, "div<div>", "</div>"]), f.fn.extend({ text: function (a) { return f.isFunction(a) ? this.each(function (b) { var c = f(this); c.text(a.call(this, b, c.text())) }) : typeof a != "object" && a !== b ? this.empty().append((this[0] && this[0].ownerDocument || c).createTextNode(a)) : f.text(this) }, wrapAll: function (a) { if (f.isFunction(a)) return this.each(function (b) { f(this).wrapAll(a.call(this, b)) }); if (this[0]) { var b = f(a, this[0].ownerDocument).eq(0).clone(!0); this[0].parentNode && b.insertBefore(this[0]), b.map(function () { var a = this; while (a.firstChild && a.firstChild.nodeType === 1) a = a.firstChild; return a }).append(this) } return this }, wrapInner: function (a) { return f.isFunction(a) ? this.each(function (b) { f(this).wrapInner(a.call(this, b)) }) : this.each(function () { var b = f(this), c = b.contents(); c.length ? c.wrapAll(a) : b.append(a) }) }, wrap: function (a) { var b = f.isFunction(a); return this.each(function (c) { f(this).wrapAll(b ? a.call(this, c) : a) }) }, unwrap: function () { return this.parent().each(function () { f.nodeName(this, "body") || f(this).replaceWith(this.childNodes) }).end() }, append: function () { return this.domManip(arguments, !0, function (a) { this.nodeType === 1 && this.appendChild(a) }) }, prepend: function () { return this.domManip(arguments, !0, function (a) { this.nodeType === 1 && this.insertBefore(a, this.firstChild) }) }, before: function () { if (this[0] && this[0].parentNode) return this.domManip(arguments, !1, function (a) { this.parentNode.insertBefore(a, this) }); if (arguments.length) { var a = f.clean(arguments); return a.push.apply(a, this.toArray()), this.pushStack(a, "before", arguments) } }, after: function () { if (this[0] && this[0].parentNode) return this.domManip(arguments, !1, function (a) { this.parentNode.insertBefore(a, this.nextSibling) }); if (arguments.length) { var a = this.pushStack(this, "after", arguments); return a.push.apply(a, f.clean(arguments)), a } }, remove: function (a, b) { for (var c = 0, d; (d = this[c]) != null; c++) if (!a || f.filter(a, [d]).length) !b && d.nodeType === 1 && (f.cleanData(d.getElementsByTagName("*")), f.cleanData([d])), d.parentNode && d.parentNode.removeChild(d); return this }, empty: function () { for (var a = 0, b; (b = this[a]) != null; a++) { b.nodeType === 1 && f.cleanData(b.getElementsByTagName("*")); while (b.firstChild) b.removeChild(b.firstChild) } return this }, clone: function (a, b) { return a = a == null ? !1 : a, b = b == null ? a : b, this.map(function () { return f.clone(this, a, b) }) }, html: function (a) { if (a === b) return this[0] && this[0].nodeType === 1 ? this[0].innerHTML.replace(W, "") : null; if (typeof a == "string" && !ba.test(a) && (f.support.leadingWhitespace || !X.test(a)) && !bg[(Z.exec(a) || ["", ""])[1].toLowerCase()]) { a = a.replace(Y, "<$1></$2>"); try { for (var c = 0, d = this.length; c < d; c++) this[c].nodeType === 1 && (f.cleanData(this[c].getElementsByTagName("*")), this[c].innerHTML = a) } catch (e) { this.empty().append(a) } } else f.isFunction(a) ? this.each(function (b) { var c = f(this); c.html(a.call(this, b, c.html())) }) : this.empty().append(a); return this }, replaceWith: function (a) { return this[0] && this[0].parentNode ? f.isFunction(a) ? this.each(function (b) { var c = f(this), d = c.html(); c.replaceWith(a.call(this, b, d)) }) : (typeof a != "string" && (a = f(a).detach()), this.each(function () { var b = this.nextSibling, c = this.parentNode; f(this).remove(), b ? f(b).before(a) : f(c).append(a) })) : this.length ? this.pushStack(f(f.isFunction(a) ? a() : a), "replaceWith", a) : this }, detach: function (a) { return this.remove(a, !0) }, domManip: function (a, c, d) { var e, g, h, i, j = a[0], k = []; if (!f.support.checkClone && arguments.length === 3 && typeof j == "string" && bd.test(j)) return this.each(function () { f(this).domManip(a, c, d, !0) }); if (f.isFunction(j)) return this.each(function (e) { var g = f(this); a[0] = j.call(this, e, c ? g.html() : b), g.domManip(a, c, d) }); if (this[0]) { i = j && j.parentNode, f.support.parentNode && i && i.nodeType === 11 && i.childNodes.length === this.length ? e = { fragment: i } : e = f.buildFragment(a, this, k), h = e.fragment, h.childNodes.length === 1 ? g = h = h.firstChild : g = h.firstChild; if (g) { c = c && f.nodeName(g, "tr"); for (var l = 0, m = this.length, n = m - 1; l < m; l++) d.call(c ? bi(this[l], g) : this[l], e.cacheable || m > 1 && l < n ? f.clone(h, !0, !0) : h) } k.length && f.each(k, bp) } return this } }), f.buildFragment = function (a, b, d) { var e, g, h, i, j = a[0]; return b && b[0] && (i = b[0].ownerDocument || b[0]), i.createDocumentFragment || (i = c), a.length === 1 && typeof j == "string" && j.length < 512 && i === c && j.charAt(0) === "<" && !bb.test(j) && (f.support.checkClone || !bd.test(j)) && (f.support.html5Clone || !bc.test(j)) && (g = !0, h = f.fragments[j], h && h !== 1 && (e = h)), e || (e = i.createDocumentFragment(), f.clean(a, i, e, d)), g && (f.fragments[j] = h ? e : 1), { fragment: e, cacheable: g } }, f.fragments = {}, f.each({ appendTo: "append", prependTo: "prepend", insertBefore: "before", insertAfter: "after", replaceAll: "replaceWith" }, function (a, b) { f.fn[a] = function (c) { var d = [], e = f(c), g = this.length === 1 && this[0].parentNode; if (g && g.nodeType === 11 && g.childNodes.length === 1 && e.length === 1) return e[b](this[0]), this; for (var h = 0, i = e.length; h < i; h++) { var j = (h > 0 ? this.clone(!0) : this).get(); f(e[h])[b](j), d = d.concat(j) } return this.pushStack(d, a, e.selector) } }), f.extend({ clone: function (a, b, c) { var d, e, g, h = f.support.html5Clone || !bc.test("<" + a.nodeName) ? a.cloneNode(!0) : bo(a); if ((!f.support.noCloneEvent || !f.support.noCloneChecked) && (a.nodeType === 1 || a.nodeType === 11) && !f.isXMLDoc(a)) { bk(a, h), d = bl(a), e = bl(h); for (g = 0; d[g]; ++g) e[g] && bk(d[g], e[g]) } if (b) { bj(a, h); if (c) { d = bl(a), e = bl(h); for (g = 0; d[g]; ++g) bj(d[g], e[g]) } } return d = e = null, h }, clean: function (a, b, d, e) { var g; b = b || c, typeof b.createElement == "undefined" && (b = b.ownerDocument || b[0] && b[0].ownerDocument || c); var h = [], i; for (var j = 0, k; (k = a[j]) != null; j++) { typeof k == "number" && (k += ""); if (!k) continue; if (typeof k == "string") if (!_.test(k)) k = b.createTextNode(k); else { k = k.replace(Y, "<$1></$2>"); var l = (Z.exec(k) || ["", ""])[1].toLowerCase(), m = bg[l] || bg._default, n = m[0], o = b.createElement("div"); b === c ? bh.appendChild(o) : U(b).appendChild(o), o.innerHTML = m[1] + k + m[2]; while (n--) o = o.lastChild; if (!f.support.tbody) { var p = $.test(k), q = l === "table" && !p ? o.firstChild && o.firstChild.childNodes : m[1] === "<table>" && !p ? o.childNodes : []; for (i = q.length - 1; i >= 0; --i) f.nodeName(q[i], "tbody") && !q[i].childNodes.length && q[i].parentNode.removeChild(q[i]) } !f.support.leadingWhitespace && X.test(k) && o.insertBefore(b.createTextNode(X.exec(k)[0]), o.firstChild), k = o.childNodes } var r; if (!f.support.appendChecked) if (k[0] && typeof (r = k.length) == "number") for (i = 0; i < r; i++) bn(k[i]); else bn(k); k.nodeType ? h.push(k) : h = f.merge(h, k) } if (d) { g = function (a) { return !a.type || be.test(a.type) }; for (j = 0; h[j]; j++) if (e && f.nodeName(h[j], "script") && (!h[j].type || h[j].type.toLowerCase() === "text/javascript")) e.push(h[j].parentNode ? h[j].parentNode.removeChild(h[j]) : h[j]); else { if (h[j].nodeType === 1) { var s = f.grep(h[j].getElementsByTagName("script"), g); h.splice.apply(h, [j + 1, 0].concat(s)) } d.appendChild(h[j]) } } return h }, cleanData: function (a) { var b, c, d = f.cache, e = f.event.special, g = f.support.deleteExpando; for (var h = 0, i; (i = a[h]) != null; h++) { if (i.nodeName && f.noData[i.nodeName.toLowerCase()]) continue; c = i[f.expando]; if (c) { b = d[c]; if (b && b.events) { for (var j in b.events) e[j] ? f.event.remove(i, j) : f.removeEvent(i, j, b.handle); b.handle && (b.handle.elem = null) } g ? delete i[f.expando] : i.removeAttribute && i.removeAttribute(f.expando), delete d[c] } } } }); var bq = /alpha\([^)]*\)/i, br = /opacity=([^)]*)/, bs = /([A-Z]|^ms)/g, bt = /^-?\d+(?:px)?$/i, bu = /^-?\d/, bv = /^([\-+])=([\-+.\de]+)/, bw = { position: "absolute", visibility: "hidden", display: "block" }, bx = ["Left", "Right"], by = ["Top", "Bottom"], bz, bA, bB; f.fn.css = function (a, c) { return arguments.length === 2 && c === b ? this : f.access(this, a, c, !0, function (a, c, d) { return d !== b ? f.style(a, c, d) : f.css(a, c) }) }, f.extend({ cssHooks: { opacity: { get: function (a, b) { if (b) { var c = bz(a, "opacity", "opacity"); return c === "" ? "1" : c } return a.style.opacity } } }, cssNumber: { fillOpacity: !0, fontWeight: !0, lineHeight: !0, opacity: !0, orphans: !0, widows: !0, zIndex: !0, zoom: !0 }, cssProps: { "float": f.support.cssFloat ? "cssFloat" : "styleFloat" }, style: function (a, c, d, e) { if (!a || a.nodeType === 3 || a.nodeType === 8 || !a.style) return; var g, h, i = f.camelCase(c), j = a.style, k = f.cssHooks[i]; c = f.cssProps[i] || i; if (d === b) return k && "get" in k && (g = k.get(a, !1, e)) !== b ? g : j[c]; h = typeof d, h === "string" && (g = bv.exec(d)) && (d = +(g[1] + 1) * +g[2] + parseFloat(f.css(a, c)), h = "number"); if (d == null || h === "number" && isNaN(d)) return; h === "number" && !f.cssNumber[i] && (d += "px"); if (!k || !("set" in k) || (d = k.set(a, d)) !== b) try { j[c] = d } catch (l) { } }, css: function (a, c, d) { var e, g; c = f.camelCase(c), g = f.cssHooks[c], c = f.cssProps[c] || c, c === "cssFloat" && (c = "float"); if (g && "get" in g && (e = g.get(a, !0, d)) !== b) return e; if (bz) return bz(a, c) }, swap: function (a, b, c) { var d = {}; for (var e in b) d[e] = a.style[e], a.style[e] = b[e]; c.call(a); for (e in b) a.style[e] = d[e] } }), f.curCSS = f.css, f.each(["height", "width"], function (a, b) { f.cssHooks[b] = { get: function (a, c, d) { var e; if (c) return a.offsetWidth !== 0 ? bC(a, b, d) : (f.swap(a, bw, function () { e = bC(a, b, d) }), e) }, set: function (a, b) { if (!bt.test(b)) return b; b = parseFloat(b); if (b >= 0) return b + "px" } } }), f.support.opacity || (f.cssHooks.opacity = { get: function (a, b) { return br.test((b && a.currentStyle ? a.currentStyle.filter : a.style.filter) || "") ? parseFloat(RegExp.$1) / 100 + "" : b ? "1" : "" }, set: function (a, b) { var c = a.style, d = a.currentStyle, e = f.isNumeric(b) ? "alpha(opacity=" + b * 100 + ")" : "", g = d && d.filter || c.filter || ""; c.zoom = 1; if (b >= 1 && f.trim(g.replace(bq, "")) === "") { c.removeAttribute("filter"); if (d && !d.filter) return } c.filter = bq.test(g) ? g.replace(bq, e) : g + " " + e } }), f(function () { f.support.reliableMarginRight || (f.cssHooks.marginRight = { get: function (a, b) { var c; return f.swap(a, { display: "inline-block" }, function () { b ? c = bz(a, "margin-right", "marginRight") : c = a.style.marginRight }), c } }) }), c.defaultView && c.defaultView.getComputedStyle && (bA = function (a, b) { var c, d, e; return b = b.replace(bs, "-$1").toLowerCase(), (d = a.ownerDocument.defaultView) && (e = d.getComputedStyle(a, null)) && (c = e.getPropertyValue(b), c === "" && !f.contains(a.ownerDocument.documentElement, a) && (c = f.style(a, b))), c }), c.documentElement.currentStyle && (bB = function (a, b) { var c, d, e, f = a.currentStyle && a.currentStyle[b], g = a.style; return f === null && g && (e = g[b]) && (f = e), !bt.test(f) && bu.test(f) && (c = g.left, d = a.runtimeStyle && a.runtimeStyle.left, d && (a.runtimeStyle.left = a.currentStyle.left), g.left = b === "fontSize" ? "1em" : f || 0, f = g.pixelLeft + "px", g.left = c, d && (a.runtimeStyle.left = d)), f === "" ? "auto" : f }), bz = bA || bB, f.expr && f.expr.filters && (f.expr.filters.hidden = function (a) { var b = a.offsetWidth, c = a.offsetHeight; return b === 0 && c === 0 || !f.support.reliableHiddenOffsets && (a.style && a.style.display || f.css(a, "display")) === "none" }, f.expr.filters.visible = function (a) { return !f.expr.filters.hidden(a) }); var bD = /%20/g, bE = /\[\]$/, bF = /\r?\n/g, bG = /#.*$/, bH = /^(.*?):[ \t]*([^\r\n]*)\r?$/mg, bI = /^(?:color|date|datetime|datetime-local|email|hidden|month|number|password|range|search|tel|text|time|url|week)$/i, bJ = /^(?:about|app|app\-storage|.+\-extension|file|res|widget):$/, bK = /^(?:GET|HEAD)$/, bL = /^\/\//, bM = /\?/, bN = /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, bO = /^(?:select|textarea)/i, bP = /\s+/, bQ = /([?&])_=[^&]*/, bR = /^([\w\+\.\-]+:)(?:\/\/([^\/?#:]*)(?::(\d+))?)?/, bS = f.fn.load, bT = {}, bU = {}, bV, bW, bX = ["*/"] + ["*"]; try { bV = e.href } catch (bY) { bV = c.createElement("a"), bV.href = "", bV = bV.href } bW = bR.exec(bV.toLowerCase()) || [], f.fn.extend({ load: function (a, c, d) { if (typeof a != "string" && bS) return bS.apply(this, arguments); if (!this.length) return this; var e = a.indexOf(" "); if (e >= 0) { var g = a.slice(e, a.length); a = a.slice(0, e) } var h = "GET"; c && (f.isFunction(c) ? (d = c, c = b) : typeof c == "object" && (c = f.param(c, f.ajaxSettings.traditional), h = "POST")); var i = this; return f.ajax({ url: a, type: h, dataType: "html", data: c, complete: function (a, b, c) { c = a.responseText, a.isResolved() && (a.done(function (a) { c = a }), i.html(g ? f("<div>").append(c.replace(bN, "")).find(g) : c)), d && i.each(d, [c, b, a]) } }), this }, serialize: function () { return f.param(this.serializeArray()) }, serializeArray: function () { return this.map(function () { return this.elements ? f.makeArray(this.elements) : this }).filter(function () { return this.name && !this.disabled && (this.checked || bO.test(this.nodeName) || bI.test(this.type)) }).map(function (a, b) { var c = f(this).val(); return c == null ? null : f.isArray(c) ? f.map(c, function (a, c) { return { name: b.name, value: a.replace(bF, "\r\n") } }) : { name: b.name, value: c.replace(bF, "\r\n") } }).get() } }), f.each("ajaxStart ajaxStop ajaxComplete ajaxError ajaxSuccess ajaxSend".split(" "), function (a, b) { f.fn[b] = function (a) { return this.on(b, a) } }), f.each(["get", "post"], function (a, c) { f[c] = function (a, d, e, g) { return f.isFunction(d) && (g = g || e, e = d, d = b), f.ajax({ type: c, url: a, data: d, success: e, dataType: g }) } }), f.extend({ getScript: function (a, c) { return f.get(a, b, c, "script") }, getJSON: function (a, b, c) { return f.get(a, b, c, "json") }, ajaxSetup: function (a, b) { return b ? b_(a, f.ajaxSettings) : (b = a, a = f.ajaxSettings), b_(a, b), a }, ajaxSettings: { url: bV, isLocal: bJ.test(bW[1]), global: !0, type: "GET", contentType: "application/x-www-form-urlencoded", processData: !0, async: !0, accepts: { xml: "application/xml, text/xml", html: "text/html", text: "text/plain", json: "application/json, text/javascript", "*": bX }, contents: { xml: /xml/, html: /html/, json: /json/ }, responseFields: { xml: "responseXML", text: "responseText" }, converters: { "* text": a.String, "text html": !0, "text json": f.parseJSON, "text xml": f.parseXML }, flatOptions: { context: !0, url: !0 } }, ajaxPrefilter: bZ(bT), ajaxTransport: bZ(bU), ajax: function (a, c) { function w(a, c, l, m) { if (s === 2) return; s = 2, q && clearTimeout(q), p = b, n = m || "", v.readyState = a > 0 ? 4 : 0; var o, r, u, w = c, x = l ? cb(d, v, l) : b, y, z; if (a >= 200 && a < 300 || a === 304) { if (d.ifModified) { if (y = v.getResponseHeader("Last-Modified")) f.lastModified[k] = y; if (z = v.getResponseHeader("Etag")) f.etag[k] = z } if (a === 304) w = "notmodified", o = !0; else try { r = cc(d, x), w = "success", o = !0 } catch (A) { w = "parsererror", u = A } } else { u = w; if (!w || a) w = "error", a < 0 && (a = 0) } v.status = a, v.statusText = "" + (c || w), o ? h.resolveWith(e, [r, w, v]) : h.rejectWith(e, [v, w, u]), v.statusCode(j), j = b, t && g.trigger("ajax" + (o ? "Success" : "Error"), [v, d, o ? r : u]), i.fireWith(e, [v, w]), t && (g.trigger("ajaxComplete", [v, d]), --f.active || f.event.trigger("ajaxStop")) } typeof a == "object" && (c = a, a = b), c = c || {}; var d = f.ajaxSetup({}, c), e = d.context || d, g = e !== d && (e.nodeType || e instanceof f) ? f(e) : f.event, h = f.Deferred(), i = f.Callbacks("once memory"), j = d.statusCode || {}, k, l = {}, m = {}, n, o, p, q, r, s = 0, t, u, v = { readyState: 0, setRequestHeader: function (a, b) { if (!s) { var c = a.toLowerCase(); a = m[c] = m[c] || a, l[a] = b } return this }, getAllResponseHeaders: function () { return s === 2 ? n : null }, getResponseHeader: function (a) { var c; if (s === 2) { if (!o) { o = {}; while (c = bH.exec(n)) o[c[1].toLowerCase()] = c[2] } c = o[a.toLowerCase()] } return c === b ? null : c }, overrideMimeType: function (a) { return s || (d.mimeType = a), this }, abort: function (a) { return a = a || "abort", p && p.abort(a), w(0, a), this } }; h.promise(v), v.success = v.done, v.error = v.fail, v.complete = i.add, v.statusCode = function (a) { if (a) { var b; if (s < 2) for (b in a) j[b] = [j[b], a[b]]; else b = a[v.status], v.then(b, b) } return this }, d.url = ((a || d.url) + "").replace(bG, "").replace(bL, bW[1] + "//"), d.dataTypes = f.trim(d.dataType || "*").toLowerCase().split(bP), d.crossDomain == null && (r = bR.exec(d.url.toLowerCase()), d.crossDomain = !(!r || r[1] == bW[1] && r[2] == bW[2] && (r[3] || (r[1] === "http:" ? 80 : 443)) == (bW[3] || (bW[1] === "http:" ? 80 : 443)))), d.data && d.processData && typeof d.data != "string" && (d.data = f.param(d.data, d.traditional)), b$(bT, d, c, v); if (s === 2) return !1; t = d.global, d.type = d.type.toUpperCase(), d.hasContent = !bK.test(d.type), t && f.active++ === 0 && f.event.trigger("ajaxStart"); if (!d.hasContent) { d.data && (d.url += (bM.test(d.url) ? "&" : "?") + d.data, delete d.data), k = d.url; if (d.cache === !1) { var x = f.now(), y = d.url.replace(bQ, "$1_=" + x); d.url = y + (y === d.url ? (bM.test(d.url) ? "&" : "?") + "_=" + x : "") } } (d.data && d.hasContent && d.contentType !== !1 || c.contentType) && v.setRequestHeader("Content-Type", d.contentType), d.ifModified && (k = k || d.url, f.lastModified[k] && v.setRequestHeader("If-Modified-Since", f.lastModified[k]), f.etag[k] && v.setRequestHeader("If-None-Match", f.etag[k])), v.setRequestHeader("Accept", d.dataTypes[0] && d.accepts[d.dataTypes[0]] ? d.accepts[d.dataTypes[0]] + (d.dataTypes[0] !== "*" ? ", " + bX + "; q=0.01" : "") : d.accepts["*"]); for (u in d.headers) v.setRequestHeader(u, d.headers[u]); if (!d.beforeSend || d.beforeSend.call(e, v, d) !== !1 && s !== 2) { for (u in { success: 1, error: 1, complete: 1 }) v[u](d[u]); p = b$(bU, d, c, v); if (!p) w(-1, "No Transport"); else { v.readyState = 1, t && g.trigger("ajaxSend", [v, d]), d.async && d.timeout > 0 && (q = setTimeout(function () { v.abort("timeout") }, d.timeout)); try { s = 1, p.send(l, w) } catch (z) { if (s < 2) w(-1, z); else throw z } } return v } return v.abort(), !1 }, param: function (a, c) { var d = [], e = function (a, b) { b = f.isFunction(b) ? b() : b, d[d.length] = encodeURIComponent(a) + "=" + encodeURIComponent(b) }; c === b && (c = f.ajaxSettings.traditional); if (f.isArray(a) || a.jquery && !f.isPlainObject(a)) f.each(a, function () { e(this.name, this.value) }); else for (var g in a) ca(g, a[g], c, e); return d.join("&").replace(bD, "+") } }), f.extend({ active: 0, lastModified: {}, etag: {} }); var cd = f.now(), ce = /(\=)\?(&|$)|\?\?/i; f.ajaxSetup({ jsonp: "callback", jsonpCallback: function () { return f.expando + "_" + cd++ } }), f.ajaxPrefilter("json jsonp", function (b, c, d) { var e = b.contentType === "application/x-www-form-urlencoded" && typeof b.data == "string"; if (b.dataTypes[0] === "jsonp" || b.jsonp !== !1 && (ce.test(b.url) || e && ce.test(b.data))) { var g, h = b.jsonpCallback = f.isFunction(b.jsonpCallback) ? b.jsonpCallback() : b.jsonpCallback, i = a[h], j = b.url, k = b.data, l = "$1" + h + "$2"; return b.jsonp !== !1 && (j = j.replace(ce, l), b.url === j && (e && (k = k.replace(ce, l)), b.data === k && (j += (/\?/.test(j) ? "&" : "?") + b.jsonp + "=" + h))), b.url = j, b.data = k, a[h] = function (a) { g = [a] }, d.always(function () { a[h] = i, g && f.isFunction(i) && a[h](g[0]) }), b.converters["script json"] = function () { return g || f.error(h + " was not called"), g[0] }, b.dataTypes[0] = "json", "script" } }), f.ajaxSetup({ accepts: { script: "text/javascript, application/javascript, application/ecmascript, application/x-ecmascript" }, contents: { script: /javascript|ecmascript/ }, converters: { "text script": function (a) { return f.globalEval(a), a } } }), f.ajaxPrefilter("script", function (a) { a.cache === b && (a.cache = !1), a.crossDomain && (a.type = "GET", a.global = !1) }), f.ajaxTransport("script", function (a) { if (a.crossDomain) { var d, e = c.head || c.getElementsByTagName("head")[0] || c.documentElement; return { send: function (f, g) { d = c.createElement("script"), d.async = "async", a.scriptCharset && (d.charset = a.scriptCharset), d.src = a.url, d.onload = d.onreadystatechange = function (a, c) { if (c || !d.readyState || /loaded|complete/.test(d.readyState)) d.onload = d.onreadystatechange = null, e && d.parentNode && e.removeChild(d), d = b, c || g(200, "success") }, e.insertBefore(d, e.firstChild) }, abort: function () { d && d.onload(0, 1) } } } }); var cf = a.ActiveXObject ? function () { for (var a in ch) ch[a](0, 1) } : !1, cg = 0, ch; f.ajaxSettings.xhr = a.ActiveXObject ? function () { return !this.isLocal && ci() || cj() } : ci, function (a) { f.extend(f.support, { ajax: !!a, cors: !!a && "withCredentials" in a }) }(f.ajaxSettings.xhr()), f.support.ajax && f.ajaxTransport(function (c) { if (!c.crossDomain || f.support.cors) { var d; return { send: function (e, g) { var h = c.xhr(), i, j; c.username ? h.open(c.type, c.url, c.async, c.username, c.password) : h.open(c.type, c.url, c.async); if (c.xhrFields) for (j in c.xhrFields) h[j] = c.xhrFields[j]; c.mimeType && h.overrideMimeType && h.overrideMimeType(c.mimeType), !c.crossDomain && !e["X-Requested-With"] && (e["X-Requested-With"] = "XMLHttpRequest"); try { for (j in e) h.setRequestHeader(j, e[j]) } catch (k) { } h.send(c.hasContent && c.data || null), d = function (a, e) { var j, k, l, m, n; try { if (d && (e || h.readyState === 4)) { d = b, i && (h.onreadystatechange = f.noop, cf && delete ch[i]); if (e) h.readyState !== 4 && h.abort(); else { j = h.status, l = h.getAllResponseHeaders(), m = {}, n = h.responseXML, n && n.documentElement && (m.xml = n), m.text = h.responseText; try { k = h.statusText } catch (o) { k = "" } !j && c.isLocal && !c.crossDomain ? j = m.text ? 200 : 404 : j === 1223 && (j = 204) } } } catch (p) { e || g(-1, p) } m && g(j, k, m, l) }, !c.async || h.readyState === 4 ? d() : (i = ++cg, cf && (ch || (ch = {}, f(a).unload(cf)), ch[i] = d), h.onreadystatechange = d) }, abort: function () { d && d(0, 1) } } } }); var ck = {}, cl, cm, cn = /^(?:toggle|show|hide)$/, co = /^([+\-]=)?([\d+.\-]+)([a-z%]*)$/i, cp, cq = [["height", "marginTop", "marginBottom", "paddingTop", "paddingBottom"], ["width", "marginLeft", "marginRight", "paddingLeft", "paddingRight"], ["opacity"]], cr; f.fn.extend({ show: function (a, b, c) { var d, e; if (a || a === 0) return this.animate(cu("show", 3), a, b, c); for (var g = 0, h = this.length; g < h; g++) d = this[g], d.style && (e = d.style.display, !f._data(d, "olddisplay") && e === "none" && (e = d.style.display = ""), e === "" && f.css(d, "display") === "none" && f._data(d, "olddisplay", cv(d.nodeName))); for (g = 0; g < h; g++) { d = this[g]; if (d.style) { e = d.style.display; if (e === "" || e === "none") d.style.display = f._data(d, "olddisplay") || "" } } return this }, hide: function (a, b, c) { if (a || a === 0) return this.animate(cu("hide", 3), a, b, c); var d, e, g = 0, h = this.length; for (; g < h; g++) d = this[g], d.style && (e = f.css(d, "display"), e !== "none" && !f._data(d, "olddisplay") && f._data(d, "olddisplay", e)); for (g = 0; g < h; g++) this[g].style && (this[g].style.display = "none"); return this }, _toggle: f.fn.toggle, toggle: function (a, b, c) { var d = typeof a == "boolean"; return f.isFunction(a) && f.isFunction(b) ? this._toggle.apply(this, arguments) : a == null || d ? this.each(function () { var b = d ? a : f(this).is(":hidden"); f(this)[b ? "show" : "hide"]() }) : this.animate(cu("toggle", 3), a, b, c), this }, fadeTo: function (a, b, c, d) { return this.filter(":hidden").css("opacity", 0).show().end().animate({ opacity: b }, a, c, d) }, animate: function (a, b, c, d) { function g() { e.queue === !1 && f._mark(this); var b = f.extend({}, e), c = this.nodeType === 1, d = c && f(this).is(":hidden"), g, h, i, j, k, l, m, n, o; b.animatedProperties = {}; for (i in a) { g = f.camelCase(i), i !== g && (a[g] = a[i], delete a[i]), h = a[g], f.isArray(h) ? (b.animatedProperties[g] = h[1], h = a[g] = h[0]) : b.animatedProperties[g] = b.specialEasing && b.specialEasing[g] || b.easing || "swing"; if (h === "hide" && d || h === "show" && !d) return b.complete.call(this); c && (g === "height" || g === "width") && (b.overflow = [this.style.overflow, this.style.overflowX, this.style.overflowY], f.css(this, "display") === "inline" && f.css(this, "float") === "none" && (!f.support.inlineBlockNeedsLayout || cv(this.nodeName) === "inline" ? this.style.display = "inline-block" : this.style.zoom = 1)) } b.overflow != null && (this.style.overflow = "hidden"); for (i in a) j = new f.fx(this, b, i), h = a[i], cn.test(h) ? (o = f._data(this, "toggle" + i) || (h === "toggle" ? d ? "show" : "hide" : 0), o ? (f._data(this, "toggle" + i, o === "show" ? "hide" : "show"), j[o]()) : j[h]()) : (k = co.exec(h), l = j.cur(), k ? (m = parseFloat(k[2]), n = k[3] || (f.cssNumber[i] ? "" : "px"), n !== "px" && (f.style(this, i, (m || 1) + n), l = (m || 1) / j.cur() * l, f.style(this, i, l + n)), k[1] && (m = (k[1] === "-=" ? -1 : 1) * m + l), j.custom(l, m, n)) : j.custom(l, h, "")); return !0 } var e = f.speed(b, c, d); return f.isEmptyObject(a) ? this.each(e.complete, [!1]) : (a = f.extend({}, a), e.queue === !1 ? this.each(g) : this.queue(e.queue, g)) }, stop: function (a, c, d) { return typeof a != "string" && (d = c, c = a, a = b), c && a !== !1 && this.queue(a || "fx", []), this.each(function () { function h(a, b, c) { var e = b[c]; f.removeData(a, c, !0), e.stop(d) } var b, c = !1, e = f.timers, g = f._data(this); d || f._unmark(!0, this); if (a == null) for (b in g) g[b] && g[b].stop && b.indexOf(".run") === b.length - 4 && h(this, g, b); else g[b = a + ".run"] && g[b].stop && h(this, g, b); for (b = e.length; b--;) e[b].elem === this && (a == null || e[b].queue === a) && (d ? e[b](!0) : e[b].saveState(), c = !0, e.splice(b, 1)); (!d || !c) && f.dequeue(this, a) }) } }), f.each({ slideDown: cu("show", 1), slideUp: cu("hide", 1), slideToggle: cu("toggle", 1), fadeIn: { opacity: "show" }, fadeOut: { opacity: "hide" }, fadeToggle: { opacity: "toggle" } }, function (a, b) { f.fn[a] = function (a, c, d) { return this.animate(b, a, c, d) } }), f.extend({ speed: function (a, b, c) { var d = a && typeof a == "object" ? f.extend({}, a) : { complete: c || !c && b || f.isFunction(a) && a, duration: a, easing: c && b || b && !f.isFunction(b) && b }; d.duration = f.fx.off ? 0 : typeof d.duration == "number" ? d.duration : d.duration in f.fx.speeds ? f.fx.speeds[d.duration] : f.fx.speeds._default; if (d.queue == null || d.queue === !0) d.queue = "fx"; return d.old = d.complete, d.complete = function (a) { f.isFunction(d.old) && d.old.call(this), d.queue ? f.dequeue(this, d.queue) : a !== !1 && f._unmark(this) }, d }, easing: { linear: function (a, b, c, d) { return c + d * a }, swing: function (a, b, c, d) { return (-Math.cos(a * Math.PI) / 2 + .5) * d + c } }, timers: [], fx: function (a, b, c) { this.options = b, this.elem = a, this.prop = c, b.orig = b.orig || {} } }), f.fx.prototype = { update: function () { this.options.step && this.options.step.call(this.elem, this.now, this), (f.fx.step[this.prop] || f.fx.step._default)(this) }, cur: function () { if (this.elem[this.prop] == null || !!this.elem.style && this.elem.style[this.prop] != null) { var a, b = f.css(this.elem, this.prop); return isNaN(a = parseFloat(b)) ? !b || b === "auto" ? 0 : b : a } return this.elem[this.prop] }, custom: function (a, c, d) { function h(a) { return e.step(a) } var e = this, g = f.fx; this.startTime = cr || cs(), this.end = c, this.now = this.start = a, this.pos = this.state = 0, this.unit = d || this.unit || (f.cssNumber[this.prop] ? "" : "px"), h.queue = this.options.queue, h.elem = this.elem, h.saveState = function () { e.options.hide && f._data(e.elem, "fxshow" + e.prop) === b && f._data(e.elem, "fxshow" + e.prop, e.start) }, h() && f.timers.push(h) && !cp && (cp = setInterval(g.tick, g.interval)) }, show: function () { var a = f._data(this.elem, "fxshow" + this.prop); this.options.orig[this.prop] = a || f.style(this.elem, this.prop), this.options.show = !0, a !== b ? this.custom(this.cur(), a) : this.custom(this.prop === "width" || this.prop === "height" ? 1 : 0, this.cur()), f(this.elem).show() }, hide: function () { this.options.orig[this.prop] = f._data(this.elem, "fxshow" + this.prop) || f.style(this.elem, this.prop), this.options.hide = !0, this.custom(this.cur(), 0) }, step: function (a) { var b, c, d, e = cr || cs(), g = !0, h = this.elem, i = this.options; if (a || e >= i.duration + this.startTime) { this.now = this.end, this.pos = this.state = 1, this.update(), i.animatedProperties[this.prop] = !0; for (b in i.animatedProperties) i.animatedProperties[b] !== !0 && (g = !1); if (g) { i.overflow != null && !f.support.shrinkWrapBlocks && f.each(["", "X", "Y"], function (a, b) { h.style["overflow" + b] = i.overflow[a] }), i.hide && f(h).hide(); if (i.hide || i.show) for (b in i.animatedProperties) f.style(h, b, i.orig[b]), f.removeData(h, "fxshow" + b, !0), f.removeData(h, "toggle" + b, !0); d = i.complete, d && (i.complete = !1, d.call(h)) } return !1 } return i.duration == Infinity ? this.now = e : (c = e - this.startTime, this.state = c / i.duration, this.pos = f.easing[i.animatedProperties[this.prop]](this.state, c, 0, 1, i.duration), this.now = this.start + (this.end - this.start) * this.pos), this.update(), !0 } }, f.extend(f.fx, { tick: function () { var a, b = f.timers, c = 0; for (; c < b.length; c++) a = b[c], !a() && b[c] === a && b.splice(c--, 1); b.length || f.fx.stop() }, interval: 13, stop: function () { clearInterval(cp), cp = null }, speeds: { slow: 600, fast: 200, _default: 400 }, step: { opacity: function (a) { f.style(a.elem, "opacity", a.now) }, _default: function (a) { a.elem.style && a.elem.style[a.prop] != null ? a.elem.style[a.prop] = a.now + a.unit : a.elem[a.prop] = a.now } } }), f.each(["width", "height"], function (a, b) { f.fx.step[b] = function (a) { f.style(a.elem, b, Math.max(0, a.now) + a.unit) } }), f.expr && f.expr.filters && (f.expr.filters.animated = function (a) { return f.grep(f.timers, function (b) { return a === b.elem }).length }); var cw = /^t(?:able|d|h)$/i, cx = /^(?:body|html)$/i; "getBoundingClientRect" in c.documentElement ? f.fn.offset = function (a) { var b = this[0], c; if (a) return this.each(function (b) { f.offset.setOffset(this, a, b) }); if (!b || !b.ownerDocument) return null; if (b === b.ownerDocument.body) return f.offset.bodyOffset(b); try { c = b.getBoundingClientRect() } catch (d) { } var e = b.ownerDocument, g = e.documentElement; if (!c || !f.contains(g, b)) return c ? { top: c.top, left: c.left } : { top: 0, left: 0 }; var h = e.body, i = cy(e), j = g.clientTop || h.clientTop || 0, k = g.clientLeft || h.clientLeft || 0, l = i.pageYOffset || f.support.boxModel && g.scrollTop || h.scrollTop, m = i.pageXOffset || f.support.boxModel && g.scrollLeft || h.scrollLeft, n = c.top + l - j, o = c.left + m - k; return { top: n, left: o } } : f.fn.offset = function (a) { var b = this[0]; if (a) return this.each(function (b) { f.offset.setOffset(this, a, b) }); if (!b || !b.ownerDocument) return null; if (b === b.ownerDocument.body) return f.offset.bodyOffset(b); var c, d = b.offsetParent, e = b, g = b.ownerDocument, h = g.documentElement, i = g.body, j = g.defaultView, k = j ? j.getComputedStyle(b, null) : b.currentStyle, l = b.offsetTop, m = b.offsetLeft; while ((b = b.parentNode) && b !== i && b !== h) { if (f.support.fixedPosition && k.position === "fixed") break; c = j ? j.getComputedStyle(b, null) : b.currentStyle, l -= b.scrollTop, m -= b.scrollLeft, b === d && (l += b.offsetTop, m += b.offsetLeft, f.support.doesNotAddBorder && (!f.support.doesAddBorderForTableAndCells || !cw.test(b.nodeName)) && (l += parseFloat(c.borderTopWidth) || 0, m += parseFloat(c.borderLeftWidth) || 0), e = d, d = b.offsetParent), f.support.subtractsBorderForOverflowNotVisible && c.overflow !== "visible" && (l += parseFloat(c.borderTopWidth) || 0, m += parseFloat(c.borderLeftWidth) || 0), k = c } if (k.position === "relative" || k.position === "static") l += i.offsetTop, m += i.offsetLeft; return f.support.fixedPosition && k.position === "fixed" && (l += Math.max(h.scrollTop, i.scrollTop), m += Math.max(h.scrollLeft, i.scrollLeft)), { top: l, left: m } }, f.offset = { bodyOffset: function (a) { var b = a.offsetTop, c = a.offsetLeft; return f.support.doesNotIncludeMarginInBodyOffset && (b += parseFloat(f.css(a, "marginTop")) || 0, c += parseFloat(f.css(a, "marginLeft")) || 0), { top: b, left: c } }, setOffset: function (a, b, c) { var d = f.css(a, "position"); d === "static" && (a.style.position = "relative"); var e = f(a), g = e.offset(), h = f.css(a, "top"), i = f.css(a, "left"), j = (d === "absolute" || d === "fixed") && f.inArray("auto", [h, i]) > -1, k = {}, l = {}, m, n; j ? (l = e.position(), m = l.top, n = l.left) : (m = parseFloat(h) || 0, n = parseFloat(i) || 0), f.isFunction(b) && (b = b.call(a, c, g)), b.top != null && (k.top = b.top - g.top + m), b.left != null && (k.left = b.left - g.left + n), "using" in b ? b.using.call(a, k) : e.css(k) } }, f.fn.extend({ position: function () { if (!this[0]) return null; var a = this[0], b = this.offsetParent(), c = this.offset(), d = cx.test(b[0].nodeName) ? { top: 0, left: 0 } : b.offset(); return c.top -= parseFloat(f.css(a, "marginTop")) || 0, c.left -= parseFloat(f.css(a, "marginLeft")) || 0, d.top += parseFloat(f.css(b[0], "borderTopWidth")) || 0, d.left += parseFloat(f.css(b[0], "borderLeftWidth")) || 0, { top: c.top - d.top, left: c.left - d.left } }, offsetParent: function () { return this.map(function () { var a = this.offsetParent || c.body; while (a && !cx.test(a.nodeName) && f.css(a, "position") === "static") a = a.offsetParent; return a }) } }), f.each(["Left", "Top"], function (a, c) { var d = "scroll" + c; f.fn[d] = function (c) { var e, g; return c === b ? (e = this[0], e ? (g = cy(e), g ? "pageXOffset" in g ? g[a ? "pageYOffset" : "pageXOffset"] : f.support.boxModel && g.document.documentElement[d] || g.document.body[d] : e[d]) : null) : this.each(function () { g = cy(this), g ? g.scrollTo(a ? f(g).scrollLeft() : c, a ? c : f(g).scrollTop()) : this[d] = c }) } }), f.each(["Height", "Width"], function (a, c) { var d = c.toLowerCase(); f.fn["inner" + c] = function () { var a = this[0]; return a ? a.style ? parseFloat(f.css(a, d, "padding")) : this[d]() : null }, f.fn["outer" + c] = function (a) { var b = this[0]; return b ? b.style ? parseFloat(f.css(b, d, a ? "margin" : "border")) : this[d]() : null }, f.fn[d] = function (a) { var e = this[0]; if (!e) return a == null ? null : this; if (f.isFunction(a)) return this.each(function (b) { var c = f(this); c[d](a.call(this, b, c[d]())) }); if (f.isWindow(e)) { var g = e.document.documentElement["client" + c], h = e.document.body; return e.document.compatMode === "CSS1Compat" && g || h && h["client" + c] || g } if (e.nodeType === 9) return Math.max(e.documentElement["client" + c], e.body["scroll" + c], e.documentElement["scroll" + c], e.body["offset" + c], e.documentElement["offset" + c]); if (a === b) { var i = f.css(e, d), j = parseFloat(i); return f.isNumeric(j) ? j : i } return this.css(d, typeof a == "string" ? a : a + "px") } }), typeof define == "function" && define.amd && define.amd.jQuery && define("jquery", [], function () { return f }) }(window), define("runtime-browser/jquery", function () { }), define("runtime-browser/http", ["datajslib!jquery"], function (a) { return { request: function (b, c) { return b.success = function (a, b) { c(null, a) }, b.error = function (a) { c(a) }, a.ajax(b) } } }), function () { function B(a, b, c) { if (a === b) return a !== 0 || 1 / a == 1 / b; if (a == null || b == null) return a === b; a._chain && (a = a._wrapped), b._chain && (b = b._wrapped); if (a.isEqual && x.isFunction(a.isEqual)) return a.isEqual(b); if (b.isEqual && x.isFunction(b.isEqual)) return b.isEqual(a); var d = j.call(a); if (d != j.call(b)) return !1; switch (d) { case "[object String]": return a == String(b); case "[object Number]": return a != +a ? b != +b : a == 0 ? 1 / a == 1 / b : a == +b; case "[object Date]": case "[object Boolean]": return +a == +b; case "[object RegExp]": return a.source == b.source && a.global == b.global && a.multiline == b.multiline && a.ignoreCase == b.ignoreCase } if (typeof a != "object" || typeof b != "object") return !1; var e = c.length; while (e--) if (c[e] == a) return !0; c.push(a); var f = 0, g = !0; if (d == "[object Array]") { f = a.length, g = f == b.length; if (g) while (f--) if (!(g = f in a == f in b && B(a[f], b[f], c))) break } else { if ("constructor" in a != "constructor" in b || a.constructor != b.constructor) return !1; for (var h in a) if (k.call(a, h)) { f++; if (!(g = k.call(b, h) && B(a[h], b[h], c))) break } if (g) { for (h in b) if (k.call(b, h) && !(f--)) break; g = !f } } return c.pop(), g } var a = this, b = a._, c = {}, d = Array.prototype, e = Object.prototype, f = Function.prototype, g = d.slice, h = d.concat, i = d.unshift, j = e.toString, k = e.hasOwnProperty, l = d.forEach, m = d.map, n = d.reduce, o = d.reduceRight, p = d.filter, q = d.every, r = d.some, s = d.indexOf, t = d.lastIndexOf, u = Array.isArray, v = Object.keys, w = f.bind, x = function (a) { return new D(a) }; typeof exports != "undefined" ? (typeof module != "undefined" && module.exports && (exports = module.exports = x), exports._ = x) : typeof define == "function" && define.amd ? define("runtime-browser/underscore", [], function () { return x }) : a._ = x, x.VERSION = "1.2.3"; var y = x.each = x.forEach = function (a, b, d) { if (a == null) return; if (l && a.forEach === l) a.forEach(b, d); else if (a.length === +a.length) { for (var e = 0, f = a.length; e < f; e++) if (e in a && b.call(d, a[e], e, a) === c) return } else for (var g in a) if (k.call(a, g) && b.call(d, a[g], g, a) === c) return }; x.map = function (a, b, c) { var d = []; return a == null ? d : m && a.map === m ? a.map(b, c) : (y(a, function (a, e, f) { d[d.length] = b.call(c, a, e, f) }), d) }, x.reduce = x.foldl = x.inject = function (a, b, c, d) { var e = arguments.length > 2; a == null && (a = []); if (n && a.reduce === n) return d && (b = x.bind(b, d)), e ? a.reduce(b, c) : a.reduce(b); y(a, function (a, f, g) { e ? c = b.call(d, c, a, f, g) : (c = a, e = !0) }); if (!e) throw new TypeError("Reduce of empty array with no initial value"); return c }, x.reduceRight = x.foldr = function (a, b, c, d) { var e = arguments.length > 2; a == null && (a = []); if (o && a.reduceRight === o) return d && (b = x.bind(b, d)), e ? a.reduceRight(b, c) : a.reduceRight(b); var f = x.toArray(a).reverse(); return d && !e && (b = x.bind(b, d)), e ? x.reduce(f, b, c, d) : x.reduce(f, b) }, x.find = x.detect = function (a, b, c) { var d; return z(a, function (a, e, f) { if (b.call(c, a, e, f)) return d = a, !0 }), d }, x.filter = x.select = function (a, b, c) { var d = []; return a == null ? d : p && a.filter === p ? a.filter(b, c) : (y(a, function (a, e, f) { b.call(c, a, e, f) && (d[d.length] = a) }), d) }, x.reject = function (a, b, c) { var d = []; return a == null ? d : (y(a, function (a, e, f) { b.call(c, a, e, f) || (d[d.length] = a) }), d) }, x.every = x.all = function (a, b, d) { var e = !0; return a == null ? e : q && a.every === q ? a.every(b, d) : (y(a, function (a, f, g) { if (!(e = e && b.call(d, a, f, g))) return c }), e) }; var z = x.some = x.any = function (a, b, d) { b || (b = x.identity); var e = !1; return a == null ? e : r && a.some === r ? a.some(b, d) : (y(a, function (a, f, g) { if (e || (e = b.call(d, a, f, g))) return c }), !!e) }; x.include = x.contains = function (a, b) { var c = !1; return a == null ? c : s && a.indexOf === s ? a.indexOf(b) != -1 : (c = z(a, function (a) { return a === b }), c) }, x.invoke = function (a, b) { var c = g.call(arguments, 2); return x.map(a, function (a) { return (b.call ? b || a : a[b]).apply(a, c) }) }, x.pluck = function (a, b) { return x.map(a, function (a) { return a[b] }) }, x.max = function (a, b, c) { if (!b && x.isArray(a)) return Math.max.apply(Math, a); if (!b && x.isEmpty(a)) return -Infinity; var d = { computed: -Infinity }; return y(a, function (a, e, f) { var g = b ? b.call(c, a, e, f) : a; g >= d.computed && (d = { value: a, computed: g }) }), d.value }, x.min = function (a, b, c) { if (!b && x.isArray(a)) return Math.min.apply(Math, a); if (!b && x.isEmpty(a)) return Infinity; var d = { computed: Infinity }; return y(a, function (a, e, f) { var g = b ? b.call(c, a, e, f) : a; g < d.computed && (d = { value: a, computed: g }) }), d.value }, x.shuffle = function (a) { var b = [], c; return y(a, function (a, d, e) { d == 0 ? b[0] = a : (c = Math.floor(Math.random() * (d + 1)), b[d] = b[c], b[c] = a) }), b }, x.sortBy = function (a, b, c) { return x.pluck(x.map(a, function (a, d, e) { return { value: a, criteria: b.call(c, a, d, e) } }).sort(function (a, b) { var c = a.criteria, d = b.criteria; return c < d ? -1 : c > d ? 1 : 0 }), "value") }, x.groupBy = function (a, b) { var c = {}, d = x.isFunction(b) ? b : function (a) { return a[b] }; return y(a, function (a, b) { var e = d(a, b); (c[e] || (c[e] = [])).push(a) }), c }, x.sortedIndex = function (a, b, c) { c || (c = x.identity); var d = 0, e = a.length; while (d < e) { var f = d + e >> 1; c(a[f]) < c(b) ? d = f + 1 : e = f } return d }, x.toArray = function (a) { return a ? a.toArray ? a.toArray() : x.isArray(a) ? g.call(a) : x.isArguments(a) ? g.call(a) : x.values(a) : [] }, x.size = function (a) { return x.toArray(a).length }, x.first = x.head = function (a, b, c) { return b != null && !c ? g.call(a, 0, b) : a[0] }, x.initial = function (a, b, c) { return g.call(a, 0, a.length - (b == null || c ? 1 : b)) }, x.last = function (a, b, c) { return b != null && !c ? g.call(a, Math.max(a.length - b, 0)) : a[a.length - 1] }, x.rest = x.tail = function (a, b, c) { return g.call(a, b == null || c ? 1 : b) }, x.compact = function (a) { return x.filter(a, function (a) { return !!a }) }, x.flatten = function (a, b) { return x.reduce(a, function (a, c) { return x.isArray(c) ? a.concat(b ? c : x.flatten(c)) : (a[a.length] = c, a) }, []) }, x.without = function (a) { return x.difference(a, g.call(arguments, 1)) }, x.uniq = x.unique = function (a, b, c) { var d = c ? x.map(a, c) : a, e = []; return x.reduce(d, function (c, d, f) { if (0 == f || (b === !0 ? x.last(c) != d : !x.include(c, d))) c[c.length] = d, e[e.length] = a[f]; return c }, []), e }, x.union = function () { return x.uniq(x.flatten(arguments, !0)) }, x.intersection = x.intersect = function (a) { var b = g.call(arguments, 1); return x.filter(x.uniq(a), function (a) { return x.every(b, function (b) { return x.indexOf(b, a) >= 0 }) }) }, x.difference = function (a) { var b = x.flatten(g.call(arguments, 1)); return x.filter(a, function (a) { return !x.include(b, a) }) }, x.zip = function () { var a = g.call(arguments), b = x.max(x.pluck(a, "length")), c = new Array(b); for (var d = 0; d < b; d++) c[d] = x.pluck(a, "" + d); return c }, x.indexOf = function (a, b, c) { if (a == null) return -1; var d, e; if (c) return d = x.sortedIndex(a, b), a[d] === b ? d : -1; if (s && a.indexOf === s) return a.indexOf(b); for (d = 0, e = a.length; d < e; d++) if (d in a && a[d] === b) return d; return -1 }, x.lastIndexOf = function (a, b) { if (a == null) return -1; if (t && a.lastIndexOf === t) return a.lastIndexOf(b); var c = a.length; while (c--) if (c in a && a[c] === b) return c; return -1 }, x.range = function (a, b, c) { arguments.length <= 1 && (b = a || 0, a = 0), c = arguments[2] || 1; var d = Math.max(Math.ceil((b - a) / c), 0), e = 0, f = new Array(d); while (e < d) f[e++] = a, a += c; return f }; var A = function () { }; x.bind = function (a, b) { var c, d; if (a.bind === w && w) return w.apply(a, g.call(arguments, 1)); if (!x.isFunction(a)) throw new TypeError; return d = g.call(arguments, 2), c = function () { if (this instanceof c) { A.prototype = a.prototype; var e = new A, f = a.apply(e, d.concat(g.call(arguments))); return Object(f) === f ? f : e } return a.apply(b, d.concat(g.call(arguments))) } }, x.bindAll = function (a) { var b = g.call(arguments, 1); return b.length == 0 && (b = x.functions(a)), y(b, function (b) { a[b] = x.bind(a[b], a) }), a }, x.memoize = function (a, b) { var c = {}; return b || (b = x.identity), function () { var d = b.apply(this, arguments); return k.call(c, d) ? c[d] : c[d] = a.apply(this, arguments) } }, x.delay = function (a, b) { var c = g.call(arguments, 2); return setTimeout(function () { return a.apply(a, c) }, b) }, x.defer = function (a) { return x.delay.apply(x, [a, 1].concat(g.call(arguments, 1))) }, x.throttle = function (a, b) { var c, d, e, f, g, h = x.debounce(function () { g = f = !1 }, b); return function () { c = this, d = arguments; var i = function () { e = null, g && a.apply(c, d), h() }; e || (e = setTimeout(i, b)), f ? g = !0 : a.apply(c, d), h(), f = !0 } }, x.debounce = function (a, b) { var c; return function () { var d = this, e = arguments, f = function () { c = null, a.apply(d, e) }; clearTimeout(c), c = setTimeout(f, b) } }, x.once = function (a) { var b = !1, c; return function () { return b ? c : (b = !0, c = a.apply(this, arguments)) } }, x.wrap = function (a, b) { return function () { var c = h.apply([a], arguments); return b.apply(this, c) } }, x.compose = function () { var a = arguments; return function () { var b = arguments; for (var c = a.length - 1; c >= 0; c--) b = [a[c].apply(this, b)]; return b[0] } }, x.after = function (a, b) { return a > 0 ? function () { if (--a < 1) return b.apply(this, arguments) } : b() }, x.keys = v || function (a) { if (a !== Object(a)) throw new TypeError("Invalid object"); var b = []; for (var c in a) k.call(a, c) && (b[b.length] = c); return b }, x.values = function (a) { return x.map(a, x.identity) }, x.functions = x.methods = function (a) { var b = []; for (var c in a) x.isFunction(a[c]) && b.push(c); return b.sort() }, x.extend = function (a) { return y(g.call(arguments, 1), function (b) { for (var c in b) b[c] !== void 0 && (a[c] = b[c]) }), a }, x.defaults = function (a) { return y(g.call(arguments, 1), function (b) { for (var c in b) a[c] == null && (a[c] = b[c]) }), a }, x.clone = function (a) { return x.isObject(a) ? x.isArray(a) ? a.slice() : x.extend({}, a) : a }, x.tap = function (a, b) { return b(a), a }, x.isEqual = function (a, b) { return B(a, b, []) }, x.isEmpty = function (a) { if (x.isArray(a) || x.isString(a)) return a.length === 0; for (var b in a) if (k.call(a, b)) return !1; return !0 }, x.isElement = function (a) { return !!a && a.nodeType == 1 }, x.isArray = u || function (a) { return j.call(a) == "[object Array]" }, x.isObject = function (a) { return a === Object(a) }, x.isArguments = function (a) { return j.call(a) == "[object Arguments]" }, x.isArguments(arguments) || (x.isArguments = function (a) { return !!a && !!k.call(a, "callee") }), x.isFunction = function (a) { return j.call(a) == "[object Function]" }, x.isString = function (a) { return j.call(a) == "[object String]" }, x.isNumber = function (a) { return j.call(a) == "[object Number]" }, x.isNaN = function (a) { return a !== a }, x.isBoolean = function (a) { return a === !0 || a === !1 || j.call(a) == "[object Boolean]" }, x.isDate = function (a) { return j.call(a) == "[object Date]" }, x.isRegExp = function (a) { return j.call(a) == "[object RegExp]" }, x.isNull = function (a) { return a === null }, x.isUndefined = function (a) { return a === void 0 }, x.noConflict = function () { return a._ = b, this }, x.identity = function (a) { return a }, x.times = function (a, b, c) { for (var d = 0; d < a; d++) b.call(c, d) }, x.escape = function (a) { return ("" + a).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#x27;").replace(/\//g, "&#x2F;") }, x.mixin = function (a) { y(x.functions(a), function (b) { F(b, x[b] = a[b]) }) }; var C = 0; x.uniqueId = function (a) { var b = C++; return a ? a + b : b }, x.templateSettings = { evaluate: /<%([\s\S]+?)%>/g, interpolate: /<%=([\s\S]+?)%>/g, escape: /<%-([\s\S]+?)%>/g }, x.template = function (a, b) { var c = x.templateSettings, d = "var __p=[],print=function(){__p.push.apply(__p,arguments);};with(obj||{}){__p.push('" + a.replace(/\\/g, "\\\\").replace(/'/g, "\\'").replace(c.escape, function (a, b) { return "',_.escape(" + b.replace(/\\'/g, "'") + "),'" }).replace(c.interpolate, function (a, b) { return "'," + b.replace(/\\'/g, "'") + ",'" }).replace(c.evaluate || null, function (a, b) { return "');" + b.replace(/\\'/g, "'").replace(/[\r\n\t]/g, " ") + ";__p.push('" }).replace(/\r/g, "\\r").replace(/\n/g, "\\n").replace(/\t/g, "\\t") + "');}return __p.join('');", e = new Function("obj", "_", d); return b ? e(b, x) : function (a) { return e.call(this, a, x) } }; var D = function (a) { this._wrapped = a }; x.prototype = D.prototype; var E = function (a, b) { return b ? x(a).chain() : a }, F = function (a, b) { D.prototype[a] = function () { var a = g.call(arguments); return i.call(a, this._wrapped), E(b.apply(x, a), this._chain) } }; x.mixin(x), y(["pop", "push", "reverse", "shift", "sort", "splice", "unshift"], function (a) { var b = d[a]; D.prototype[a] = function () { return b.apply(this._wrapped, arguments), E(this._wrapped, this._chain) } }), y(["concat", "join", "slice"], function (a) { var b = d[a]; D.prototype[a] = function () { return E(b.apply(this._wrapped, arguments), this._chain) } }), D.prototype.chain = function () { return this._chain = !0, this }, D.prototype.value = function () { return this._wrapped } }.call(this), define("databases/youtube/lib/api", ["datajslib!http", "datajslib!underscore"], function (a, b) { var c = {}; return c.options = function (a) { var b = { skip: "start-index", limit: "max-results" }, c = {}; for (var d in a.options) typeof b[d] != "undefined" && (c[b[d]] = a.options[d]); if (c["start-index"]) try { c["start-index"] = parseInt(c["start-index"], 10) + 1 } catch (e) { } return c }, c.generateUrl = function (a, b) { for (var c in b) { var d = a.replace(new RegExp(":" + c), b[c]); d != a ? a = d : a += (a.indexOf("?") == -1 ? "?" : "&") + c + (b[c] ? "=" + b[c] : "") } return a }, c.request = function (b, d) { var e = "http://gdata.youtube.com/feeds/api/"; b = e + c.generateUrl(b, { alt: "json-in-script", v: 2 }), a.request({ url: b, dataType: "jsonp" }, d) }, c }), define("runtime-browser/iso8601", [], function () { var a = /^([0-9]{4})(\-([0-9]{2})(\-([0-9]{2})(T([0-9]{2}):([0-9]{2})(:([0-9]{2})(\.([0-9]+))?)?(Z|(([\-+])([0-9]{2}):([0-9]{2})))?)?)?)?$/, b = /^PT([0-9]+)H([0-9]+)M([0-9]+)S$/; return { toDate: function (b) { var c = null, d = 0, e = null, f = null; return b ? (c = b.trim().match(a), c ? (e = new Date(2010, 0, 1), c[13] ? (e.setUTCFullYear(c[1], 0, 1), e.setUTCHours(0, 0, 0, 0), c[3] && e.setUTCMonth(c[3] - 1), c[5] && e.setUTCDate(c[5]), c[7] && e.setUTCHours(c[7]), c[8] && e.setUTCMinutes(c[8]), c[10] && e.setUTCSeconds(c[10]), c[12] && e.setUTCMilliseconds(Number("0." + c[12]) * 1e3), c[14] && (d = Number(c[16]) * 60 + Number(c[17]), d *= c[15] == "-" ? 1 : -1, f = e.getTime() + d * 60 * 1e3, e.setTime(f))) : (e.setFullYear(c[1], 0, 1, 0, 0, 0, 0), c[3] && e.setMonth(c[3] - 1), c[5] && e.setDate(c[5]), c[7] && e.setHours(c[7]), c[8] && e.setMinutes(c[8]), c[10] && e.setSeconds(c[10]), c[12] && e.setMilliseconds(Number("0." + c[12]) * 1e3)), e) : null) : null }, fromString: function (a) { var b = null; return a ? (b = new Date(a), isNaN(b.getTime()) && (b = this.toDate(a)), this.fromDate(b)) : "" }, fromDate: function (a) { var b = function (a) { return a < 10 ? "0" + a : a }, c = function (a) { return a < 10 ? "00" + a : a < 100 ? "0" + a : a }; return !!a && a instanceof Date && !isNaN(a.getTime()) ? a.getUTCFullYear() + "-" + b(a.getUTCMonth() + 1) + "-" + b(a.getUTCDate()) + "T" + b(a.getUTCHours()) + ":" + b(a.getUTCMinutes()) + ":" + b(a.getUTCSeconds()) + (a.getUTCMilliseconds() !== 0 ? "." + c(a.getUTCMilliseconds()) : "") + "Z" : "" }, fromDateNoTime: function (a) { var b = function (a) { return a < 10 ? "0" + a : a }; return !!a && a instanceof Date && !isNaN(a.getTime()) ? !a || isNaN(a.getTime()) ? "" : a.getHours() === 0 && a.getMinutes() === 0 && a.getSeconds() === 0 && a.getMilliseconds() === 0 ? a.getFullYear() + "-" + b(a.getMonth() + 1) + "-" + b(a.getDate()) : a.getUTCFullYear() + "-" + b(a.getUTCMonth() + 1) + "-" + b(a.getUTCDate()) : "" }, toDuration: function (a) { if (!a) return 0; var c = a.match(b); if (!c) return 0; var d = 0; return c[2] && (d += Number(c[2]) * 3600 * 1e3), c[3] && (d += Number(c[3]) * 60 * 1e3), c[4] && (d += Number(c[4]) * 1e3), d }, fromDuration: function (a) { var b = Math.round(a / 1e3), c = Math.floor(b / 3600), d = 0; return b -= c * 3600, d = Math.floor(b / 60), b -= d * 60, "PT" + c + "H" + d + "M" + b + "S" } } }), define("databases/flickr/photos", ["datajslib!http", "datajslib!underscore", "datajslib!iso8601"], function (a, b, c) { return { desc: { options: { schema: { search: { type: "string", title: "Search text", description: "Latest items are returned first. Keep in mind that the list of photos featured in the final app will be the results of the search when the app is run. Consider using photo sets if you need more consistent results." }, set: { type: "string", title: "Photo set URL", description: "You may also directly enter a photo set ID, e.g. 72157628064679334" }, api_key: { type: "string", title: "API key", description: "Enter your Flickr API key here. The key is optional to preview your app but required at deployment stage. Follow the instructions on <a href='http://www.flickr.com/services/api/misc.api_keys.html' target='_blank'>Flickr's Web site</a> to obtain an API key.", "joshfire:requiredFor": ["deploy"] } }, form: [{ type: "selectfieldset", title: "Search by", items: [{ type: "optionfieldset", legend: "Text", items: ["search"] }, { type: "optionfieldset", legend: "Photo set", items: ["set"] }] }, { type: "authfieldset", items: ["api_key"] }] }, runAtClient: "force", outputType: "ImageObject" }, fetch: function (b, c) { var d = b.filter || {}, e = d.api_key || "5c7b0ae951c10171dc18f69f6572c537", f = null, g = null, h = null, i = null, j = "description,date_upload,date_taken,owner_name,icon_server,last_update,geo,tags,url_sq,url_t,url_s,url_m,url_z,url_l"; if (d.search) g = encodeURIComponent(d.search), f = "http://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=" + e + "&text=" + g + "&extras=" + j + "&format=json&jsoncallback=_callback"; else { if (!d.set) return c(null, null); i = d.set.match(/(?:www\.)?flickr\.com\/photos\/[^\/]+\/sets\/([^\/]+)/); if (i) h = i[1]; else if (d.set.match(/^[a-z0-9]+$/i)) h = d.set; else return c(null, null); f = "http://api.flickr.com/services/rest/?method=flickr.photosets.getPhotos&api_key=" + e + "&photoset_id=" + h + "&extras=" + j + "&format=json" } a.request({ url: f, jsonp: "jsoncallback", dataType: "jsonp" }, function (a, b) { return c(a, b) }) }, process: function (a, b, d) { var e = b ? b.filter : null, f = null, g = null, h = null, i = null, j = [], k = null, l = null, m = null; if (!a) return d(null, { entries: [] }); if (a.stat == "fail") return a.message ? d(a.message, a) : d("Source provider complained about something", a); e && (e.search ? f = a.photos.photo : e.set && (f = a.photoset.photo, g = a.photoset.owner, h = a.photoset.ownername)), f || d("Filter search or set ID must be defined.", null); for (var n = 0; n < f.length; n++) k = f[n], k.url_l ? m = { contentURL: k.url_l, width: parseInt(k.width_l, 10), height: parseInt(k.height_l, 10) } : k.url_z ? m = { contentURL: k.url_z, width: parseInt(k.width_z, 10), height: parseInt(k.height_z, 10) } : m = { contentURL: k.url_m, width: parseInt(k.width_m, 10), height: parseInt(k.height_m, 10) }, l = { "@type": "ImageObject", itemType: "ImageObject", url: "http://www.flickr.com/photos/" + (k.owner || g) + "/" + k.id, name: k.title, contentURL: m.contentURL, width: m.width, height: m.height, image: { "@type": "ImageObject", itemType: "ImageObject", contentURL: k.url_s, width: parseInt(k.width_s, 10), height: parseInt(k.height_s, 10) }, author: [{ "@type": "Person", itemType: "Person", name: k.ownername || h }], thumbnail: [{ "@type": "ImageObject", itemType: "ImageObject", contentURL: k.url_sq, width: parseInt(k.width_sq, 10), height: parseInt(k.height_sq, 10) }, { "@type": "ImageObject", itemType: "ImageObject", contentURL: k.url_t, width: parseInt(k.width_t, 10), height: parseInt(k.height_t, 10) }, { "@type": "ImageObject", itemType: "ImageObject", contentURL: k.url_s, width: parseInt(k.width_s, 10), height: parseInt(k.height_s, 10) }, { "@type": "ImageObject", itemType: "ImageObject", contentURL: k.url_m, width: parseInt(k.width_m, 10), height: parseInt(k.height_m, 10) }], publisher: { "@type": "Organization", itemType: "Organization", url: "http://www.flickr.com", name: "flickr" } }, k.url_z && l.thumbnail.push({ "@type": "ImageObject", itemType: "ImageObject", contentURL: k.url_z, width: parseInt(k.width_z, 10), height: parseInt(k.height_z, 10) }), k.iconfarm > 0 && (l.author[0].image = { "@type": "ImageObject", itemType: "ImageObject", contentURL: "http://farm" + k.iconfarm + ".static.flickr.com" + "/" + k.iconserver + "/buddyicons/" + (k.owner || g) + ".jpg", width: 48, height: 48 }), k.latitude && k.longitude && k.accuracy && (l.contentLocation = { "@type": "Place", itemType: "Place", geo: { "@type": "GeoCoordinates", itemType: "GeoCoordinates", latitude: k.latitude, longitude: k.longitude } }), k.description && k.description._content && (l.description = k.description._content), k.tags && (l.keywords = k.tags), k.datetaken && (l.dateCreated = k.datetaken.replace(/ /, "T") + "Z"), k.lastupdate && (i = new Date(parseInt(k.lastupdate, 10) * 1e3), l.dateModified = c.fromDate(i)), k.dateupload ? (i = new Date(parseInt(k.dateupload, 10) * 1e3), l.datePublished = c.fromDate(i)) : l.dateModified ? l.datePublished = j[n].dateModified : l.dateCreated && (l.datePublished = j[n].dateCreated), j.push(l); return d(null, { entries: j }) }, find: function (a, b) { var c = this; c.fetch(a, function (d, e) { if (d) return b(d, null); c.process(e, a, function (a, c) { return b(a, c) }) }) } } }), define("databases/youtube/videos", ["./lib/api", "datajslib!underscore", "datajslib!iso8601"], function (a, b, c) { return { desc: { options: { schema: { playlist: { type: "string", title: "Playlist URL", description: "You may also enter the ID of the playlist" }, search: { type: "string", title: "Search text", description: "Keep in mind that the list of videos featured in the final app will be the results of the search when the app is run. Consider using playlists if you need more consistent results." }, feed: { type: "string", title: "Feed", "enum": ["", "top_rated", "most_viewed", "most_shared", "most_popular", "most_recent", "most_discussed", "most_responded", "recently_featured", "on_the_web"] }, user: { type: "string", title: "Username", description: "Filter results by username" } }, form: [{ type: "selectfieldset", title: "Search by", items: [{ type: "optionfieldset", legend: "Text", items: ["search"] }, { type: "optionfieldset", legend: "Playlist", items: ["playlist"] }, { type: "optionfieldset", legend: "Username", items: ["user"] }, { type: "optionfieldset", legend: "Feed", items: ["feed"] }] }] }, runAtClient: "force", outputType: "VideoObject" }, fetch: function (c, d) { var e = c && c.filter ? c.filter : {}, f = this.desc.options.schema.feed["enum"], g = null; if (e.search) g = "videos", e = b.extend({ q: encodeURI(e.search) }, e.user ? { author: e.user } : {}); else if (e.feed) { g = "standardfeeds/:feed"; if (b.indexOf(f, e.feed) == -1) return d('Invalid feed type "' + e.feed + '".'); e = b.extend({ feed: e.feed }, e.user ? { author: e.user } : {}) } else if (e.playlist) { g = "playlists/:playlist"; if (e.playlist.length > 16) { var h = e.playlist.match(/http(s?):\/\/(www\.?)(youtube\.com\/playlist\?).*(list=)([A-Z0-9]*)/i); h.length && (e.playlist = h.pop()), e.playlist.length > 16 && (e.playlist = e.playlist.replace(/^PL/, "").substring(0, 16)) } e = b.extend({ playlist: e.playlist }, e.user ? { author: e.user } : {}) } else if (e.user) g = "users/:user/uploads"; else return d(null, null); g = a.generateUrl(g, b.extend({}, e, a.options(c))), a.request(g, function (a, b) { return d(a, b) }) }, process: function (a, d, e) { if (!a || !a.feed || !a.feed.entry) return e(null, { entries: [] }); var f = a.feed.entry, g = null, h = null; for (var i = 0, j = f.length; i < j; i++) { var k = f[i]; if (k.media$group && k.media$group.media$content) { var l = k.media$group.media$content[0].url, m = l.match(/^https?:\/\/(www\.)?youtube\.com\/v\/([a-z0-9_\-]+).*$/i); m && (h = m[2]) } f[i] = { "@type": "VideoObject", itemType: "VideoObject", url: k.link[0].href.replace(/\&.*$/, ""), name: k.title.$t, playerType: h ? "iframe" : null, embedURL: h ? "http://www.youtube-nocookie.com/embed/" + h + "?rel=0" : null, publisher: { "@type": "Organization", itemType: "Organization", url: "http://www.youtube.com", name: "Youtube" }, description: k.media$group && k.media$group.media$description ? k.media$group.media$description.$t : "", author: [], genre: k.media$group && k.media$group.media$category && k.media$group.media$category.$t ? k.media$group.media$category.$t : "", thumbnail: [], datePublished: k.published ? k.published.$t : k.media$group && k.media$group.yt$uploaded ? k.media$group.yt$uploaded.$t : "", uploadDate: k.media$group && k.media$group.yt$uploaded ? k.media$group.yt$uploaded.$t : "", duration: k.media$group && k.media$group.yt$duration ? c.fromDuration(Number(k.media$group.yt$duration.seconds) * 1e3) : "" }; if (k.author) for (var n = 0, o = k.author.length; n < o; n++) k.author[n].uri && k.author[n].name && f[i].author.push({ "@type": "Person", itemType: "Person", url: k.author[n].uri.$t, name: k.author[n].name.$t }); if (k.media$group && k.media$group.media$thumbnail) { for (var p = 0, q = k.media$group.media$thumbnail.length; p < q; p++) { var r = k.media$group.media$thumbnail[p]; f[i].thumbnail.push({ "@type": "ImageObject", itemType: "ImageObject", url: r.url, name: r.yt$name, contentURL: r.url, width: r.width, height: r.height }) } f[i].thumbnail[0] && (f[i].image = b.clone(f[i].thumbnail[0])) } k.georss$where && k.georss$where.gml$Point && k.georss$where.gml$Point.gml$pos && k.georss$where.gml$Point.gml$pos.$t && (g = k.georss$where.gml$Point.gml$pos.$t.split(" "), g.length === 2 && (f[i].contentLocation = { "@type": "Place", itemType: "Place", geo: { "@type": "GeoCoordinates", itemType: "GeoCoordinates", latitude: parseFloat(g[0], 10), longitude: parseFloat(g[1], 10) } })), k.yt$location && k.yt$location.$t && (f[i].contentLocation || (f[i].contentLocation = { "@type": "Place", itemType: "Place" }), f[i].contentLocation.name = k.yt$location.$t), k.media$group && k.media$group.yt$aspectRatio && k.media$group.yt$aspectRatio.$t && (f[i]["yt:aspectRatio"] = k.media$group.yt$aspectRatio.$t) } e(null, { entries: f }) }, find: function (a, b) { var c = this; c.fetch(a, function (d, e) { if (d) return b(d, null); c.process(e, a, function (a, c) { return b(a, c) }) }) } } });
-; (function (a, b, c, d, e, f) { var g = function (a, b) { for (var c in b) b.hasOwnProperty(c) && (a[c] = b[c]); return a }, h = function () { var a = 0, b = c.getElementsByTagName("head")[0]; return { get: function (g, h, i, j) { var k = null, l = null, m = null, n = !1, o = !1, p = null, q = "json" + ++a, r = function () { if (o) return; o = !0; try { m.onload = null, m.onreadystatechange = null, m.onerror = null, m.parentNode && m.parentNode.removeChild(m) } catch (a) { } }, s = function (a, b) { if (n) return; n = !0, p && e(p), j(a, b); try { delete f.Joshfire.datajs.proxy[q] } catch (c) { } f.Joshfire.datajs.proxy[q] = null }; if (!g) return j("No url to request", null); k = g.indexOf("?") !== -1 ? "&" : "?", h = h || {}; for (l in h) h.hasOwnProperty(l) && (k += encodeURIComponent(l) + "=" + encodeURIComponent(h[l]) + "&"); return k += "callback=Joshfire.datajs.proxy." + q, f.Joshfire.datajs.proxy[q] = function (a) { s(null, a) }, m = c.createElement("script"), m.src = g + k, m.async = !0, m.onload = m.onreadystatechange = function () { (!this.readyState || this.readyState === "loaded" || this.readyState === "complete" || this.readyState === 4) && r() }, m.onerror = function (a) { r(), s("Invalid script received", null) }, b.appendChild(m), p = d(function () { r(), s("Timeout exceeded", null) }, i * 1e3), q } } }(), i = function (c, d, e) { e = e || {}, this.find = function (f, i) { var j = this, k = {}, l = null; g(k, e), g(k, f), k.apikey = b.app.id, k.filter && (k.filter = JSON.stringify(k.filter)), l = "http://" + a.DATAHOSTPORT + "/api/" + a.DATAVERSION + "/" + c + "/" + d, h.get(l, k, 30, function (a, b) { b && !b.name && j.name && (b.name = j.name), i(a, b) }) }, this.getOutputType = function () { return this.config && this.config.outputType ? this.config.outputType : "Thing" }, this.onLoaded = function (a) { a() }, this.getDesc = function (a) { j.getCollectionDesc(c, d, e, a) } }, j = { getCollection: function (a, b, c) { return new i(a, b, c) }, getCollectionDesc: function (b, c, d, e) { var f = this, i = {}, j = null; d && g(i, d), i.filter && (i.filter = JSON.stringify(i.filter)), j = "http://" + a.DATAHOSTPORT + "/api/" + a.DATAVERSION + "/" + b + "/" + c + "/_desc", h.get(j, i, 30, e) } }; f.Joshfire = f.Joshfire || {}, f.Joshfire.datajs = f.Joshfire.datajs || {}, f.Joshfire.datajs.proxy = j })(window.Joshfire.factory.globalConfig, window.Joshfire.factory.config, window.document, window.setTimeout, window.clearTimeout, window);
-    (function (a, b) { var c = function (a, b) { for (var c in b) b.hasOwnProperty(c) && (a[c] = b[c]); return a }, d = function (b, d, f) { var g = this, h = [], i = !1, j = null, k = null; a([e.urlRoot + b + "/" + d, "datajslib!jsonform-defaults"], function (a, b) { j = a, k = b.setDefaultValues, i = !0; for (var c = 0; c < h.length; c++) h[c](); h = [] }), g.onLoaded = function (a) { i ? a() : h.push(a) }, g.find = function (a, b) { g.onLoaded(function () { var d = f || {}; a && c(d, a); var e = j.desc.options.schema; e.properties || (e = { properties: e }), d.filter || (d.filter = {}), k(d.filter, e), j.find(d, function (a, c) { c && !c.name && g.name && (c.name = g.name), b(a, c) }) }) }, g.getDesc = function (a) { var b = function () { var a = f || {}, b = j.desc.options.schema; return b.properties || (b = { properties: b }), a.filter || (a.filter = {}), k(a.filter, b), j.getDesc ? j.getDesc(a) : j.desc }; i ? a(null, b()) : g.onLoaded(function () { a(null, b()) }) }, g.getOutputType = function () { return g.config && g.config.outputType ? g.config.outputType : "Thing" } }, e = { urlRoot: "databases/", getCollection: function (a, b, c) { return new d(a, b, c) } }; b.Joshfire = b.Joshfire || {}, b.Joshfire.datajs = b.Joshfire.datajs || {}, b.Joshfire.datajs.client = e })(require, window);
-    (function (a, b) { var c = function (c) { var d = null, e = null, f = null, g = 0, h = { name: "", find: function (a, b) { return b(null, { entries: [] }) }, onLoaded: function (a) { a() }, getDesc: function (a) { a(null, {}) }, getOutputType: function () { return "Thing" } }; if (!c || !a || !a.config || !a.config.datasources || !a.config.datasources[c]) return null; d = a.config.datasources[c]; if (Object.prototype.toString.call(d) == "[object Array]") { e = { children: [], find: function (a, b) { var c = d.length, f = !1, g = [], h = 0, i = function (a, d) { c -= 1; if (f) return; a && (f = !0), d && g.push(d); if (a || c === 0) return b(a, { entries: g }) }; for (h = 0; h < e.children.length; h++) e.children[h].find(a, i) } }; for (g = 0; g < d.length; g++) d[g] ? (f = d[g].runatclient ? b.client : b.proxy, e.children[g] = f.getCollection(d[g].db, d[g].col, d[g].query), e.children[g].name = d[g].name, e.children[g].config = d[g]) : e.children[g] = { name: h.name, find: h.find, onLoaded: h.onLoaded, getDesc: h.getDesc, getOutputType: h.getOutputType } } else d ? (f = d.runatclient ? b.client : b.proxy, e = f.getCollection(d.db, d.col, d.query), e.name = d.name, e.config = d) : e = { name: h.name, find: h.find, onLoaded: h.onLoaded, getDesc: h.getDesc, getOutputType: h.getOutputType }; return e }; a.getDataSource = c })(window.Joshfire.factory, window.Joshfire.datajs);
+
+(function (globalConfig, config, document, setTimeout, clearTimeout, global) {
+  /**
+   * Copies all of the properties in the source objects over to the destination
+   * object. It's in-order, so the last source will override properties of the
+   * same name in previous arguments.
+   * Same code as Underscore.js extend function
+   * @see http://documentcloud.github.com/underscore/#extend
+   */
+  var _extend = function(obj1,obj2) {
+    for (var key in obj2 ) {
+      if ( obj2.hasOwnProperty(key) ) {
+        obj1[key] = obj2[key];
+      }
+    }
+    return obj1;
+  };
+
+  /**
+   * Lightweight JSONP browser implementation:
+   * - sets a global callback function
+   * - uses a <script> tag to load the JSON content that will run the callback
+   * - detects script loading errors
+   * - calls the callback after the given timeout if not already done
+   * Based on https://github.com/IntoMethod/Lightweight-JSONP but adjusted to
+   * be much more robust, to ensure the final callback method gets called
+   * no matter what in particular.
+   */
+  var JSONP = (function () {
+    /**
+     * Counter used to name JSONP callback functions and avoid collisions
+     * when more than one JSONP request is executed at a given time.
+     */
+    var counter = 0;
+
+    /**
+     * Keep a pointer to the <head> tag in the DOM tree
+     */
+    var head = document.getElementsByTagName('head')[0];
+
+    return {
+      /**
+       * Fetches the given URL, expecting the server to return JSONP content
+       * @function
+       * @param {String} url The URL to fetch.
+       * @param {Object} params Query string parameters to send
+       * @param {Number} Request timeout (in seconds)
+       * @param {function} callback Callback function to call. Potential error
+       *  in first parameter, JSON object in second.
+       */
+      get: function (url, params, timeout, callback) {
+        var query = null,
+          key = null,
+          script = null,
+          done = false,
+          cleaned = false,
+          timeoutID = null,
+          jsonFunction = 'json' + (++counter);
+
+        // Internal method that cleans the script tag when
+        // it's no longer needed
+        var cleanScript = function () {
+          if (cleaned) return;
+          cleaned = true;
+          try {
+            script.onload = null;
+            script.onreadystatechange = null;
+            script.onerror = null;
+            if (script.parentNode) {
+              script.parentNode.removeChild(script);
+            }
+          }
+          catch (e) {
+          }
+        };
+
+        // Internal callback method that calls the final callback,
+        // clears the timeout and removes the global JSONP callback
+        // function. The function returns immediately if it has
+        // already been called.
+        var cb = function (err, data) {
+          if (done) return;
+          done = true;
+          if (timeoutID) {
+            clearTimeout(timeoutID);
+          }
+          callback(err, data);
+          try {
+            delete global.Joshfire.datajs.proxy[jsonFunction];
+          }
+          catch (e) {
+          }
+          global.Joshfire.datajs.proxy[jsonFunction] = null;
+        };
+
+        // Check that there's a URL defined
+        // TODO: ensure the URL is somewhat correct
+        if (!url) {
+          return callback('No url to request', null);
+        }
+
+        // Prepare query to send
+        query = (url.indexOf('?') !== -1) ? '&' : '?';
+        params = params || {};
+        for (key in params) {
+          if (params.hasOwnProperty(key)) {
+            query += encodeURIComponent(key) + "=" + encodeURIComponent(params[key]) + "&";
+          }
+        }
+        query += "callback=Joshfire.datajs.proxy." + jsonFunction;
+
+        // Initialize global callback function that will be called
+        // when the script is received.
+        global.Joshfire.datajs.proxy[jsonFunction] = function (data) {
+          // JSON object received, pass it to the final callback method
+          // and reset timeout and global callback function
+          cb(null, data);
+        };
+
+        // Create the script tag that serves as
+        // 'fake cross-domain XMLHttpRequest' object
+        script = document.createElement('script');
+        script.src = url + query;
+        script.async = true;
+
+        // Set event handler for the 'onload' event
+        // (and 'onreadystatechange' for maximum compatibility,
+        // although I'm not quite clear whether there's a browser around
+        // that actually triggers such an event)
+        // The handler simply cleans up the now useless script tag
+        script.onload = script.onreadystatechange = function () {
+          if (!this.readyState ||
+            (this.readyState === 'loaded') ||
+            (this.readyState === 'complete') ||
+            (this.readyState === 4)) {
+            cleanScript();
+          }
+        };
+
+        // Set event handler for the 'onerror' event triggered when the script
+        // received is not valid. The handler ensures the callback function is
+        // properly called and removes the script tag.
+        script.onerror = function (err) {
+          cleanScript();
+          cb('Invalid script received', null);
+        };
+
+        // Ready to start, add the script to the DOM tree
+        head.appendChild(script);
+
+        // ... and start the timeout
+        // (canceled if all goes fine)
+        timeoutID = setTimeout(function () {
+          cleanScript();
+          cb('Timeout exceeded', null);
+        }, timeout * 1000);
+
+        // For info, return the JSONP callback name
+        return jsonFunction;
+      }
+    };
+  })();
+
+
+  /**
+   * Datasource collection object that exposes a 'find' method to retrieve
+   * feed items from the data proxy.
+   *
+   * @class
+   * @param {String} db The datasource provider
+   * @param {String} colname The collection in the provider's catalog
+   * @param {Object} options Common query options (e.g. filtering options)
+   * @returns {Collection} The collection that matches the given parameter.
+   */
+  var collection = function (db, colname, options) {
+    options = options || {};
+
+    /**
+     * Sends a request to the data proxy to fetch collection feed items
+     * @function
+     * @param {Object} query Query parameters (search field, query filters...)
+     * @param {function} callback Callback method that receives a potential
+     *  error and the list of data entries as an object. The returned object
+     *  includes an 'entries' property that contains the list of items.
+     */
+    this.find = function (query, callback) {
+      var self = this,
+        finalQuery = {},
+        uri = null;
+
+      // Clone default options
+      _extend(finalQuery, options);
+      _extend(finalQuery, query);
+
+      // Add API key
+      finalQuery.apikey = config.app.id;
+
+      // TODO: json2.js for maximum compatibility?
+      if (finalQuery.filter) {
+        finalQuery.filter = JSON.stringify(finalQuery.filter);
+      }
+
+      uri = 'http://' + globalConfig.DATAHOSTPORT +
+        '/api/'+ globalConfig.DATAVERSION +
+        '/' + db +'/'+ colname;
+      JSONP.get(uri, finalQuery, 30, function (err, data) {
+        if (data && !data.name && self.name) {
+          // Propagate datasource title to the returned feed
+          // if not already set
+          data.name = self.name;
+        }
+        callback(err,data);
+      });
+    };
+
+    /**
+     * Returns the type of items that a call to find would return.
+     *
+     * The output type returned by this function is taken from the datasource
+     * query options (the Factory saves the outputType along with
+     * query parameters). For datasources that return mixed content, the
+     * output type is normally the most precise type that is possible.
+     *
+     * In the absence of bugs, getOutputType() should return the same value
+     * as getDesc().outputType, the difference being that getOutputType()
+     * returns a value immediately whereas getDesc() may send an HTTP
+     * request.
+     *
+     * @function
+     * @return {string} Type of items returned by the collection,
+     *   "Thing" if the output type is not present in the query options.
+     */
+    this.getOutputType = function () {
+      if (this.config && this.config.outputType) {
+        return this.config.outputType;
+      }
+      else {
+        return 'Thing';
+      }
+    };
+
+    /**
+     * Runs given function when object is 'loaded'.
+     *
+     * In practice, the function is run immediately, and here only for
+     * interface symmetry with datajs.client.js.
+     *
+     * @function
+     * @param {function} f The function to execute.
+     */
+    this.onLoaded = function (f) {
+      f();
+    };
+
+    /**
+     * Gets the description of the datasource.
+     *
+     * The description is a JSON object that details the collection
+     * parameters. The returned object is usually the collection's
+     * "desc" property, but may be more precise depending on the
+     * query options (typically the outputType may be adjusted for
+     * a more precise one for the given query).
+     *
+     * @function
+     * @param {function} callback Callback function called with the error
+     *  and the description.
+     */
+    this.getDesc = function(callback) {
+      client.getCollectionDesc(db, colname, options, callback);
+    };
+  };
+
+
+  /**
+   * API exposed in Joshfire.datajs.proxy
+   */
+  var client = {
+    /**
+     * Creates a new datasource collection object.
+     *
+     * Feed items are not fetched at this stage. Call the 'find' method
+     * on the returned object to retrieve the feed.
+     *
+     * @function
+     * @param {String} db The datasource provider
+     * @param {String} colname The collection in the provider's catalog
+     * @param {Object} options Common query options (e.g. filtering options)
+     * @returns {Collection} The collection
+     */
+    getCollection: function (db, colname, options) {
+      return new collection(db, colname, options);
+    },
+
+    /**
+     * Gets the description of the datasource collection
+     * from the data proxy.
+     *
+     * The description is a JSON object that details the collection
+     * parameters.
+     *
+     * @function
+     * @param {String} db The datasource provider
+     * @param {String} colname The collection in the provider's catalog
+     * @param {Object} options Common query options (e.g. filtering options)
+     * @param {function} callback Callback function called with the error
+     *  and the description.
+     */
+    getCollectionDesc: function(db, colname, options, callback) {
+      var self = this,
+        finalQuery = {},
+        uri = null;
+
+      if (options) _extend(finalQuery, options);
+      if (finalQuery.filter) {
+        finalQuery.filter = JSON.stringify(finalQuery.filter);
+      }
+
+      uri = 'http://' + globalConfig.DATAHOSTPORT +
+        '/api/' + globalConfig.DATAVERSION +
+        '/' + db +'/'+ colname + '/_desc';
+
+      JSONP.get(uri, finalQuery, 30, callback);
+    }
+  };
+
+  // Export the API to the external world
+  global.Joshfire = global.Joshfire || {};
+  global.Joshfire.datajs = global.Joshfire.datajs || {};
+  global.Joshfire.datajs.proxy = client;
+
+})(
+  window.Joshfire.factory.globalConfig,
+  window.Joshfire.factory.config,
+  window.document,
+  window.setTimeout,
+  window.clearTimeout,
+  window
+);
+/**
+ * @fileoverview Client-side API to retrieve datasource feeds locally.
+ *
+ * The code exposes a global Joshfire.datajs.client object.
+ *
+ * The code calls "require" to load and run the code of the datasource.
+ */
+
+(function(require, global) {
+  // Taken from underscore.js (not included here to save a few bytes)
+  var _extend = function(obj1,obj2) {
+    for (var key in obj2 ) {
+      if ( obj2.hasOwnProperty(key) ) {
+        obj1[key] = obj2[key];
+      }
+    }
+    return obj1;
+  };
+
+  var collection = function (db, colname, options) {
+    var self = this;
+
+    var _loadedCallbacks = [];
+    var _loaded = false;
+    var collectionObject = null;
+    var setDefaultValues = null;
+
+    require([
+      client.urlRoot + db +'/'+ colname,
+      'datajslib!jsonform-defaults'
+    ], function (datasource, defaults) {
+      collectionObject = datasource;
+      setDefaultValues = defaults.setDefaultValues;
+      _loaded = true;
+      for (var i=0;i<_loadedCallbacks.length;i++) {
+        _loadedCallbacks[i]();
+      }
+      _loadedCallbacks = [];
+    });
+
+    /**
+     * Runs given function when object is 'loaded'.
+     *
+     * @function
+     * @param {function} f The function to execute.
+     */
+    self.onLoaded = function(f) {
+      if (!_loaded) {
+        _loadedCallbacks.push(f);
+      } else {
+        f();
+      }
+    };
+
+    /**
+     * Executes the datasource request
+     *
+     * @function
+     * @param {Object} query Query parameters (search field, query filters...)
+     * @param {function} callback Callback method that receives a potential
+     *  error and the list of data entries as an object. The returned object
+     *  includes an 'entries' property that contains the list of items.
+     */
+    self.find = function(query, callback) {
+      self.onLoaded(function() {
+        var completeQuery = options || {};
+        if (query) _extend(completeQuery, query);
+        var schema = collectionObject.desc.options.schema;
+        if (!schema.properties) {
+          schema = { properties: schema };
+        }
+        if (!completeQuery.filter) {
+          completeQuery.filter = {};
+        }
+        setDefaultValues(completeQuery.filter, schema);
+        collectionObject.find(completeQuery, function (err, data) {
+          if (data && !data.name && self.name) {
+            // Propagate datasource title if the returned feed does not have one
+            data.name = self.name;
+          }
+          callback(err, data);
+        });
+      });
+    };
+
+    /**
+     * Gets the description of the datasource.
+     *
+     * The description is a JSON object that details the collection
+     * parameters. The returned object is usually the collection's
+     * "desc" property, but may be more precise depending on the
+     * query options (typically the outputType may be adjusted for
+     * a more precise one for the given query)
+     *
+     * @function
+     * @param {function} callback Callback function called with the error
+     *  and the description.
+     */
+    self.getDesc = function(callback) {
+      // Internal function that returns the description
+      var getActualDesc = function() {
+        var query = options || {};
+        var schema = collectionObject.desc.options.schema;
+        if (!schema.properties) {
+          schema = { properties: schema };
+        }
+        if (!query.filter) {
+          query.filter = {};
+        }
+        setDefaultValues(query.filter, schema);
+
+        if (collectionObject.getDesc) {
+          return collectionObject.getDesc(query);
+        }
+        else {
+          return collectionObject.desc;
+        }
+      };
+
+      if (!_loaded) {
+        self.onLoaded(function() {
+          callback(null, getActualDesc());
+        });
+      } else {
+        callback(null, getActualDesc());
+      }
+    };
+
+    /**
+     * Returns the type of items that a call to find would return.
+     *
+     * The output type returned by this function is taken from the datasource
+     * query options (the Factory saves the outputType along with
+     * query parameters). For datasources that return mixed content, the
+     * output type is normally the most precise type that is possible.
+     *
+     * In the absence of bugs, getOutputType() should return the same value
+     * as getDesc().outputType, the difference being that getOutputType()
+     * returns a value immediately whereas getDesc() may send an HTTP
+     * request.
+     *
+     * @function
+     * @return {string} Type of items returned by the collection,
+     *   "Thing" if the output type is not present in the query options.
+     */
+    self.getOutputType = function () {
+      if (self.config && self.config.outputType) {
+        return self.config.outputType;
+      }
+      else {
+        return 'Thing';
+      }
+    };
+  };
+
+
+  /**
+   * API exposed in Joshfire.datajs.client
+   */
+  var client = {
+    urlRoot: 'databases/',
+
+    /**
+     * Creates a new datasource collection object.
+     *
+     * Feed items are not fetched at this stage. Call the 'find' method
+     * on the returned object to retrieve the feed.
+     *
+     * @function
+     * @param {String} db The datasource provider
+     * @param {String} colname The collection in the provider's catalog
+     * @param {Object} options Common query options (e.g. filtering options)
+     * @returns {Collection} The collection
+     */
+    getCollection: function(db, colname, options) {
+      return new collection(db, colname, options);
+    }
+  };
+
+  // Export the API to the external world
+  global.Joshfire = global.Joshfire || {};
+  global.Joshfire.datajs = global.Joshfire.datajs || {};
+  global.Joshfire.datajs.client = client;
+
+})(require, window);
+/**
+ * @fileoverview Exposes the getDataSource method that returns datasource
+ * objects to the Joshfire.factory global object.
+ *
+ * Datasource objects returned by the getDataSource method may in turn be
+ * used to retrieve feeds. The datasource may either run locally (client-side)
+ * or through the data proxy.
+ *
+ * The code requires the following global objects to be available:
+ * - window.Joshfire.factory (code uses Joshfire.factory.config)
+ * - window.Joshfire.datajs (code uses client.getCollection and/or
+ * proxy.getCollection methods depending on datasource parameters)
+ */
+
+(function (factory, datajs) {
+
+  /**
+   * Returns a datasource object that may be used to retrieve feed items
+   * for the given datasource input name.
+   *
+   * @function
+   * @param {String} datasourceName The name of the datasource input, as
+   *  defined in the template's manifest file (package.json)
+   * @return {Object} A datasource object that exposes a "find" method,
+   *  null when the datasource cannot be found,
+   *  a dummy "empty" datasource when the datasource is defined but does
+   *  not target any real datasource.
+   */
+  var getDataSource = function (datasourceName) {
+    var ds = null;
+    var ret = null;
+    var dsFactory = null;
+    var i = 0;
+    var emptyds = {
+      name: '',
+      find: function (query, callback) {
+        return callback(null, { entries: [] });
+      },
+      onLoaded: function (f) {
+        f();
+      },
+      getDesc: function(callback) {
+        callback(null, {});
+      },
+      getOutputType: function() {
+        return 'Thing';
+      }
+    };
+
+    // Check parameters
+    if (!datasourceName ||
+      !factory ||
+      !factory.config ||
+      !factory.config.datasources ||
+      !factory.config.datasources[datasourceName]) {
+      return null;
+    }
+
+    // Retrieve the definition of the datasource from the app config
+    ds = factory.config.datasources[datasourceName];
+
+    if (Object.prototype.toString.call(ds) == '[object Array]') {
+      // The datasource is actually a set of datasources.
+
+      // The "find" method returns a feed whose items are the feeds
+      // returned by the underlying datasources. In particular, it
+      // does not return the union of the feeds returned by the
+      // underlying datasources.
+      ret = {
+        "children": [],
+        "find": function (options, callback) {
+          var pending = ds.length;
+          var errorCaught = false;
+          var entries = [];
+          var i = 0;
+
+          // Callback called as soon as a "find" returns, calls the final
+          // callback when all collections have been retrieved.
+          var cb = function (err, data) {
+            pending -= 1;
+            if (errorCaught) {
+              // Error already caught, do nothing
+              return;
+            }
+            if (err) {
+              errorCaught = true;
+            }
+            if (data) {
+              entries.push(data);
+            }
+            if (err || (pending === 0)) {
+              return callback(err, {"entries": entries});
+            }
+          };
+
+          for (i=0; i<ret.children.length; i++) {
+            ret.children[i].find(options, cb);
+          }
+        }
+      };
+
+      // Expose the underlying datasources in the "children" property
+      // of the returned object.
+      for (i = 0; i < ds.length; i++) {
+        // A multiple datasource may contain "null" elements depending
+        // on whether the user entered all datasources or not
+        if (ds[i]) {
+          dsFactory = ds[i].runatclient ? datajs.client : datajs.proxy;
+          ret.children[i] = dsFactory.getCollection(ds[i].db, ds[i].col, ds[i].query);
+          ret.children[i].name = ds[i].name;
+
+          // Datasource should be opaque from template's point of view,
+          // but the config contains useful info, typically the type of
+          // items that will be returned (outputType), used by getOutputType
+          ret.children[i].config = ds[i];
+        }
+        else {
+          // Return an empty collection for this item
+          ret.children[i] = {
+            name: emptyds.name,
+            find: emptyds.find,
+            onLoaded: emptyds.onLoaded,
+            getDesc: emptyds.getDesc,
+            getOutputType: emptyds.getOutputType
+          };
+        }
+      }
+    }
+    else if (ds) {
+      // Atomic datasource
+      dsFactory = ds.runatclient ? datajs.client : datajs.proxy;
+      ret = dsFactory.getCollection(ds.db, ds.col, ds.query);
+      ret.name = ds.name;
+
+      // Datasource should be opaque from template's point of view,
+      // but the config contains useful info, typically the type of
+      // items that will be returned (outputType), used by getOutputType
+      ret.config = ds;
+    }
+    else {
+      // Datasource defined but not set, return an empty datasource
+      ret = {
+        name: emptyds.name,
+        find: emptyds.find,
+        onLoaded: emptyds.onLoaded,
+        getDesc: emptyds.getDesc,
+        getOutputType: emptyds.getOutputType
+      };
+    }
+
+    return ret;
+  };
+
+  // Expose the "getDataSource" method to Joshfire.factory
+  factory.getDataSource = getDataSource;
+
+})(window.Joshfire.factory, window.Joshfire.datajs);
 })();
