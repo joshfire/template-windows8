@@ -12,17 +12,30 @@
         ready: function (element, options) {
             var item = options && options.item ? options.item : data.items.getAt(0);
             _currentItem = item;
+            
+            // Main title is the Group title
             element.querySelector(".titlearea .pagetitle").textContent = item.group.title;
-            element.querySelector("article .item-title").textContent = item.name;
-            element.querySelector("article .item-subtitle").textContent = item.description;
-            element.querySelector("article .item-image").src = item.image.contentURL;
-            element.querySelector("article .item-image").alt = item.name;
-            if (item["@type"] == "VideoObject") {
-                element.querySelector("article .item-video").src = item.embedURL;
+
+            // Then choose the page layout depending on the type of the item
+            var tplSelect;
+            switch (item["@type"]) {
+                case "VideoObject":
+                    tplSelect = "#videoDetailTemplate";
+                    break;
+                case "ImageObject":
+                default:
+                    tplSelect = "#imageDetailTemplate";
+                    break;
             }
-//            element.querySelector("article .item-content").innerHTML = item.articleBody;
+
+            // For the moment, we use jQuery and underscore, use Windows Template when we figure out how to use them
+            var result = _.template($(tplSelect).html(), item);
+            // weird : when I add <%= description %> in a template, it crashes
+            $("section", element).append(result);
 
 
+
+            // Code to handle the sharing
             var dtm = Windows.ApplicationModel.DataTransfer.DataTransferManager.getForCurrentView();
             dtm.addEventListener("datarequested", function (e) {
                 var item = _currentItem;

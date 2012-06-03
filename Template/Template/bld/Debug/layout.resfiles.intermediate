@@ -17,3 +17,5 @@ js\groupDetailPage.js
 js\groupedItemsPage.js
 js\itemDetailPage.js
 js\navigator.js
+lib\jquery-1.7.2.min.js
+lib\underscore-min.js

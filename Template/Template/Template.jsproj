@@ -70,6 +70,8 @@
     <Content Include="js\data.js" />
     <Content Include="js\itemDetailPage.js" />
     <Content Include="js\groupedItemsPage.js" />
+    <Content Include="lib\jquery-1.7.2.min.js" />
+    <Content Include="lib\underscore-min.js" />
     <None Include="Template_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>

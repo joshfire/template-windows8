@@ -25,18 +25,46 @@
             </h1>
         </header>
         <section aria-label="Main content" role="main">
-            <article>
-                <div>
-                    <header>
-                        <h2 class="item-title"></h2>
-                        <h4 class="item-subtitle"></h4>     
-                    </header>
-                    <img class="item-image" src="#"/>
-                    <iframe class="item-video" src="#"></iframe>
-<!--                    <div class="item-content"></div>    -->
-                </div>
+            <!-- Use Windows Template when we figure out how to use them
+            <article class="videoDetailTemplate" data-win-control="WinJS.Binding.Template">
+                <header>
+                    <h2 class="item-title" data-win-bind="textContent: name; alt: name"></h2>
+                    <h4 class="item-subtitle"></h4>
+                </header>
+                <iframe class="item-video" src="#" data-win-bind="src: embedURL"></iframe>
             </article>
+            -->
         </section>
     </div>
+
+<script type="text/template" id="videoDetailTemplate">
+    <article>
+        <header>
+            <h2 class="item-title"><%= name %></h2>
+            <h4 class="item-subtitle"></h4>     
+        </header>
+    </article>
+</script>
+
+<script type="text/template" id="imageDetailTemplate">
+    <article>
+        <header>
+            <h2 class="item-title"><%= name %></h2>
+            <h4 class="item-subtitle"></h4>
+            <img src="<%= image.contentURL %>"/>    
+        </header>
+    </article>
+</script>
+
+<script type="text/template" id="articleDetailTemplate">
+    <article>
+        <header>
+            <h2 class="item-title"><%= name %></h2>
+            <h4 class="item-subtitle"></h4>
+        </header>
+        <p><%= articleBody %></p>
+    </article>
+</script>
+
 </body>
 </html>
