@@ -2,6 +2,13 @@
     cursor: default;
 }
 
+body {
+background: -ms-linear-gradient(top, #1e5799 0%,#2989d8 27%,#7db9e8 100%); /* IE10+ */
+}
+
+
+
+
 #contenthost {
     height: 100%;
     width: 100%;

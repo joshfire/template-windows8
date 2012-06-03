@@ -20,7 +20,7 @@
         margin-left: 0px;
         margin-right: 70px;
         padding: 0;
-        width: 480px;
+        width: 100px;
     }
 
         .groupdetailpage .grouplist .win-groupheader .group-subtitle {
@@ -35,10 +35,10 @@
         .groupdetailpage .grouplist .win-groupheader .group-image {
             -ms-grid-row: 2;
             background-color: rgba(147, 149, 152, 1);
-            height: 238px;
+            height: 38px;
             margin: 0;
             margin-bottom: 20px;
-            width: 480px;
+            width: 180px;
         }
 
         .groupdetailpage .grouplist .win-groupheader .group-description {
@@ -48,7 +48,7 @@
         }
 
     .groupdetailpage .grouplist .win-item {
-        -ms-grid-columns: 110px 1fr;
+        -ms-grid-columns: 147px 1fr;
         -ms-grid-rows: 1fr;
         display: -ms-grid;
         height: 110px;

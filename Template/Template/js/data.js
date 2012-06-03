@@ -42,13 +42,12 @@
     // http://msdn.microsoft.com/library/windows/apps/Hh452745
     // http://msdn.microsoft.com/library/windows/apps/Hh465373
 
-    for (var dsNb = 0; dsNb < datasources.children.length; dsNb++) {
+    for (var dsNb = 1; dsNb < datasources.children.length; dsNb++) {
         var group = { key: "main" + dsNb, title: datasources.children[dsNb].name };
         groups.push(group);
 
         datasources.children[dsNb].find({}, function(g) { 
                 return function (err, data) {
-                    if (err) return;
                     // Process data entries in data.entries
                     data.entries.forEach(function (item) {
                         item.group = g;

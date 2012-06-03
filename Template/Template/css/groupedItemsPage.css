@@ -29,10 +29,10 @@
 
     .groupeditemspage .groupeditemslist .win-item {
         -ms-grid-columns: 1fr;
-        -ms-grid-rows: 1fr 90px;
+        -ms-grid-rows: 1fr 48px;
         display: -ms-grid;
-        height: 250px;
-        width: 250px;
+        height: 240px;
+        width: 320px;
     }
 
         .groupeditemspage .groupeditemslist .win-item .item-image {
@@ -41,7 +41,7 @@
 
         .groupeditemspage .groupeditemslist .win-item .item-overlay {
             -ms-grid-row: 2;
-            -ms-grid-rows: 1fr 21px;
+            -ms-grid-rows: 1fr 2px;
             display: -ms-grid;
             padding: 6px 15px 2px 15px;
         }
