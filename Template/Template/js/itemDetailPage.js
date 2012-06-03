@@ -17,11 +17,13 @@
             element.querySelector("article .item-subtitle").textContent = item.description;
             element.querySelector("article .item-image").src = item.image.contentURL;
             element.querySelector("article .item-image").alt = item.name;
-            element.querySelector("article .item-video").src = item.embedURL;
+            if (item.type == "@VideoObject") {
+                element.querySelector("article .item-video").src = item.embedURL;
+            }
 //            element.querySelector("article .item-content").innerHTML = item.articleBody;
 
-            var dtm = Windows.ApplicationModel.DataTransfer.DataTransferManager.getForCurrentView();
 
+            var dtm = Windows.ApplicationModel.DataTransfer.DataTransferManager.getForCurrentView();
             dtm.addEventListener("datarequested", function (e) {
                 var item = _currentItem;
                 var request = e.request;

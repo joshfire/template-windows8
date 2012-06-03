@@ -1,1 +1,1 @@
-C:\Users\Ali\Documents\GitHub\template-windows8\Template\Template\Template.jsproj;neutral
+E:\GitHub\template-windows8\Template\Template\Template.jsproj;neutral
