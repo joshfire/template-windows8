@@ -28,12 +28,29 @@
     }
 
     .groupeditemspage .groupeditemslist .win-item {
-        -ms-grid-columns: 1fr;
         -ms-grid-rows: 1fr 48px;
         display: -ms-grid;
+        height: 120px;
+        width: 170px;
+        -ms-grid-columns: 1fr;
+    }
+
+
+    .groupeditemspage .win-item.smallitemtemplate
+    {
+
+    }
+
+    .groupeditemspage .win-item.mediumitemtemplate
+    {
+
+    }       
+    .groupeditemspage .win-item.largeitemtemplate
+    {
         height: 240px;
         width: 320px;
     }
+
 
         .groupeditemspage .groupeditemslist .win-item .item-image {
             -ms-grid-row-span: 2;
@@ -56,6 +73,7 @@
                 -ms-grid-row: 2;
                 width: 220px;
             }
+            
 
 @media screen and (-ms-view-state: fullscreen-landscape), screen and (-ms-view-state: fullscreen-portrait), screen and (-ms-view-state: filled) {
     .groupeditemspage .groupeditemslist .win-item .item-overlay {
@@ -127,3 +145,5 @@
         margin-left: 26px;
     }
 }
+
+
