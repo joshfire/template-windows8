@@ -30,7 +30,8 @@
 
             // For the moment, we use jQuery and underscore, use Windows Template when we figure out how to use them
             var result = _.template($(tplSelect).html(), item);
-            // weird : when I add <%= description %> in a template, it crashes
+            // weird: when I add <%= description %> in a template, it crashes
+            // problem: if we insert an iframe, it throws an error :/
             $("section", element).append(result);
 
 
