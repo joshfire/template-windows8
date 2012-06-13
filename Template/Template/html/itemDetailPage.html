@@ -12,10 +12,29 @@
 
     <link href="/css/default.css" rel="stylesheet">
     <link href="/css/itemDetailPage.css" rel="stylesheet">
-    <script src="/js/data.js"></script>
     <script src="/js/itemDetailPage.js"></script>
 </head>
 <body>
+
+    
+    <!-- Use Windows Template when we figure out how to use them -->
+    <article class="videoDetailTemplate" data-win-control="WinJS.Binding.Template">
+        <header>
+            <h2 class="item-title" data-win-bind="textContent: name; alt: name"></h2>
+            <h4 class="item-subtitle"></h4>
+        </header>
+        <iframe class="item-video" src="#" data-win-bind="src: embedURL"></iframe>
+    </article>
+
+    <!-- Use Windows Template when we figure out how to use them -->
+    <article class="imageDetailTemplate" data-win-control="WinJS.Binding.Template">
+        <header>
+            <h2 class="item-title" data-win-bind="textContent: name; alt: name"></h2>
+            <h4 class="item-subtitle"></h4>
+        </header>
+        <img src="http://placehold.it/200/200" data-win-bind="src: contentURL" />
+    </article>
+
     <!-- The content that will be loaded and displayed. -->
     <div class="itemdetailpage fragment">
         <header aria-label="Header content" role="banner">
@@ -25,17 +44,11 @@
             </h1>
         </header>
         <section aria-label="Main content" role="main">
-            <!-- Use Windows Template when we figure out how to use them
-            <article class="videoDetailTemplate" data-win-control="WinJS.Binding.Template">
-                <header>
-                    <h2 class="item-title" data-win-bind="textContent: name; alt: name"></h2>
-                    <h4 class="item-subtitle"></h4>
-                </header>
-                <iframe class="item-video" src="#" data-win-bind="src: embedURL"></iframe>
-            </article>
-            -->
+            <div id="detailsFlipView" style="height: 500px;" data-win-control="WinJS.UI.FlipView"></div>
         </section>
     </div>
+
+
 
 <script type="text/template" id="videoDetailTemplate">
     <article>

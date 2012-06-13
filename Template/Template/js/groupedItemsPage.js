@@ -33,7 +33,7 @@
             } else {
                 // If the page is not snapped, the user invoked an item.
                 var item = data.items.getAt(eventObject.detail.itemIndex);
-                nav.navigate("/html/itemDetailPage.html", { item: item });
+                nav.navigate("/html/itemDetailPage.html", { item: item, index: eventObject.detail.itemIndex });
             }
         },
 

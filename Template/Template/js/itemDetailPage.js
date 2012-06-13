@@ -10,29 +10,13 @@
         // This function is called whenever a user navigates to this page. It
         // populates the page elements with the app's data.
         ready: function (element, options) {
-            var item = options && options.item ? options.item : data.items.getAt(0);
-            _currentItem = item;
-            
-            // Main title is the Group title
-            element.querySelector(".titlearea .pagetitle").textContent = item.group.title;
 
-            // Then choose the page layout depending on the type of the item
-            var tplSelect;
-            switch (item["@type"]) {
-                case "VideoObject":
-                    tplSelect = "#videoDetailTemplate";
-                    break;
-                case "ImageObject":
-                default:
-                    tplSelect = "#imageDetailTemplate";
-                    break;
-            }
-
-            // For the moment, we use jQuery and underscore, use Windows Template when we figure out how to use them
-            var result = _.template($(tplSelect).html(), item);
-            // weird : when I add <%= description %> in a template, it crashes
-            $("section", element).append(result);
-
+            var flipView = document.getElementById('detailsFlipView').winControl;
+            ui.setOptions(flipView, {
+                itemDataSource: data.items.dataSource,
+                itemTemplate: this.itemRenderer,
+                currentPage: options.index
+            });
 
 
             // Code to handle the sharing
@@ -51,8 +35,27 @@
                 var contenu = (item.description);
                 request.data.setText(contenu);
             });
+        },
 
+        itemRenderer: function (itemPromise) {
+            return itemPromise.then(function (currentItem, recycled) {
 
+                var tplSelect;
+                switch (currentItem.data["@type"]) {
+                    case "VideoObject":
+                        tplSelect = document.querySelector('.videoDetailTemplate').winControl;
+                        break;
+                    case "ImageObject":
+                    default:
+                        tplSelect = document.querySelector('.imageDetailTemplate').winControl;
+                        break;
+                }
+
+                tplSelect = tplSelect.renderItem(itemPromise, recycled);
+
+                return tplSelect.element;
+
+            });
         }
     })
 })();
