@@ -7,6 +7,48 @@
     var ui = WinJS.UI;
     var utils = WinJS.Utilities;
 
+    function groupInfo() {
+        return {
+            enableCellSpanning: true,
+            cellWidth: 150,
+            cellHeight: 150
+        };
+    }
+
+
+    function multisizeItemTemplateRenderer(itemPromise) {
+        return itemPromise.then(function (currentItem) {
+            var content;
+            // Grab the default item template used on the groupeditems page.
+            content = document.getElementsByClassName("multisizebaseitemtemplate")[0];
+            var result = content.cloneNode(true);
+
+            // Change the CSS class of the item depending on the group, then set the size in CSS.
+
+            // For the first item, use the largest template.
+            if (currentItem.index == 0) {
+                result.className = "largeitemtemplate";
+            }
+            else {
+                result.className = "mediumitemtemplate";
+            }
+
+            // Because we used a WinJS template, we need to strip off some attributes
+            // for it to render.
+            result.attributes.removeNamedItem("data-win-control");
+            result.attributes.removeNamedItem("style");
+            result.style.overflow = "hidden";
+
+            // Because we're doing the rendering, we need to put the data into the item.
+            // We can't use databinding.
+            result.getElementsByClassName("item-image")[0].src = currentItem.data.image.contentURL;
+            result.getElementsByClassName("item-title")[0].textContent = currentItem.data.name;
+            //result.getElementsByClassName("item-subtitle")[0].textContent = currentItem.data.subtitle;
+            return result;
+        });
+    }
+
+
     ui.Pages.define("/html/groupedItemsPage.html", {
 
         // This function is used in updateLayout to select the data to display
@@ -44,7 +86,6 @@
 
             ui.setOptions(listView, {
                 groupHeaderTemplate: element.querySelector(".headerTemplate"),
-                itemTemplate: element.querySelector(".itemtemplate"),
                 oniteminvoked: this.itemInvoked.bind(this)
             });
 
@@ -59,7 +100,8 @@
                 ui.setOptions(listView, {
                     itemDataSource: data.groups.dataSource,
                     groupDataSource: null,
-                    layout: new ui.ListLayout()
+                    layout: new ui.ListLayout(),
+                    itemTemplate: element.querySelector(".itemtemplate")
                 });
             } else {
                 // If the page is not snapped, display a grid of grouped items.
@@ -68,7 +110,8 @@
                 ui.setOptions(listView, {
                     itemDataSource: data.items.dataSource,
                     groupDataSource: groupDataSource.dataSource,
-                    layout: new ui.GridLayout({ groupHeaderPosition: "top" })
+                    layout: new ui.GridLayout({ groupInfo: groupInfo, groupHeaderPosition: "top" }),
+                    itemTemplate: multisizeItemTemplateRenderer
                 });
             }
         },
