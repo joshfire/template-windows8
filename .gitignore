@@ -25,3 +25,6 @@
 *.maf
 *.mtc
 *.mtc0
+Template/Template/bin/
+Template/Template/bld/
+

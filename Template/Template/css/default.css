@@ -2,13 +2,6 @@
     cursor: default;
 }
 
-body {
-background: -ms-linear-gradient(top, #1e5799 0%,#2989d8 27%,#7db9e8 100%); /* IE10+ */
-}
-
-
-
-
 #contenthost {
     height: 100%;
     width: 100%;
@@ -17,7 +10,7 @@ background: -ms-linear-gradient(top, #1e5799 0%,#2989d8 27%,#7db9e8 100%); /* IE
 .fragment {
     /* Define a grid with rows for a banner and a body */
     -ms-grid-columns: 1fr;
-    -ms-grid-rows: 133px 1fr 0px;
+    -ms-grid-rows: 128px 1fr 0px;
     display: -ms-grid;
     height: 100%;
     width: 100%;

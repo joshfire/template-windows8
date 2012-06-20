@@ -32,10 +32,10 @@
     <ProjectConfiguration Include="Release|x86">
       <Configuration>Release</Configuration>
       <Platform>x86</Platform>
-    </ProjectConfiguration>
+    </ProjectConfiguration>  
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>b30a4ebb-7565-4b25-9931-9c9c8dea4e6d</ProjectGuid>
+    <ProjectGuid>9d9c5df0-fe97-4818-af0b-2699ac20b735</ProjectGuid>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\$(WMSJSProjectDirectory)\Microsoft.VisualStudio.$(WMSJSProject).Default.props" />
@@ -43,39 +43,35 @@
   <PropertyGroup>
     <TargetPlatformIdentifier>Windows</TargetPlatformIdentifier>
     <TargetPlatformVersion>8.0</TargetPlatformVersion>
-    <DefaultLanguage>fr-FR</DefaultLanguage>
+    <DefaultLanguage>en-US</DefaultLanguage>
     <PackageCertificateKeyFile>Template_TemporaryKey.pfx</PackageCertificateKeyFile>
-    <PackageCertificateThumbprint>21F065CF1B54B79BD67CC1414F2CCC34B3E23559</PackageCertificateThumbprint>
   </PropertyGroup>
   <ItemGroup>
     <AppxManifest Include="package.appxmanifest">
       <SubType>Designer</SubType>
     </AppxManifest>
-    <Content Include="default.html" />
-    <Content Include="css\groupDetailPage.css" />
     <Content Include="css\default.css" />
-    <Content Include="css\itemDetailPage.css" />
-    <Content Include="css\groupedItemsPage.css" />
-    <Content Include="html\groupDetailPage.html" />
-    <Content Include="html\itemDetailPage.html" />
-    <Content Include="html\groupedItemsPage.html" />
     <Content Include="images\logo.png" />
     <Content Include="images\smalllogo.png" />
     <Content Include="images\splashscreen.png" />
     <Content Include="images\storelogo.png" />
-    <Content Include="js\bootstrap.js" />
-    <Content Include="js\groupDetailPage.js" />
+    <Content Include="js\data.js" />
     <Content Include="js\default.js" />
     <Content Include="js\navigator.js" />
-    <Content Include="js\data.js" />
-    <Content Include="js\itemDetailPage.js" />
-    <Content Include="js\groupedItemsPage.js" />
-    <Content Include="lib\jquery-1.7.2.min.js" />
-    <Content Include="lib\underscore-min.js" />
+    <Content Include="pages\itemDetail\itemDetail.css" />
+    <Content Include="pages\itemDetail\itemDetail.html" />
+    <Content Include="pages\itemDetail\itemDetail.js" />
+    <Content Include="pages\groupDetail\groupDetail.css" />
+    <Content Include="pages\groupDetail\groupDetail.html" />
+    <Content Include="pages\groupDetail\groupDetail.js" />
+    <Content Include="pages\groupedItems\groupedItems.css" />
+    <Content Include="pages\groupedItems\groupedItems.html" />
+    <Content Include="pages\groupedItems\groupedItems.js" />
+    <Content Include="default.html" />
     <None Include="Template_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
-    <SDKReference Include="Microsoft.WinJS, Version=0.6" />
+    <SDKReference Include="Microsoft.WinJS.1.0.RC, Version=1.0" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\$(WMSJSProjectDirectory)\Microsoft.VisualStudio.$(WMSJSProject).targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
