@@ -15,6 +15,23 @@
     <script src="/pages/itemDetail/itemDetail.js"></script>
 </head>
 <body>
+
+    <!-- Templates -->
+    <article class="videoDetailTemplate" data-win-control="WinJS.Binding.Template">
+        <header>
+            <h2 class="item-title" data-win-bind="textContent: name; alt: name"></h2>
+            <h4 class="item-subtitle"></h4>
+        </header>
+        <iframe class="item-video" src="#" data-win-bind="src: embedURL"></iframe>
+    </article>
+    <article class="imageDetailTemplate" data-win-control="WinJS.Binding.Template">
+        <header>
+            <h2 class="item-title" data-win-bind="textContent: name; alt: name"></h2>
+            <h4 class="item-subtitle"></h4>
+        </header>
+        <img src="http://placehold.it/200/200" data-win-bind="src: contentURL" />
+    </article>
+
     <!-- The content that will be loaded and displayed. -->
     <div class="itemdetailpage fragment">
         <header aria-label="Header content" role="banner">
@@ -23,18 +40,9 @@
                 <span class="pagetitle"></span>
             </h1>
         </header>
-        <div class="content" aria-label="Main content" role="main">
-            <article>
-                <div>
-                    <header>
-                        <h2 class="item-title"></h2>
-                        <h4 class="item-subtitle"></h4>
-                    </header>
-                    <img class="item-image" src="#" />
-                    <div class="item-content"></div>
-                </div>
-            </article>
-        </div>
+        <section aria-label="Main content" role="main">
+            <div id="detailsFlipView" style="height: 500px;" data-win-control="WinJS.UI.FlipView"></div>
+        </section>
     </div>
 </body>
 </html>

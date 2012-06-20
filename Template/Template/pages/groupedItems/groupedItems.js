@@ -32,7 +32,7 @@
             } else {
                 // If the page is not snapped, the user invoked an item.
                 var item = Data.items.getAt(args.detail.itemIndex);
-                nav.navigate("/pages/itemDetail/itemDetail.html", { item: Data.getItemReference(item) });
+                nav.navigate("/pages/itemDetail/itemDetail.html", { item: Data.getItemReference(item), index: args.detail.itemIndex });
             }
         },
 

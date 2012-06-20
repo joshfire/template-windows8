@@ -4,5 +4,8 @@
     <ReferenceCachePath>C:\Users\Steren\AppData\Local\Temp\Template_refcache</ReferenceCachePath>
     <AutoRefresh>true</AutoRefresh>
     <ShowAllFiles>false</ShowAllFiles>
+    <AppxPackageIsForStore>False</AppxPackageIsForStore>
+    <AppxShowAllApps>False</AppxShowAllApps>
+    <AppxBuildConfigurationSelection>neutral</AppxBuildConfigurationSelection>
   </PropertyGroup>
 </Project>

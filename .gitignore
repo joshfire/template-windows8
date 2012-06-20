@@ -27,4 +27,5 @@
 *.mtc0
 Template/Template/bin/
 Template/Template/bld/
+Template/Template/AppPackages
 
