@@ -21,10 +21,10 @@
             onclick="WinJS.Navigation.navigate('/pages/groupDetail/groupDetail.html', { groupKey: event.srcElement.groupKey })" role="link"></p>
     </div>
     <div class="itemtemplate" data-win-control="WinJS.Binding.Template">
-        <img class="item-image" src="#" data-win-bind="src: backgroundImage; alt: title" />
+        <img class="item-image" src="#" data-win-bind="src: image.contentURL; alt: name" />
         <div class="item-overlay">
-            <h4 class="item-title" data-win-bind="textContent: title"></h4>
-            <h6 class="item-subtitle win-type-ellipsis" data-win-bind="textContent: subtitle"></h6>
+            <h4 class="item-title" data-win-bind="textContent: name"></h4>
+            <h6 class="item-subtitle win-type-ellipsis" data-win-bind="textContent: description"></h6>
         </div>
     </div>
 
