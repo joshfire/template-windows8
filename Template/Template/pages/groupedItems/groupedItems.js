@@ -44,6 +44,10 @@
             listView.itemTemplate = element.querySelector(".itemtemplate");
             listView.oniteminvoked = this.itemInvoked.bind(this);
 
+            // Listen to the share event
+            var dtm = Windows.ApplicationModel.DataTransfer.DataTransferManager.getForCurrentView();
+            dtm.ondatarequested = null;
+
             this.initializeLayout(listView, appView.value);
             listView.element.focus();
         },

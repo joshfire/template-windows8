@@ -48,6 +48,10 @@
 
             this.initializeLayout(listView, Windows.UI.ViewManagement.ApplicationView.value);
             listView.element.focus();
+
+            // Listen to the share event
+            var dtm = Windows.ApplicationModel.DataTransfer.DataTransferManager.getForCurrentView();
+            dtm.ondatarequested = null;
         },
 
         unload: function () {

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <ReferenceCachePath>C:\Users\Steren\AppData\Local\Temp\Template_refcache</ReferenceCachePath>
+    <ReferenceCachePath>C:\Users\arthu_000\AppData\Local\Temp\1h1sydkv_Template_refcache</ReferenceCachePath>
     <AutoRefresh>true</AutoRefresh>
     <ShowAllFiles>false</ShowAllFiles>
     <AppxPackageIsForStore>False</AppxPackageIsForStore>
