@@ -56,7 +56,7 @@
             uri = item.data.image.contentURL;
 
         uri = new Windows.Foundation.Uri(uri);
-        console.log(item.data.thumbnail[0].url);
+
         var thumbnail = Windows.Storage.Streams.RandomAccessStreamReference.createFromUri(uri);
         // Async return lets us use the famous .then();
         return Windows.Storage.StorageFile.createStreamedFileFromUriAsync(item.data.name + ".jpg", uri, thumbnail);
@@ -76,12 +76,17 @@
             // Set a ref to the item for the sharing event
             _currentItem = Data.items.dataSource.itemFromIndex(options.index)._value;
 
+
             // Listen to share event
             var dtm = Windows.ApplicationModel.DataTransfer.DataTransferManager.getForCurrentView();
             dtm.ondatarequested = handleShare;
 
         },
         itemRenderer: function (itemPromise) {
+
+            // Set static elements
+            
+            
             return itemPromise.then(function (currentItem, recycled) {
 
                 var tplSelect;
