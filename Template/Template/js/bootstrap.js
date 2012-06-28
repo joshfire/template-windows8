@@ -8,7 +8,7 @@
     plugins: {}
   };
   Joshfire.factory.config.deploy = {"env":"dev","type":"preview","id":""};
-  Joshfire.factory.config.datasources = {"main":[{"name":"Feed","db":"feed","col":"rss","query":{"filter":{"url":"http://blog.steren.fr/feed"}},"runatclient":false,"missingKeys":[],"outputType":"BlogPosting"},{"name":"Youtube","db":"youtube","col":"videos","query":{"filter":{"search":"bemyapp"}},"runatclient":true,"missingKeys":[],"outputType":"VideoObject"},{"name":"Flickr","db":"flickr","col":"photos","query":{"filter":{"search":"bemyapp"}},"runatclient":true,"missingKeys":["api_key"],"outputType":"ImageObject"}]};
+  Joshfire.factory.config.datasources = { "main": [{ "name": "Feed", "db": "feed", "col": "rss", "query": { "filter": { "url": "http://blog.steren.fr/feed" } }, "runatclient": false, "missingKeys": [], "outputType": "BlogPosting" }, { "name": "Flickr", "db": "flickr", "col": "photos", "query": { "filter": { "search": "bemyapp" } }, "runatclient": true, "missingKeys": ["api_key"], "outputType": "ImageObject" }, { "name": "Youtube", "db": "youtube", "col": "videos", "query": { "filter": { "search": "bemyapp" } }, "runatclient": true, "missingKeys": [], "outputType": "VideoObject" }] };
   window.Joshfire = Joshfire;
 
 })();
