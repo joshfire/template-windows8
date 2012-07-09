@@ -39,7 +39,6 @@
             );
 
             element.querySelector("header[role=banner] .pagetitle").textContent = group.title;
-
             listView.itemDataSource = pageList.dataSource;
             listView.itemTemplate = element.querySelector(".itemtemplate");
             listView.groupDataSource = pageList.groups.dataSource;

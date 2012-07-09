@@ -55,9 +55,10 @@
     // http://msdn.microsoft.com/library/windows/apps/Hh452745
     // http://msdn.microsoft.com/library/windows/apps/Hh465373
     for (var dsNb = 1; dsNb < datasources.children.length; dsNb++) {
-        var group = { key: "main" + dsNb, title: datasources.children[dsNb].name };
+        var group = { key: "main" + dsNb, title: datasources.children[dsNb].name, image: datasources.children[dsNb].config.meta.image };
 
         datasources.children[dsNb].find({}, function (g) {
+           
             return function (err, data) {
                 var limit = 0;
                 // Process data entries in data.entries

@@ -8,7 +8,7 @@
     plugins: {}
   };
   Joshfire.factory.config.deploy = {"env":"dev","type":"preview","id":""};
-  Joshfire.factory.config.datasources = { "main": [{ "name": "Feed", "db": "feed", "col": "rss", "query": { "filter": { "url": "http://blog.steren.fr/feed" } }, "runatclient": false, "missingKeys": [], "outputType": "BlogPosting" }, { "name": "Flickr", "db": "flickr", "col": "photos", "query": { "filter": { "search": "bemyapp" } }, "runatclient": true, "missingKeys": ["api_key"], "outputType": "ImageObject" }, { "name": "Youtube", "db": "youtube", "col": "videos", "query": { "filter": { "search": "bemyapp" } }, "runatclient": true, "missingKeys": [], "outputType": "VideoObject" }] };
+  Joshfire.factory.config.datasources = { "main": [{ "name": "Feed", "db": "feed", "col": "rss", "query": { "filter": { "url": "http://blog.steren.fr/feed" } }, "runatclient": false, "missingKeys": [], "outputType": "BlogPosting", "meta": { "desc": "Posts from Steren blog", "image": "http://animal.discovery.com/mammals/cheetah/pictures/cheetah-picture.jpg" } }, { "name": "Flickr", "db": "flickr", "col": "photos", "query": { "filter": { "search": "bemyapp" } }, "runatclient": true, "missingKeys": ["api_key"], "outputType": "ImageObject", "meta": { "desc": "Photos flickr", "image": "http://3.bp.blogspot.com/-6HINx6Kz_wM/T7-rMHiE32I/AAAAAAAAAHU/ln5vfJmde2Y/s1600/flickr.jpg" } }, { "name": "Youtube", "db": "youtube", "col": "videos", "query": { "filter": { "search": "bemyapp" } }, "runatclient": true, "missingKeys": [], "outputType": "VideoObject", "meta": { "desc": "Videos Youtube", "image": "http://learning.hubspot.com/Portals/137828/images/youtube%20logo%2005.png" } }] };
   window.Joshfire = Joshfire;
 
 })();

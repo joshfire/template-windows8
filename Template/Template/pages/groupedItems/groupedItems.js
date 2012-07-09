@@ -27,6 +27,18 @@
         });
     }
 
+    function listTemplateHandler(itemPromise) {
+        return itemPromise.then(function (currentItem, recycled) {
+
+            /*var tplSelect = document.querySelector('.largeitemtemplate').winControl;
+    
+            tplSelect = tplSelect.renderItem(itemPromise, recycled);*/
+
+            return tplSelect.element;
+
+        });
+    }
+
     function layoutGroupInfoHandler() {
         return {
             enableCellSpanning: true,
@@ -44,10 +56,12 @@
             if (viewState === appViewState.snapped) {
                 listView.itemDataSource = Data.groups.dataSource;
                 listView.groupDataSource = null;
+                listView.itemTemplate = listTemplateHandler;
                 listView.layout = new ui.ListLayout();
             } else {
                 listView.itemDataSource = Data.homeItems.dataSource;
                 listView.groupDataSource = Data.homeGroups.dataSource;
+                listView.itemTemplate = templateHandler;
                 listView.layout = new ui.GridLayout({ groupHeaderPosition: "top", groupInfo: layoutGroupInfoHandler });
             }
         },
@@ -70,7 +84,6 @@
 
             var listView = element.querySelector(".groupeditemslist").winControl;
             listView.groupHeaderTemplate = element.querySelector(".headerTemplate");
-            listView.itemTemplate = templateHandler;
             listView.oniteminvoked = this.itemInvoked.bind(this);
 
             // Listen to the share event
