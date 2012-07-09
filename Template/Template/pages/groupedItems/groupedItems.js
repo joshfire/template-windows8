@@ -7,6 +7,34 @@
     var ui = WinJS.UI;
     var utils = WinJS.Utilities;
 
+
+    function templateHandler(itemPromise) {
+        return itemPromise.then(function (currentItem, recycled) {
+
+
+            var tplSelect;
+            if (currentItem.index == 0) {
+                tplSelect = document.querySelector('.largeitemtemplate').winControl;
+            }
+            else {
+                tplSelect = document.querySelector('.itemtemplate').winControl;
+            }
+
+            tplSelect = tplSelect.renderItem(itemPromise, recycled);
+
+            return tplSelect.element;
+
+        });
+    }
+
+    function layoutGroupInfoHandler() {
+        return {
+            enableCellSpanning: true,
+            cellWidth: 250,
+            cellHeight: 250
+        };
+    }
+
     ui.Pages.define("/pages/groupedItems/groupedItems.html", {
 
         // This function updates the ListView with new layouts
@@ -18,9 +46,9 @@
                 listView.groupDataSource = null;
                 listView.layout = new ui.ListLayout();
             } else {
-                listView.itemDataSource = Data.items.dataSource;
-                listView.groupDataSource = Data.groups.dataSource;
-                listView.layout = new ui.GridLayout({ groupHeaderPosition: "top" });
+                listView.itemDataSource = Data.homeItems.dataSource;
+                listView.groupDataSource = Data.homeGroups.dataSource;
+                listView.layout = new ui.GridLayout({ groupHeaderPosition: "top", groupInfo: layoutGroupInfoHandler });
             }
         },
 
@@ -39,17 +67,29 @@
         // This function is called whenever a user navigates to this page. It
         // populates the page elements with the app's data.
         ready: function (element, options) {
+
             var listView = element.querySelector(".groupeditemslist").winControl;
             listView.groupHeaderTemplate = element.querySelector(".headerTemplate");
-            listView.itemTemplate = element.querySelector(".itemtemplate");
+            listView.itemTemplate = templateHandler;
             listView.oniteminvoked = this.itemInvoked.bind(this);
 
             // Listen to the share event
             var dtm = Windows.ApplicationModel.DataTransfer.DataTransferManager.getForCurrentView();
             dtm.ondatarequested = null;
 
+            if (Data.appConfig.logo) {
+                var logo = document.createElement('img');
+                logo.src = Data.appConfig.logo;
+                element.querySelector("header[role=banner] .pagetitle").textContent = '';
+                element.querySelector("header[role=banner] .pagetitle").appendChild(logo);
+            }
+            else {
+                if (Data.appConfig.name) {
+                    element.querySelector("header[role=banner] .pagetitle").textContent = Data.appConfig.name;
+                }
+            }
+
             this.initializeLayout(listView, appView.value);
-            listView.element.focus();
         },
 
         // This function updates the page layout in response to viewState changes.

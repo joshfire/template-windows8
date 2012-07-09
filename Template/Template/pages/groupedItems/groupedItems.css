@@ -12,6 +12,44 @@
     z-index: 0;
 }
 
+.groupeditemspage header[role=banner] img {
+    max-height: 100%;
+}
+
+
+    .largeitem {
+        width: 510px!important;
+        height: 510px;
+        -ms-grid-columns: 2fr;
+        -ms-grid-rows: 0;
+        min-width: 510px!important;
+        background: #000;
+        text-align: center;
+    }
+
+        .largeitem img {
+            max-width: 100%;
+            height: 100%;
+            display: inline;
+        }
+
+    .regularitem {
+        width: 250px!important;
+        height: 250px;
+        display: -ms-grid;
+        -ms-grid-columns: 1fr;
+        -ms-grid-rows: 1fr;
+        min-width: 250px!important;
+        background: #000;
+        text-align: center;
+    }
+
+        .regularitem img {
+            height: 100%;
+            max-width: 100%;
+            display: inline;
+        }
+    
     .groupeditemspage .groupeditemslist .win-groupheader {
         margin-top: 5px;
         margin-left: 70px;
@@ -24,17 +62,6 @@
             margin-top: 0;
         }
 
-    .groupeditemspage .groupeditemslist .win-item {
-        -ms-grid-columns: 1fr;
-        -ms-grid-rows: 1fr 90px;
-        display: -ms-grid;
-        height: 250px;
-        width: 250px;
-    }
-
-        .groupeditemspage .groupeditemslist .win-item .item-image {
-            -ms-grid-row-span: 2;
-        }
 
         .groupeditemspage .groupeditemslist .win-item .item-overlay {
             -ms-grid-row: 2;

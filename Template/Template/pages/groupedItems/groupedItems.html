@@ -20,11 +20,24 @@
         <p class="group-title win-type-x-large" data-win-bind="textContent: title; groupKey: key" 
             onclick="WinJS.Navigation.navigate('/pages/groupDetail/groupDetail.html', { groupKey: event.srcElement.groupKey })" role="link"></p>
     </div>
+    
     <div class="itemtemplate" data-win-control="WinJS.Binding.Template">
-        <img class="item-image" src="#" data-win-bind="src: image.contentURL; alt: name" />
-        <div class="item-overlay">
-            <h4 class="item-title" data-win-bind="textContent: name"></h4>
-            <h6 class="item-subtitle win-type-ellipsis" data-win-bind="textContent: description"></h6>
+        <div class="regularitem">
+            <img src="#" data-win-bind="src: image.contentURL; alt: name" />
+            <div class="item-overlay">
+                <h4 class="item-title" data-win-bind="textContent: name"></h4>
+                <h6 class="item-subtitle win-type-ellipsis" data-win-bind="textContent: description"></h6>
+            </div>
+        </div>
+    </div>
+    
+    <div class="largeitemtemplate" data-win-control="WinJS.Binding.Template">
+        <div class="largeitem">
+            <img class="" src="#" style="" data-win-bind="src: image.contentURL; alt: name" />
+            <div class="item-overlay">
+                <h4 class="item-title" data-win-bind="textContent: name"></h4>
+                <h6 class="item-subtitle win-type-ellipsis" data-win-bind="textContent: description"></h6>
+            </div>
         </div>
     </div>
 
@@ -37,7 +50,9 @@
             </h1>
         </header>
         <section aria-label="Main content" role="main">
-            <div class="groupeditemslist" aria-label="List of groups" data-win-control="WinJS.UI.ListView" data-win-options="{ selectionMode: 'none' }"></div>
+            <div class="groupeditemslist" aria-label="List of groups" data-win-control="WinJS.UI.ListView" data-win-options="{ selectionMode: 'none',
+                    itemDataSource: Data.items.dataSource, 
+                    groupDataSource: Data.groups.dataSource }"></div>
         </section>
     </div>
 </body>

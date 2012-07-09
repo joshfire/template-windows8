@@ -1,6 +1,35 @@
-﻿.win-template {
-    width: 100%;
+﻿#detailsFlipView {
+    height: 910px!important;
 }
+
+    #detailsFlipView .anitem {
+        box-sizing: border-box;
+        border: 1px solid #FFF;
+        background-color: #111;
+        height: 100%;
+        position: absolute;
+        left: 120px;
+        right: 120px;
+        top: 0;
+        text-align: center;
+        padding: 20px 0;
+    }
+        
+        #detailsFlipView .anitem img {
+            display: inline;
+            position: relative;
+            height: 100%;
+            max-width: 100%;
+            margin: 0 auto;
+        }
+
+        #detailsFlipView .anitem iframe {
+            height: 100%;
+            width: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
 
 .itemdetailpage .content {
     -ms-grid-row: 2;

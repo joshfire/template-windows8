@@ -73,6 +73,9 @@
                 currentPage: options.index
             });
 
+
+            element.querySelector("header[role=banner] .pagetitle").textContent = Data.items.getAt(options.index).name;
+
             // Set a ref to the item for the sharing event
             _currentItem = Data.items.dataSource.itemFromIndex(options.index)._value;
 

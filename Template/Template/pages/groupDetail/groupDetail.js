@@ -43,7 +43,7 @@
             listView.itemDataSource = pageList.dataSource;
             listView.itemTemplate = element.querySelector(".itemtemplate");
             listView.groupDataSource = pageList.groups.dataSource;
-            listView.groupHeaderTemplate = element.querySelector(".headerTemplate");
+            //listView.groupHeaderTemplate = element.querySelector(".headerTemplate");
             listView.oniteminvoked = this.itemInvoked.bind(this);
 
             this.initializeLayout(listView, Windows.UI.ViewManagement.ApplicationView.value);

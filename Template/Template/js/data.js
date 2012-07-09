@@ -23,6 +23,7 @@
             }
         }
     }
+    
 
     // This function returns a WinJS.Binding.List containing only the items
     // that belong to the provided group.
@@ -31,10 +32,19 @@
     }
 
     var list = new WinJS.Binding.List();
+    var ltdList = new WinJS.Binding.List();
+
     var groupedItems = list.createGrouped(
         function groupKeySelector(item) { return item.group.key; },
         function groupDataSelector(item) { return item.group; }
     );
+    var ltdGroupedItems = ltdList.createGrouped(
+        function groupKeySelector(item) { return item.group.key; },
+        function groupDataSelector(item) { return item.group; }
+    );
+
+    // Expose the config for general use through the app.
+    var factoryconfig = Joshfire.factory.config;
 
     // Use Joshfire Factory data sources for the moment.
     // See http://developer.joshfire.com/doc/dev/develop/datasources
@@ -49,10 +59,15 @@
 
         datasources.children[dsNb].find({}, function (g) {
             return function (err, data) {
+                var limit = 0;
                 // Process data entries in data.entries
                 data.entries.forEach(function (item) {
                     item.group = g;
                     list.push(item);
+                    if (limit < 6) {
+                        ltdList.push(item);
+                        limit++;
+                    }
                 });
             };
         }(group)
@@ -61,10 +76,14 @@
 
     WinJS.Namespace.define("Data", {
         items: groupedItems,
+        homeItems: ltdGroupedItems,
         groups: groupedItems.groups,
+        homeGroups: ltdGroupedItems.groups,
         getItemsFromGroup: getItemsFromGroup,
         getItemReference: getItemReference,
         resolveGroupReference: resolveGroupReference,
-        resolveItemReference: resolveItemReference
+        resolveItemReference: resolveItemReference,
+
+        appConfig: factoryconfig.app
     });
 })();
