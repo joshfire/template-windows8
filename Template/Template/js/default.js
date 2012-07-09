@@ -8,7 +8,7 @@
     var nav = WinJS.Navigation;
     WinJS.strictProcessing();
 
-    app.addEventListener("activated", function (args) {
+    app.onactivated = function (args) {
         if (args.detail.kind === activation.ActivationKind.launch) {
             if (args.detail.previousExecutionState !== activation.ApplicationExecutionState.terminated) {
                 // TODO: This application has been newly launched. Initialize
@@ -30,7 +30,7 @@
                 }
             }));
         }
-    });
+    };
 
     app.oncheckpoint = function (args) {
         // TODO: This application is about to be suspended. Save any state
