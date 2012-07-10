@@ -32,16 +32,33 @@
     }
 
     var list = new WinJS.Binding.List();
-    var ltdList = new WinJS.Binding.List();
 
     var groupedItems = list.createGrouped(
         function groupKeySelector(item) { return item.group.key; },
         function groupDataSelector(item) { return item.group; }
     );
-    var ltdGroupedItems = ltdList.createGrouped(
-        function groupKeySelector(item) { return item.group.key; },
-        function groupDataSelector(item) { return item.group; }
-    );
+
+    var getxItems = function (x) {
+
+        var ltdList = list.createFiltered(function (item) {
+            var key = item.group.key;
+            if (item.innerIndex < x) {
+                return true;
+            }
+            return false;
+        });
+
+        ltdList = ltdList.createGrouped(
+            function groupKeySelector(item) { return item.group.key; },
+            function groupDataSelector(item) { return item.group; }
+        );
+
+        return ltdList;
+    };
+
+    var getHomeItemReference = function (index) {
+        
+    };
 
     // Expose the config for general use through the app.
     var factoryconfig = Joshfire.factory.config;
@@ -54,20 +71,21 @@
     // note that external <script> cannot be called on a local context, so no JSONP
     // http://msdn.microsoft.com/library/windows/apps/Hh452745
     // http://msdn.microsoft.com/library/windows/apps/Hh465373
-    for (var dsNb = 1; dsNb < datasources.children.length; dsNb++) {
-        var group = { key: "main" + dsNb, title: datasources.children[dsNb].name };
+    for (var dsNb = 0; dsNb < datasources.children.length; dsNb++) {
+        var group = { key: "main" + dsNb, title: datasources.children[dsNb].name, index: dsNb, length: 0 };
 
         datasources.children[dsNb].find({}, function (g) {
             return function (err, data) {
-                var limit = 0;
                 // Process data entries in data.entries
+                var k = 0;
+                g.length = data.entries.length;
                 data.entries.forEach(function (item) {
                     item.group = g;
+                    // index inside its datasource
+                    item.innerIndex = k;
                     list.push(item);
-                    if (limit < 6) {
-                        ltdList.push(item);
-                        limit++;
-                    }
+
+                    k++;
                 });
             };
         }(group)
@@ -76,13 +94,14 @@
 
     WinJS.Namespace.define("Data", {
         items: groupedItems,
-        homeItems: ltdGroupedItems,
         groups: groupedItems.groups,
-        homeGroups: ltdGroupedItems.groups,
         getItemsFromGroup: getItemsFromGroup,
         getItemReference: getItemReference,
         resolveGroupReference: resolveGroupReference,
         resolveItemReference: resolveItemReference,
+
+        homeItems: getxItems,
+        getHomeItemReference: getHomeItemReference,
 
         appConfig: factoryconfig.app
     });

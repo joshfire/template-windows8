@@ -1,5 +1,5 @@
 ﻿#detailsFlipView {
-    height: 910px!important;
+    height: calc(100% - 50px)!important;
 }
 
     #detailsFlipView .anitem {

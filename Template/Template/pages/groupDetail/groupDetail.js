@@ -24,7 +24,7 @@
 
         itemInvoked: function (args) {
             var item = this.items.getAt(args.detail.itemIndex);
-            nav.navigate("/pages/itemDetail/itemDetail.html", { item: Data.getItemReference(item) });
+            nav.navigate("/pages/itemDetail/itemDetail.html", { item: Data.getItemReference(item), index: Data.items.indexOf(item) });
         },
 
         // This function is called whenever a user navigates to this page. It

@@ -72,9 +72,8 @@
                 itemTemplate: this.itemRenderer,
                 currentPage: options.index
             });
-
-
-            element.querySelector("header[role=banner] .pagetitle").textContent = Data.items.getAt(options.index).name;
+            console.log(Data.items);
+            document.querySelector("header[role=banner] .pagetitle").textContent = Data.items.getAt(options.index).name;
 
             // Set a ref to the item for the sharing event
             _currentItem = Data.items.dataSource.itemFromIndex(options.index)._value;
@@ -88,7 +87,6 @@
         itemRenderer: function (itemPromise) {
 
             // Set static elements
-            
             
             return itemPromise.then(function (currentItem, recycled) {
 

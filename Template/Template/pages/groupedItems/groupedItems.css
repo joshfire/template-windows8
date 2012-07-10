@@ -18,11 +18,10 @@
 
 
     .largeitem {
-        width: 510px!important;
+        width: 545px!important;
         height: 510px;
-        -ms-grid-columns: 2fr;
+        -ms-grid-columns: 3fr;
         -ms-grid-rows: 0;
-        min-width: 510px!important;
         background: #000;
         text-align: center;
     }
@@ -34,12 +33,11 @@
         }
 
     .regularitem {
-        width: 250px!important;
+        width: 175px!important;
         height: 250px;
         display: -ms-grid;
         -ms-grid-columns: 1fr;
         -ms-grid-rows: 1fr;
-        min-width: 250px!important;
         background: #000;
         text-align: center;
     }
@@ -47,7 +45,6 @@
         .regularitem img {
             height: 100%;
             max-width: 100%;
-            display: inline;
         }
     
     .groupeditemspage .groupeditemslist .win-groupheader {

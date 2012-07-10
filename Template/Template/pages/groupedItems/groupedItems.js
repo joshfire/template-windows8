@@ -13,7 +13,7 @@
 
 
             var tplSelect;
-            if (currentItem.index == 0) {
+            if (currentItem.data.innerIndex == 0) {
                 tplSelect = document.querySelector('.largeitemtemplate').winControl;
             }
             else {
@@ -30,7 +30,7 @@
     function layoutGroupInfoHandler() {
         return {
             enableCellSpanning: true,
-            cellWidth: 250,
+            cellWidth: 175,
             cellHeight: 250
         };
     }
@@ -46,8 +46,8 @@
                 listView.groupDataSource = null;
                 listView.layout = new ui.ListLayout();
             } else {
-                listView.itemDataSource = Data.homeItems.dataSource;
-                listView.groupDataSource = Data.homeGroups.dataSource;
+                listView.itemDataSource = Data.homeItems(7).dataSource;
+                listView.groupDataSource = Data.homeItems(7).groups.dataSource;
                 listView.layout = new ui.GridLayout({ groupHeaderPosition: "top", groupInfo: layoutGroupInfoHandler });
             }
         },
@@ -59,8 +59,10 @@
                 nav.navigate("/pages/groupDetail/groupDetail.html", { groupKey: group.key });
             } else {
                 // If the page is not snapped, the user invoked an item.
-                var item = Data.items.getAt(args.detail.itemIndex);
-                nav.navigate("/pages/itemDetail/itemDetail.html", { item: Data.getItemReference(item), index: args.detail.itemIndex });
+                var item = Data.homeItems(7).getAt(args.detail.itemIndex),
+                    realIndex = Data.items.indexOf(item);
+
+                nav.navigate("/pages/itemDetail/itemDetail.html", { item: Data.getItemReference(item), index: realIndex });
             }
         },
 

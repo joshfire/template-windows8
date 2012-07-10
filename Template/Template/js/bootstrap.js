@@ -8,7 +8,7 @@
     plugins: {}
   };
   Joshfire.factory.config.deploy = {"env":"dev","type":"preview","id":""};
-  Joshfire.factory.config.datasources = { "main": [{ "name": "Feed", "db": "feed", "col": "rss", "query": { "filter": { "url": "http://blog.steren.fr/feed" } }, "runatclient": false, "missingKeys": [], "outputType": "BlogPosting" }, { "name": "Flickr", "db": "flickr", "col": "photos", "query": { "filter": { "search": "bemyapp" } }, "runatclient": true, "missingKeys": ["api_key"], "outputType": "ImageObject" }, { "name": "Youtube", "db": "youtube", "col": "videos", "query": { "filter": { "search": "bemyapp" } }, "runatclient": true, "missingKeys": [], "outputType": "VideoObject" }] };
+  Joshfire.factory.config.datasources = { "main": [/*{ "name": "Feed", "db": "feed", "col": "rss", "query": { "filter": { "url": "http://blog.steren.fr/feed" } }, "runatclient": false, "missingKeys": [], "outputType": "BlogPosting" }, */{ "name": "Flickr", "db": "flickr", "col": "photos", "query": { "filter": { "search": "bemyapp" } }, "runatclient": true, "missingKeys": ["api_key"], "outputType": "ImageObject" }, { "name": "Youtube", "db": "youtube", "col": "videos", "query": { "filter": { "search": "bemyapp" } }, "runatclient": true, "missingKeys": [], "outputType": "VideoObject" }] };
   window.Joshfire = Joshfire;
 
 })();
@@ -2011,7 +2011,7 @@ define('databases/youtube/lib/api',['datajslib!http', 'datajslib!underscore'], f
 
     // We add default parameter
     url = baseUrl + api.generateUrl(url, { alt:'json-in-script', v:2 });
-
+    console.log(url);
     http.request({
       'url': url,
       'dataType': 'jsonp'
@@ -2449,7 +2449,7 @@ define('databases/flickr/photos',[
         // TODO: notify the client that a parameter should be given
         return callback(null, null);
       }
-
+           
       http.request({
         'url': url,
         'jsonp': 'jsoncallback',
