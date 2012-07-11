@@ -98,18 +98,29 @@
     }
 
     .groupdetailpage .itemslist .win-item {
-        -ms-grid-columns: 60px 1fr;
-        height: 60px;
+        -ms-grid-columns: 80px 1fr;
+        height: 80px;
         width: 272px;
     }
 
+        .groupdetailpage .itemslist .win-item .item-info {
+            padding-left: 4%;
+        }
+
         .groupdetailpage .itemslist .win-item .item-info .item-title {
-            max-height: 30pt;
+            max-height: 45pt;
+            display: block;
+            overflow: hidden;
+            margin-top: -2px;
+            font-size: 14px;
         }
 
         .groupdetailpage .itemslist .win-item .item-info .item-description {
             visibility: hidden;
         }
+
+        
+        
 }
 
 @media screen and (-ms-view-state: fullscreen-portrait) {

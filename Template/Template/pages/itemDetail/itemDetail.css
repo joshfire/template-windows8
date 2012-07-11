@@ -99,6 +99,48 @@
             .itemdetailpage .content article .item-content {
                 padding-bottom: 60px;
             }
+            
+    #detailsFlipView {
+        height: calc(100% - 50px)!important;
+    }
+
+        #detailsFlipView .anitem {
+            box-sizing: border-box;
+            border: none;
+            padding: 0 20px;
+            background-color: transparent;
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            text-align: justify;
+        }
+        
+            #detailsFlipView .anitem img {
+                display: inline;
+                position: relative;
+                max-height: 100%;
+                width: 100%;
+                height: auto;
+            }
+
+            #detailsFlipView .anitem iframe {
+                display: inline;
+                max-height: 100%;
+                width: 100%;
+                position: relative;
+                height: auto;
+            }
+            
+            #detailsFlipView .anitem .author {
+                font-size: 16px;
+                text-align: left;
+            }
+            
+            #detailsFlipView .anitem .description {
+                font-size: 14px;
+                color: #CCC;
+            }
 }
 
 @media screen and (-ms-view-state: fullscreen-portrait) {

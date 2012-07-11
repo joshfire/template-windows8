@@ -28,8 +28,10 @@
     }
 
         .largeitem img {
-            max-width: 100%;
-            height: 100%;
+            min-height: 500px;
+            min-width: 525px;
+            -ms-interpolation-mode: bicubic;
+            position: absolute;
         }
 
     .regularitem {
@@ -43,10 +45,19 @@
         position: relative;
     }
 
-        .regularitem img {
-            height: 100%;
-            max-width: 100%;
+        .regulatitem .thumbnailViewer {
+            overflow: hidden;
+            height: 250px;
+            width: 175px;
+            position: relative;
         }
+
+            .regularitem .thumbnailViewer img {
+                min-height: 250px;
+                min-width: 175px;
+                -ms-interpolation-mode: bicubic;
+                position: absolute;
+            }
     
     .groupeditemspage .groupeditemslist .win-groupheader {
         margin-top: 5px;
@@ -70,6 +81,7 @@
             left:0;
             width:96%;
             text-align:center;
+            min-height: 40px;
         }
 
             .groupeditemspage .groupeditemslist .win-item .item-overlay .item-title {
@@ -113,35 +125,14 @@
         display: -ms-grid;
         height: 60px;
         width: 272px;
+        background: rgba(0, 0, 0, 0.6);
     }
 
-        .groupeditemspage .groupeditemslist .win-item .item-image {
-            -ms-grid-column: 1;
-            -ms-grid-row-span: 1;
-            height: 60px;
-            width: 60px;
-        }
+    .groupeditemspage .groupeditemslist .win-item .title {
+        font-size: 18px;
+        padding-left: 20px;
+    }
 
-        .groupeditemspage .groupeditemslist .win-item .item-overlay {
-            -ms-grid-column: 2;
-            -ms-grid-row: 1;
-            -ms-grid-row-align: stretch;
-            background: transparent;
-            display: inline-block;
-            margin-left: 10px;
-            padding: 0;
-        }
-
-            .groupeditemspage .groupeditemslist .win-item .item-overlay .item-title {
-                margin-top: 4px;
-                max-height: 40px;
-                width: 202px;
-            }
-
-            .groupeditemspage .groupeditemslist .win-item .item-overlay .item-subtitle {
-                opacity: 0.6;
-                width: 202px;
-            }
 }
 
 @media screen and (-ms-view-state: fullscreen-portrait) {

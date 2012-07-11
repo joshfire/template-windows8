@@ -11,16 +11,63 @@
     function templateHandler(itemPromise) {
         return itemPromise.then(function (currentItem, recycled) {
 
-
-            var tplSelect;
-            if (currentItem.data.innerIndex == 0) {
+            var tplSelect,
+                isLarge = (currentItem.data.innerIndex == 0);
+            if (isLarge) {
                 tplSelect = document.querySelector('.largeitemtemplate').winControl;
             }
             else {
                 tplSelect = document.querySelector('.itemtemplate').winControl;
             }
 
+            if (!currentItem.data.name)
+                currentItem.data.name = 'No name';
+
+            if (!currentItem.data.description)
+                currentItem.data.description = 'No description';
+
+
             tplSelect = tplSelect.renderItem(itemPromise, recycled);
+            var img = tplSelect.element._value.querySelector('.thumbnail');
+
+            if (currentItem.data.thumbnail.length) {
+                var thumbs = currentItem.data.thumbnail,
+                    thethumb = {height: 0, width: 0};
+                /* Find the best thumb */
+                for (var k in thumbs) {
+                    if (thumbs.hasOwnProperty(k)) {
+                        if (!isLarge && (thumbs[k].height >= 250 || thumbs.width >= 175)) {
+                            thethumb = thumbs[k];
+                            break;
+                        }
+                        else if (isLarge && (
+                            (thumbs[k].height >= 500 || thumbs.width >= 525) ||
+                            (thumbs[k].height > thethumb.height || thumbs[k].width > thethumb.width)
+                            )) {
+                            thethumb = thumbs[k];
+                        }
+                    }
+                }
+
+                /* Set the image accordingly */
+                img.src = thethumb.contentURL;
+                img.width = thethumb.width;
+                img.height = thethumb.height;
+
+                /* Center it */
+                if (!isLarge) {
+                    if (thethumb.width > 175)
+                        img.style.left = ((175 - parseInt(thethumb.width)) / 2) + 'px';
+                    else
+                        img.style.left = ((parseInt(thethumb.width) - 175) / 2) + 'px';
+                    if (thethumb.height > 250)
+                        img.style.top = ((250 - parseInt(thethumb.height)) / 2) + 'px';
+                    else
+                        img.style.top = ((parseInt(thethumb.height) - 250) / 2) + 'px';
+                }
+            }
+
+            
 
             return tplSelect.element;
 
@@ -29,10 +76,9 @@
 
     function listTemplateHandler(itemPromise) {
         return itemPromise.then(function (currentItem, recycled) {
-
-            /*var tplSelect = document.querySelector('.largeitemtemplate').winControl;
-    
-            tplSelect = tplSelect.renderItem(itemPromise, recycled);*/
+            var tplSelect = document.querySelector('.listitemtemplate').winControl;
+ 
+            tplSelect = tplSelect.renderItem(itemPromise, recycled);
 
             return tplSelect.element;
 

@@ -3,7 +3,7 @@
   var Joshfire = window.Joshfire || {};
   Joshfire.factory = {
     globalConfig: {"DATAVERSION":"1","DATAHOSTPORT":"localhost:40020","STATSHOSTPORT":"localhost:40023","HOSTPORT":"localhost:40021"},
-    config: { "app": { "id": "4fc9d6120767864406000069", "icon": null, "logo": "http://www.yourlogoresources.com/wp-content/uploads/2011/09/ted-logo-448x181.png", "name": "Metro", "version": "1.0" }, "template": { "id": "4f9668187c4553dd8e00023a", "name": "sleek", "version": "0.1.3", "options": { "color": "gray" } } },
+    config: { "app": { "id": "4fc9d6120767864406000069", "icon": null, "logo": "http://de.bemyapp.com/blog/wp-content/uploads/2012/02/logo_weekend_us_HD.png", "name": "Metro", "version": "1.0" }, "template": { "id": "4f9668187c4553dd8e00023a", "name": "sleek", "version": "0.1.3", "options": { "color": "gray" } } },
     device: {"type":"phone"},
     plugins: {}
   };

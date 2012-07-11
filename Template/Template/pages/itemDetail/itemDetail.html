@@ -19,11 +19,13 @@
     <!-- Templates -->
     <article class="videoDetailTemplate" data-win-control="WinJS.Binding.Template">
         <div class="anitem">   
-            <header>
+            <!--<header>
                 <h2 class="item-title" data-win-bind="textContent: name; alt: name"></h2>
                 <h4 class="item-subtitle"></h4>
-            </header>
+            </header>-->
             <iframe class="item-video" src="#" data-win-bind="src: embedURL"></iframe>
+            <p class="author"></p>
+            <p class="description" data-win-bind="textContent: description"></p>
         </div>
     </article>
     <article class="imageDetailTemplate" data-win-control="WinJS.Binding.Template">
@@ -33,6 +35,8 @@
                 <h4 class="item-subtitle"></h4>
             </header>-->
             <img data-win-bind="src: contentURL" />
+            <p class="metainfo"><span class="author"></span></p>
+            <p class="description" data-win-bind="textContent: description"></p>
         </div>
     </article>
 

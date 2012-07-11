@@ -6,6 +6,18 @@
     var ui = WinJS.UI;
     var utils = WinJS.Utilities;
 
+    var templateHandler = function (itemPromise) {
+        return itemPromise.then(function(currentItem, recycled) {
+            var tpl = document.querySelector(".itemtemplate").winControl;
+            tpl = tpl.renderItem(itemPromise, recycled);
+
+            var dateItem = tpl.element._value.querySelector('.item-subtitle');
+            dateItem.textContent = toReadableDate(currentItem.data.datePublished);
+            
+            return tpl.element;
+        });
+    }
+
     ui.Pages.define("/pages/groupDetail/groupDetail.html", {
 
         /// <field type="WinJS.Binding.List" />
@@ -40,7 +52,7 @@
 
             element.querySelector("header[role=banner] .pagetitle").textContent = group.title;
             listView.itemDataSource = pageList.dataSource;
-            listView.itemTemplate = element.querySelector(".itemtemplate");
+            listView.itemTemplate = templateHandler;
             listView.groupDataSource = pageList.groups.dataSource;
             //listView.groupHeaderTemplate = element.querySelector(".headerTemplate");
             listView.oniteminvoked = this.itemInvoked.bind(this);
@@ -76,6 +88,26 @@
                     listView.indexOfFirstVisible = firstVisible;
                 }
             }
+        },
+
+        formatDate: function (str) {
+
         }
     });
+    function toReadableDate(str) {
+        var thedate = toDateIso(str);
+        var month = thedate.getMonth().toString();
+        month = (month.length > 1) ? month : '0' + month;
+        return thedate.getDate() + '/' + month + '/' + thedate.getFullYear();
+    }
+    function toDateIso(iso8601) {
+
+        var s = iso8601.trim();
+        s = s.replace(/\.\d\d\d+/, ""); // remove milliseconds
+        s = s.replace(/-/, "/").replace(/-/, "/");
+        s = s.replace(/T/, " ").replace(/Z/, " UTC");
+        s = s.replace(/([\+\-]\d\d)\:?(\d\d)/, " $1$2"); // -04:00 -> -0400
+
+        return new Date(s);
+    }
 })();

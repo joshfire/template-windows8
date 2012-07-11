@@ -41,7 +41,7 @@
                 requestData.setStorageItems([file]);
                 requestData.setBitmap(streamReference);
 
-               // deferral.complete();
+                // deferral.complete();
             });
 
         }
@@ -72,7 +72,7 @@
                 itemTemplate: this.itemRenderer,
                 currentPage: options.index
             });
-            console.log(Data.items);
+
             document.querySelector("header[role=banner] .pagetitle").textContent = Data.items.getAt(options.index).name;
 
             // Set a ref to the item for the sharing event
@@ -102,10 +102,39 @@
                 }
 
                 tplSelect = tplSelect.renderItem(itemPromise, recycled);
+                var data = currentItem.data;
+                var elem = tplSelect.element._value;
+
+                if (data.author.length) {
+                    var iauthor = elem.querySelector('.author');
+                    if (iauthor) {
+                        iauthor.textContent = 'By ' + data.author.shift().name;
+                    }
+                    if (data.datePublished) {
+                        iauthor.textContent += ' on the ' + toReadableDate(data.datePublished);
+                    }
+
+                }
 
                 return tplSelect.element;
 
             });
         }
     });
+    function toReadableDate(str) {
+        var thedate = toDateIso(str);
+        var month = thedate.getMonth().toString();
+        month = (month.length > 1) ? month : '0' + month;
+        return thedate.getDate() + '/' + month + '/' + thedate.getFullYear();
+    }
+    function toDateIso(iso8601) {
+
+        var s = iso8601.trim();
+        s = s.replace(/\.\d\d\d+/, ""); // remove milliseconds
+        s = s.replace(/-/, "/").replace(/-/, "/");
+        s = s.replace(/T/, " ").replace(/Z/, " UTC");
+        s = s.replace(/([\+\-]\d\d)\:?(\d\d)/, " $1$2"); // -04:00 -> -0400
+
+        return new Date(s);
+    }
 })();

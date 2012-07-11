@@ -23,17 +23,24 @@
     
     <div class="itemtemplate" data-win-control="WinJS.Binding.Template">
         <div class="regularitem">
-            <img class="thumbnail" src="#" data-win-bind="src: image.contentURL; alt: name" />
+            <div class="thumbnailViewer">
+                <img class="thumbnail" src="#" data-win-bind="src: image.contentURL; alt: name" />
+            </div>
             <div class="item-overlay">
                 <h4 class="item-title" data-win-bind="textContent: name"></h4>
                 <h6 class="item-subtitle win-type-ellipsis" data-win-bind="textContent: description"></h6>
             </div>
         </div>
     </div>
+
+    <div class="listitemtemplate" data-win-control="WinJS.Binding.Template">
+        <!--<img data-win-bind="src: image; alt: title" />-->
+        <p class="title" data-win-bind="textContent: title"></p>
+    </div>
     
     <div class="largeitemtemplate" data-win-control="WinJS.Binding.Template">
         <div class="largeitem">
-            <img class="thumbnail" src="#" style="" data-win-bind="src: image.contentURL; alt: name" />
+            <img class="thumbnail" src="#" data-win-bind="src: image.contentURL; alt: name" />
             <div class="item-overlay">
                 <h4 class="item-title" data-win-bind="textContent: name"></h4>
                 <h6 class="item-subtitle win-type-ellipsis" data-win-bind="textContent: description"></h6>
