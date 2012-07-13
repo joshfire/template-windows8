@@ -2,14 +2,14 @@
   /* This bootstrap script is documented at http://developer.joshfire.com/ */
   var Joshfire = window.Joshfire || {};
   Joshfire.factory = {
-    globalConfig: {"DATAVERSION":"1","DATAHOSTPORT":"localhost:40020","STATSHOSTPORT":"localhost:40023","HOSTPORT":"localhost:40021"},
+    globalConfig: {"DATAVERSION":"1","DATAHOSTPORT":"api.datajs.com","STATSHOSTPORT":"localhost:40023","HOSTPORT":"localhost:40021"},
     config: { "app": { "id": "4fc9d6120767864406000069", "icon": null, "logo": "http://de.bemyapp.com/blog/wp-content/uploads/2012/02/logo_weekend_us_HD.png", "name": "Metro", "version": "1.0" }, "template": { "id": "4f9668187c4553dd8e00023a", "name": "sleek", "version": "0.1.3", "options": { "color": "gray" } } },
     device: {"type":"phone"},
     plugins: {}
   };
   Joshfire.factory.config.deploy = {"env":"dev","type":"preview","id":""};
 
-  Joshfire.factory.config.datasources = { "main": [/*{ "name": "Feed", "db": "feed", "col": "rss", "query": { "filter": { "url": "http://blog.steren.fr/feed" } }, "runatclient": false, "missingKeys": [], "outputType": "BlogPosting", "meta": { "desc": "Posts from Steren blog", "image": "http://animal.discovery.com/mammals/cheetah/pictures/cheetah-picture.jpg" } }, */{ "name": "Flickr", "db": "flickr", "col": "photos", "query": { "filter": { "search": "bemyapp" } }, "runatclient": true, "missingKeys": ["api_key"], "outputType": "ImageObject", "meta": { "desc": "Photos flickr", "image": "http://3.bp.blogspot.com/-6HINx6Kz_wM/T7-rMHiE32I/AAAAAAAAAHU/ln5vfJmde2Y/s1600/flickr.jpg" } }, { "name": "Youtube", "db": "youtube", "col": "videos", "query": { "filter": { "search": "bemyapp" } }, "runatclient": true, "missingKeys": [], "outputType": "VideoObject", "meta": { "desc": "Videos Youtube", "image": "http://learning.hubspot.com/Portals/137828/images/youtube%20logo%2005.png" } }] };
+  Joshfire.factory.config.datasources = { "main": [{ "name": "Feed", "db": "feed", "col": "rss", "query": { "filter": { "url": "http://blog.steren.fr/" } }, "runatclient": false, "missingKeys": [], "outputType": "BlogPosting", "meta": { "desc": "Posts from Steren blog", "image": "http://animal.discovery.com/mammals/cheetah/pictures/cheetah-picture.jpg" } }, { "name": "Flickr", "db": "flickr", "col": "photos", "query": { "filter": { "search": "bemyapp" } }, "runatclient": true, "missingKeys": ["api_key"], "outputType": "ImageObject", "meta": { "desc": "Photos flickr", "image": "http://3.bp.blogspot.com/-6HINx6Kz_wM/T7-rMHiE32I/AAAAAAAAAHU/ln5vfJmde2Y/s1600/flickr.jpg" } }, { "name": "Youtube", "db": "youtube", "col": "videos", "query": { "filter": { "search": "bemyapp" } }, "runatclient": true, "missingKeys": [], "outputType": "VideoObject", "meta": { "desc": "Videos Youtube", "image": "http://learning.hubspot.com/Portals/137828/images/youtube%20logo%2005.png" } }] };
 
   window.Joshfire = Joshfire;
 
@@ -28,7 +28,7 @@
       document.addEventListener("deviceready", func, false);
     } else if (window.addEventListener) {
       window.addEventListener("load", func, false);
-    } else if (document.addEventListener) {
+    } else if (document.addEventListener) { 
       document.addEventListener("load", func, false);
     } else if (window.attachEvent) {
       window.attachEvent("onload", func);
@@ -1963,6 +1963,7 @@ define('runtime-browser/http',[], function () {
 
 });
 
+
 define('databases/youtube/lib/api',['datajslib!http', 'datajslib!underscore'], function(http, _) {
 
   var api = {};
@@ -2701,356 +2702,190 @@ define('databases/flickr/photos',[
     }
   };
 });;
-;/**
- * @fileoverview Client-side API to retrieve datasource feeds
- * from the Joshfire's data proxy.
- *
- * The file exposes a global Joshfire.datajs.proxy object.
- *
- * The file expects Joshfire.factory.globalConfig and
- * Joshfire.factory.config to be defined and to contain
- * actual configuration settings.
- *
- * TODO: move timeout to factory configuration setting? (30s used right now)
- */
 
-(function (globalConfig, config, document, setTimeout, clearTimeout, global) {
-  /**
-   * Copies all of the properties in the source objects over to the destination
-   * object. It's in-order, so the last source will override properties of the
-   * same name in previous arguments.
-   * Same code as Underscore.js extend function
-   * @see http://documentcloud.github.com/underscore/#extend
-   */
-  var _extend = function(obj1,obj2) {
-    for (var key in obj2 ) {
-      if ( obj2.hasOwnProperty(key) ) {
-        obj1[key] = obj2[key];
-      }
-    }
-    return obj1;
-  };
 
-  /**
-   * Lightweight JSONP browser implementation:
-   * - sets a global callback function
-   * - uses a <script> tag to load the JSON content that will run the callback
-   * - detects script loading errors
-   * - calls the callback after the given timeout if not already done
-   * Based on https://github.com/IntoMethod/Lightweight-JSONP but adjusted to
-   * be much more robust, to ensure the final callback method gets called
-   * no matter what in particular.
-   */
-  var JSONP = (function () {
-    /**
-     * Counter used to name JSONP callback functions and avoid collisions
-     * when more than one JSONP request is executed at a given time.
+
+define("runtime-browser/collection.proxy", ["datajslib!http"], function (http) {
+
+
+    /*
+     * @fileoverview Collection factory that creates the appropriate collection
+     * object to request the data server to run the given datasource.
+     *
+     * This version is client-side specific.
      */
-    var counter = 0;
+
+    // TODO: find some way to get that information differently,
+    // as this code must not rely on a Factory context!
+    var globalConfig = Joshfire.factory.globalConfig;
+    var config = Joshfire.factory.config;
 
     /**
-     * Keep a pointer to the <head> tag in the DOM tree
+     * Copies all of the properties in the source objects over to the destination
+     * object. It's in-order, so the last source will override properties of the
+     * same name in previous arguments.
+     * Same code as Underscore.js extend function
+     * @see http://documentcloud.github.com/underscore/#extend
      */
-    var head = document.getElementsByTagName('head')[0];
-
-    return {
-      /**
-       * Fetches the given URL, expecting the server to return JSONP content
-       * @function
-       * @param {String} url The URL to fetch.
-       * @param {Object} params Query string parameters to send
-       * @param {Number} Request timeout (in seconds)
-       * @param {function} callback Callback function to call. Potential error
-       *  in first parameter, JSON object in second.
-       */
-      get: function (url, params, timeout, callback) {
-        var query = null,
-          key = null,
-          script = null,
-          done = false,
-          cleaned = false,
-          timeoutID = null,
-          jsonFunction = 'json' + (++counter);
-
-        // Internal method that cleans the script tag when
-        // it's no longer needed
-        var cleanScript = function () {
-          if (cleaned) return;
-          cleaned = true;
-          try {
-            script.onload = null;
-            script.onreadystatechange = null;
-            script.onerror = null;
-            if (script.parentNode) {
-              script.parentNode.removeChild(script);
+    var _extend = function (obj1, obj2) {
+        for (var key in obj2) {
+            if (obj2.hasOwnProperty(key)) {
+                obj1[key] = obj2[key];
             }
-          }
-          catch (e) {
-          }
-        };
-
-        // Internal callback method that calls the final callback,
-        // clears the timeout and removes the global JSONP callback
-        // function. The function returns immediately if it has
-        // already been called.
-        var cb = function (err, data) {
-          if (done) return;
-          done = true;
-          if (timeoutID) {
-            clearTimeout(timeoutID);
-          }
-          callback(err, data);
-          try {
-            delete global.Joshfire.datajs.proxy[jsonFunction];
-          }
-          catch (e) {
-          }
-          global.Joshfire.datajs.proxy[jsonFunction] = null;
-        };
-
-        // Check that there's a URL defined
-        // TODO: ensure the URL is somewhat correct
-        if (!url) {
-          return callback('No url to request', null);
         }
-
-        // Prepare query to send
-        query = (url.indexOf('?') !== -1) ? '&' : '?';
-        params = params || {};
-        for (key in params) {
-          if (params.hasOwnProperty(key)) {
-            query += encodeURIComponent(key) + "=" + encodeURIComponent(params[key]) + "&";
-          }
-        }
-        query += "callback=Joshfire.datajs.proxy." + jsonFunction;
-
-        // Initialize global callback function that will be called
-        // when the script is received.
-        global.Joshfire.datajs.proxy[jsonFunction] = function (data) {
-          // JSON object received, pass it to the final callback method
-          // and reset timeout and global callback function
-          cb(null, data);
-        };
-
-        // Create the script tag that serves as
-        // 'fake cross-domain XMLHttpRequest' object
-        script = document.createElement('script');
-        script.src = url + query;
-        script.async = true;
-
-        // Set event handler for the 'onload' event
-        // (and 'onreadystatechange' for maximum compatibility,
-        // although I'm not quite clear whether there's a browser around
-        // that actually triggers such an event)
-        // The handler simply cleans up the now useless script tag
-        script.onload = script.onreadystatechange = function () {
-          if (!this.readyState ||
-            (this.readyState === 'loaded') ||
-            (this.readyState === 'complete') ||
-            (this.readyState === 4)) {
-            cleanScript();
-          }
-        };
-
-        // Set event handler for the 'onerror' event triggered when the script
-        // received is not valid. The handler ensures the callback function is
-        // properly called and removes the script tag.
-        script.onerror = function (err) {
-          cleanScript();
-          cb('Invalid script received', null);
-        };
-
-        // Ready to start, add the script to the DOM tree
-        head.appendChild(script);
-
-        // ... and start the timeout
-        // (canceled if all goes fine)
-        timeoutID = setTimeout(function () {
-          cleanScript();
-          cb('Timeout exceeded', null);
-        }, timeout * 1000);
-
-        // For info, return the JSONP callback name
-        return jsonFunction;
-      }
-    };
-  })();
-
-
-  /**
-   * Datasource collection object that exposes a 'find' method to retrieve
-   * feed items from the data proxy.
-   *
-   * @class
-   * @param {String} db The datasource provider
-   * @param {String} colname The collection in the provider's catalog
-   * @param {Object} options Common query options (e.g. filtering options)
-   * @returns {Collection} The collection that matches the given parameter.
-   */
-  var collection = function (db, colname, options) {
-    options = options || {};
-
-    /**
-     * Sends a request to the data proxy to fetch collection feed items
-     * @function
-     * @param {Object} query Query parameters (search field, query filters...)
-     * @param {function} callback Callback method that receives a potential
-     *  error and the list of data entries as an object. The returned object
-     *  includes an 'entries' property that contains the list of items.
-     */
-    this.find = function (query, callback) {
-      var self = this,
-        finalQuery = {},
-        uri = null;
-
-      // Clone default options
-      _extend(finalQuery, options);
-      _extend(finalQuery, query);
-
-      // Add API key
-      finalQuery.apikey = config.app.id;
-
-      // TODO: json2.js for maximum compatibility?
-      if (finalQuery.filter) {
-        finalQuery.filter = JSON.stringify(finalQuery.filter);
-      }
-
-      uri = 'http://' + globalConfig.DATAHOSTPORT +
-        '/api/'+ globalConfig.DATAVERSION +
-        '/' + db +'/'+ colname;
-      JSONP.get(uri, finalQuery, 30, function (err, data) {
-        if (data && !data.name && self.name) {
-          // Propagate datasource title to the returned feed
-          // if not already set
-          data.name = self.name;
-        }
-        callback(err,data);
-      });
+        return obj1;
     };
 
     /**
-     * Returns the type of items that a call to find would return.
+     * Datasource collection object that exposes a 'find' method to retrieve
+     * feed items from the data proxy.
      *
-     * The output type returned by this function is taken from the datasource
-     * query options (the Factory saves the outputType along with
-     * query parameters). For datasources that return mixed content, the
-     * output type is normally the most precise type that is possible.
-     *
-     * In the absence of bugs, getOutputType() should return the same value
-     * as getDesc().outputType, the difference being that getOutputType()
-     * returns a value immediately whereas getDesc() may send an HTTP
-     * request.
-     *
-     * @function
-     * @return {string} Type of items returned by the collection,
-     *   "Thing" if the output type is not present in the query options.
-     */
-    this.getOutputType = function () {
-      if (this.config && this.config.outputType) {
-        return this.config.outputType;
-      }
-      else {
-        return 'Thing';
-      }
-    };
-
-    /**
-     * Runs given function when object is 'loaded'.
-     *
-     * In practice, the function is run immediately, and here only for
-     * interface symmetry with datajs.client.js.
-     *
-     * @function
-     * @param {function} f The function to execute.
-     */
-    this.onLoaded = function (f) {
-      f();
-    };
-
-    /**
-     * Gets the description of the datasource.
-     *
-     * The description is a JSON object that details the collection
-     * parameters. The returned object is usually the collection's
-     * "desc" property, but may be more precise depending on the
-     * query options (typically the outputType may be adjusted for
-     * a more precise one for the given query).
-     *
-     * @function
-     * @param {function} callback Callback function called with the error
-     *  and the description.
-     */
-    this.getDesc = function(callback) {
-      client.getCollectionDesc(db, colname, options, callback);
-    };
-  };
-
-
-  /**
-   * API exposed in Joshfire.datajs.proxy
-   */
-  var client = {
-    /**
-     * Creates a new datasource collection object.
-     *
-     * Feed items are not fetched at this stage. Call the 'find' method
-     * on the returned object to retrieve the feed.
-     *
-     * @function
+     * @class
      * @param {String} db The datasource provider
      * @param {String} colname The collection in the provider's catalog
      * @param {Object} options Common query options (e.g. filtering options)
-     * @returns {Collection} The collection
+     * @returns {Collection} The collection that matches the given parameter.
      */
-    getCollection: function (db, colname, options) {
-      return new collection(db, colname, options);
-    },
+    var collection = function (datasource) {
+        var options = datasource.query || {};
+        var db = datasource.db;
+        var colname = datasource.col;
+
+        /**
+         * Sends a request to the data proxy to fetch collection feed items
+         * @function
+         * @param {Object} query Query parameters (search field, query filters...)
+         * @param {function} callback Callback method that receives a potential
+         *  error and the list of data entries as an object. The returned object
+         *  includes an 'entries' property that contains the list of items.
+         */
+        this.find = function (query, callback) {
+            var self = this,
+              finalQuery = {},
+              uri = null;
+
+            // Clone default options
+            _extend(finalQuery, options);
+            _extend(finalQuery, query);
+
+            // Add API key
+            finalQuery.apikey = config.app.id;
+
+            // TODO: json2.js for maximum compatibility?
+            if (finalQuery.filter) {
+                finalQuery.filter = JSON.stringify(finalQuery.filter);
+            }
+
+            uri = 'http://' + globalConfig.DATAHOSTPORT +
+              '/api/' + globalConfig.DATAVERSION +
+              '/' + db + '/' + colname + '?flag=0';
+            
+
+            for (var k in finalQuery) {
+                if (typeof finalQuery[k] == 'Object')
+                    finalQuery[k] = JSON.stringify(finalQuery[k]);
+
+                uri += '&' + k + '=' + encodeURIComponent(finalQuery[k]);
+            }
+
+            http.request({ type: 'GET', dataType: 'jsonp', url: uri, data: finalQuery, timeout: 30 }, function (err, data) {
+                if (data && !data.name && self.name) {
+                    // Propagate datasource title to the returned feed
+                    // if not already set
+                    data.name = self.name;
+                }
+                callback(err, data);
+            });
+        };
+
+
+        /**
+         * Gets the description of the datasource.
+         *
+         * The description is a JSON object that details the collection
+         * parameters. The returned object is usually the collection's
+         * "desc" property, but may be more precise depending on the
+         * query options (typically the outputType may be adjusted for
+         * a more precise one for the given query).
+         *
+         * @function
+         * @param {function} callback Callback function called with the error
+         *  and the description.
+         */
+        this.getDesc = function (callback) {
+            client.getCollectionDesc(db, colname, options, callback);
+        };
+    };
+
 
     /**
-     * Gets the description of the datasource collection
-     * from the data proxy.
-     *
-     * The description is a JSON object that details the collection
-     * parameters.
-     *
-     * @function
-     * @param {String} db The datasource provider
-     * @param {String} colname The collection in the provider's catalog
-     * @param {Object} options Common query options (e.g. filtering options)
-     * @param {function} callback Callback function called with the error
-     *  and the description.
+     * API exposed in Joshfire.datajs
      */
-    getCollectionDesc: function(db, colname, options, callback) {
-      var self = this,
-        finalQuery = {},
-        uri = null;
+    var client = {
+        /**
+         * Creates a new datasource collection object.
+         *
+         * Feed items are not fetched at this stage. Call the 'find' method
+         * on the returned object to retrieve the feed.
+         *
+         * @function
+         * @param {String} db The datasource provider
+         * @param {String} colname The collection in the provider's catalog
+         * @param {Object} options Common query options (e.g. filtering options)
+         * @returns {Collection} The collection
+         */
+        getCollection: function (datasource, callback) {
+            var col = new collection(datasource);
+            return callback(null, col);
+        },
 
-      if (options) _extend(finalQuery, options);
-      if (finalQuery.filter) {
-        finalQuery.filter = JSON.stringify(finalQuery.filter);
-      }
+        /**
+         * Gets the description of the datasource collection
+         * from the data proxy.
+         *
+         * The description is a JSON object that details the collection
+         * parameters.
+         *
+         * @function
+         * @param {String} db The datasource provider
+         * @param {String} colname The collection in the provider's catalog
+         * @param {Object} options Common query options (e.g. filtering options)
+         * @param {function} callback Callback function called with the error
+         *  and the description.
+         */
+        getCollectionDesc: function (db, colname, options, callback) {
+            var self = this,
+              finalQuery = {},
+              uri = null;
 
-      uri = 'http://' + globalConfig.DATAHOSTPORT +
-        '/api/' + globalConfig.DATAVERSION +
-        '/' + db +'/'+ colname + '/_desc';
+            if (options) _extend(finalQuery, options);
+            if (finalQuery.filter) {
+                finalQuery.filter = JSON.stringify(finalQuery.filter);
+            }
 
-      JSONP.get(uri, finalQuery, 30, callback);
-    }
-  };
+            uri = 'http://' + globalConfig.DATAHOSTPORT +
+              '/api/' + globalConfig.DATAVERSION +
+              '/' + db + '/' + colname + '/_desc';
 
-  // Export the API to the external world
-  global.Joshfire = global.Joshfire || {};
-  global.Joshfire.datajs = global.Joshfire.datajs || {};
-  global.Joshfire.datajs.proxy = client;
+            JSONP.get(uri, finalQuery, 30, callback);
+        }
+    };
 
-})(
-  window.Joshfire.factory.globalConfig,
-  window.Joshfire.factory.config,
-  window.document,
-  window.setTimeout,
-  window.clearTimeout,
-  window
-);
+    return client;
+
+});
+
+
+
+require("runtime-browser/collection.proxy", function (theproxy) {
+    // Export the API to the external world
+    window.Joshfire = window.Joshfire || {};
+    window.Joshfire.datajs = window.Joshfire.datajs || {};
+    window.Joshfire.datajs.proxy = theproxy;
+});
+
+
+
 /**
  * @fileoverview Client-side API to retrieve datasource feeds locally.
  *
@@ -3236,7 +3071,421 @@ define('databases/flickr/photos',[
   global.Joshfire.datajs.client = client;
 
 })(require, window);
-/**
+
+    /**
+ * @fileoverview Defines the current runtime environment.
+ *
+ * This lets datasources and operators know whether they are being run
+ * client-side or server-side (this should not be needed most of the
+ * time, but is useful, e.g. for graph execution to prepare the graph
+ * accordingly)
+ */
+define("runtime", [], {
+    name: 'win8'
+});
+
+    /*
+ * @fileoverview Collection factory that creates the appropriate collection
+ * object to run a given datasource.
+ *
+ * The code dynamically delegates to collection.client or collection.proxy
+ * depending on whether the datasource needs to run client-side or server-side.
+ *
+ * If this code is run server-side, trying to run a client-side datasource
+ * will throw an error.
+ */
+
+define('collection', [
+  'require',
+  'runtime'
+], function (require, runtime) {
+    // Taken from underscore.js (not included here to save a few bytes)
+    var _extend = function (obj1, obj2) {
+        for (var key in obj2) {
+            if (obj2.hasOwnProperty(key)) {
+                obj1[key] = obj2[key];
+            }
+        }
+        return obj1;
+    };
+
+    var collectionFactory = {
+        /**
+         * Returns the datasource that matches the given source provider and collection.
+         * Returned datasource object features a "find" method that takes a query.
+         *
+         * @function
+         * @param {String} datasource The datasource to execute
+         * @param {Boolean} atomicCollection True to return an "atomic" collection for
+         *  the given datasource, False to return a graph collection that can be used
+         *  to execute the datasource. The flag should typically be set when a graph is
+         *  run to create the appropriate collections for each node in the graph. Note
+         *  that the function does not return a graph if the datasource does not have
+         *  inputs and thus does not need to be executed as a graph.
+         */
+        getCollection: function (datasource, atomicCollection) {
+            if (!datasource) {
+                // Datasource not set, return an empty collection
+                return {
+                    desc: {},
+                    name: '',
+                    find: function (options, callback) {
+                        return callback(null, { entries: [] });
+                    },
+                    onLoaded: function (f) {
+                        f();
+                    },
+                    getDesc: function (callback) {
+                        callback(null, {});
+                    },
+                    getOutputType: function () {
+                        return 'Thing';
+                    }
+                };
+            }
+            return new collection(datasource, atomicCollection);
+        }
+    };
+
+    /**
+     * Collection class that exposes a "find" method to run queries against
+     * the underlying datasource.
+     *
+     * @constructor
+     * @param {Object} datasource The datasource description
+     * @param {Boolean} atomicCollection True to return an atomic collection,
+     *   false to create a graph if needed
+     */
+    var collection = function (datasource, atomicCollection) {
+        var query = datasource.query;
+        var self = this;
+        var _loadedCallbacks = [];
+        var _loaded = false;
+        var collectionObject = null;
+        var collectionLib = 'collection.';
+        var collectionError = null;
+
+        var completeQuery = function (options) {
+            var extendedQuery = _extend({}, query);
+            extendedQuery = _extend(extendedQuery, options);
+            if (!extendedQuery.filter) {
+                extendedQuery.filter = {};
+            }
+            if (collectionObject.setDefaultValues) {
+                collectionObject.setDefaultValues(extendedQuery.filter);
+            }
+            return extendedQuery;
+        };
+
+        /**
+         * Runs the function when the collection is loaded.
+         * @function
+         * @param {function} f Function to execute. The function won't receive
+         *  any parameter.
+         * @private
+         */
+        self.onLoaded = function (f) {
+            if (!_loaded) {
+                _loadedCallbacks.push(f);
+            } else {
+                f();
+            }
+        };
+
+        /**
+         * Sends a request to the underlying datasource and calls the callback
+         * function once done with the retrieved feed (or the error).
+         * @function
+         * @param {Object} options Query options that complete/override the query
+         *  parameters used to create the collection.
+         * @param {function(string,Object)} callback The callback function to call
+         *  once done
+         * @public
+         */
+        self.find = function (options, callback) {
+            self.onLoaded(function () {
+                // console.log('collection', datasource.db, datasource.col, 'find');
+                var fullQuery = completeQuery(options);
+                // console.log(fullQuery);
+                if (collectionError) return callback(collectionError);
+                if (!collectionObject) return callback('Collection does not exist.');
+                if (collectionObject.find) {
+                    collectionObject.find(fullQuery, function (err, data) {
+                        if (data && !data.name && datasource.name) {
+                            // Propagate datasource title if the returned feed does not have one
+                            data.name = datasource.name;
+                        }
+                        if (data && !data.maxAge &&
+                          collectionObject.desc &&
+                          collectionObject.desc.maxAge) {
+                            // Add response max-age if not already done
+                            data.maxAge = collectionObject.desc.maxAge;
+                        }
+                        return callback(err, data);
+                    });
+                }
+                else if (collectionObject.fetch && collectionObject.process) {
+                    collectionObject.fetch(fullQuery, function (err, data) {
+                        if (err) {
+                            return callback(err, null);
+                        }
+                        else {
+                            collectionObject.process(data, fullQuery, function (err, data) {
+                                if (data && !data.name && datasource.name) {
+                                    // Propagate datasource title if the returned feed does not have one
+                                    data.name = datasource.name;
+                                }
+                                if (data && !data.maxAge &&
+                                  collectionObject.desc &&
+                                  collectionObject.desc.maxAge) {
+                                    // Add response max-age if not already done
+                                    data.maxAge = collectionObject.desc.maxAge;
+                                }
+                                return callback(err, data);
+                            });
+                        }
+                    });
+                }
+                else {
+                    return callback('Invalid collection');
+                }
+            });
+        };
+
+
+        /**
+         * Sends a request to the underlying operator and calls the callback
+         * function once done with the retrieved feed (or the error).
+         *
+         * @function
+         * @param {Object} data Processor inputs. Typical example for a single
+         *  input: { "main": { "entries": [list of items] }}. Input names are
+         *  operator specific, "main" by default.
+         * @param {Object} options Query options that complete/override the query
+         *  parameters used to create the collection.
+         * @param {function(string,Object)} callback The callback function to call
+         *  once done
+         * @public
+         */
+        self.process = function (data, options, callback) {
+            self.onLoaded(function () {
+                //console.log('collection', datasource.db, datasource.col, 'process');
+                if (collectionError) return callback(collectionError);
+                if (!collectionObject) return callback('Collection does not exist.');
+                if (collectionObject.process) {
+                    collectionObject.process(data, completeQuery(options), callback);
+                }
+                else {
+                    callback('Collection does not have a "process" method.');
+                }
+            });
+        };
+
+
+        /**
+         * Fetches feed items from the source provider.
+         *
+         * @function
+         * @param {Object} options Query options that complete/override the query
+         *  parameters used to create the collection.
+         * @param {function(Object, Object)} callback Callback function.
+         *   The data type depends on the datasource.
+         */
+        self.fetch = function (options, callback) {
+            self.onLoaded(function () {
+                //console.log('collection', datasource.db, datasource.col, 'fetch');
+                if (collectionError) return callback(collectionError);
+                if (!collectionObject) return callback('Collection does not exist.');
+                if (collectionObject.fetch) {
+                    collectionObject.fetch(completeQuery(options), callback);
+                }
+                else {
+                    // Return a null object when the "fetch" method does not exist
+                    // (Note that "collection.graph" decides to fetch inputs on its
+                    // own based on this "null" value)
+                    callback(null, null);
+                }
+            });
+        };
+
+
+        /**
+         * Updates the generic query options for a proper resolution of the
+         * inputs of the underlying operator.
+         *
+         * In particular, the operator might want to adjust "skip" and "limit"
+         * depending on what it does.
+         *
+         * Note there is simply no way for an operator that filters entries or that
+         * generates a response from multiple inputs to know beforehand how many
+         * items it needs for each input. The adjustment may not be enough. We'll
+         * have to live with it to keep things simple enough (otherwise the graph
+         * would need to implement some sort of "fetchMore" but there are all sorts
+         * of corner-cases to take into account such as the use of intermediary
+         * caches)
+         *
+         * @function
+         * @param {Object} options current query options
+         * @param {function} callback Callback function called with the error
+         *   and/or the new generic options to use to resolve the inputs
+         */
+        self.updateInputOptions = function (options, callback) {
+            self.onLoaded(function () {
+                // console.log('collection', datasource.db, datasource.col, 'updateInputOptions');
+                if (collectionError) return callback(collectionError);
+                if (!collectionObject) return callback('Collection does not exist.');
+
+                // Copy all options (skipping datasource specific filter) by default
+                var inputOptions = {};
+                for (var key in options) {
+                    if ((key !== 'filter') &&
+                      (key !== 'graph') &&
+                      options.hasOwnProperty(key)) {
+                        inputOptions[key] = options[key];
+                    }
+                }
+
+                if (collectionObject.updateInputOptions) {
+                    // The operator may need to adjust query options for its inputs
+                    collectionObject.updateInputOptions(inputOptions, callback);
+                }
+                else {
+                    // The operator does not need to adjust query options
+                    return callback(null, inputOptions);
+                }
+            });
+        };
+
+
+        /**
+         * Returns true if collection is loaded and exposes a "fetch" function
+         *
+         * The function is only useful for unit testing purpose.
+         *
+         * @function
+         */
+        self.canBeFetched = function () {
+            return (collectionObject &&
+              !collectionError &&
+              collectionObject.fetch);
+        };
+
+
+        /**
+         * Returns true if collection is loaded and exposes a "process" function
+         *
+         * The function is only useful for unit testing purpose.
+         *
+         * @function
+         */
+        self.canBeProcessed = function () {
+            return (collectionObject &&
+              !collectionError &&
+              collectionObject.process);
+        };
+
+
+        /**
+         * Gets the description of the datasource.
+         *
+         * The description is a JSON object that details the collection
+         * parameters. The returned object is usually the collection's
+         * "desc" property, but may be more precise depending on the
+         * query options (typically the outputType may be adjusted for
+         * a more precise one for the given query)
+         *
+         * @function
+         * @param {function} callback Callback function called with the error
+         *  and the description.
+         */
+        self.getDesc = function (callback) {
+            self.onLoaded(function () {
+                //console.log('collection', datasource.db, datasource.col, 'getDesc');
+                if (collectionError) return callback(err);
+                if (!collectionObject) return callback('Collection does not exist.');
+
+                if (collectionObject.setDefaultValues) {
+                    collectionObject.setDefaultValues(query.filter);
+                }
+
+                if (collectionObject.getDesc) {
+                    return callback(null, collectionObject.getDesc(query));
+                }
+                else {
+                    return callback(null, collectionObject.desc);
+                }
+            });
+        };
+
+
+        /**
+         * Returns the type of items that a call to find would return.
+         *
+         * The output type returned by this function is taken from the datasource
+         * query options (the Factory saves the outputType along with
+         * query parameters). For datasources that return mixed content, the
+         * output type is normally the most precise type that is possible.
+         *
+         * In the absence of bugs, getOutputType() should return the same value
+         * as getDesc().outputType for simple collections.
+         *
+         * @function
+         * @return {string} Type of items returned by the collection,
+         *   "Thing" if the output type is not present in the query options.
+         */
+        self.getOutputType = function () {
+            if (datasource.outputType) {
+                return datasource.outputType;
+            }
+            else {
+                return 'Thing';
+            }
+        };
+
+        // Ensure query is set.
+        query = query || {};
+        if (!query.filter) query.filter = {};
+
+        // Select the right library to require based on the
+        // "runtime" property (or the deprecated "runatclient" flag)
+        if (!atomicCollection && (datasource.db === 'operator')) {
+            // Note it's useless to create a graph client-side if the operator
+            // is to run server-side.
+            if ((runtime.name !== 'hosted') &&
+              !datasource.runatclient &&
+              (!datasource.runtime || (datasource.runtime === 'hosted'))) {
+                collectionLib += 'proxy';
+            }
+            else {
+                collectionLib += 'graph';
+            }
+        }
+        else if (datasource.runatclient || (datasource.runtime !== 'hosted')) {
+            collectionLib += 'client';
+        }
+        else {
+            collectionLib += 'proxy';
+        }
+
+        // Require the appropriate factory library and retrieve the collection
+        // Run the "loaded" callbacks when done
+        require(['runtime-browser/collection.proxy'], function (colFactory) {
+            colFactory.getCollection(datasource, function (err, col) {
+                collectionError = err;
+                collectionObject = col;
+                _loaded = true;
+                for (var i = 0; i < _loadedCallbacks.length; i++) {
+                    _loadedCallbacks[i]();
+                }
+                _loadedCallbacks = [];
+            });
+        });
+    };
+
+    return collectionFactory;
+});
+
+    /**
  * @fileoverview Exposes the getDataSource method that returns datasource
  * objects to the Joshfire.factory global object.
  *
@@ -3246,151 +3495,110 @@ define('databases/flickr/photos',[
  *
  * The code requires the following global objects to be available:
  * - window.Joshfire.factory (code uses Joshfire.factory.config)
- * - window.Joshfire.datajs (code uses client.getCollection and/or
- * proxy.getCollection methods depending on datasource parameters)
+ * - require
+ *
+ * Note the call to "require" runs synchronously on purpose to ensure
+ * "Joshfire.factory.getDataSource" remains synchronous. The code of
+ * "datajslib!collection" is included in the bootstrap script
+ * and is pretty small, so that should not create any problematic delay.
  */
 
-(function (factory, datajs) {
 
-  /**
-   * Returns a datasource object that may be used to retrieve feed items
-   * for the given datasource input name.
-   *
-   * @function
-   * @param {String} datasourceName The name of the datasource input, as
-   *  defined in the template's manifest file (package.json)
-   * @return {Object} A datasource object that exposes a "find" method,
-   *  null when the datasource cannot be found,
-   *  a dummy "empty" datasource when the datasource is defined but does
-   *  not target any real datasource.
-   */
-  var getDataSource = function (datasourceName) {
-    var ds = null;
-    var ret = null;
-    var dsFactory = null;
-    var i = 0;
-    var emptyds = {
-      name: '',
-      find: function (query, callback) {
-        return callback(null, { entries: [] });
-      },
-      onLoaded: function (f) {
-        f();
-      },
-      getDesc: function(callback) {
-        callback(null, {});
-      },
-      getOutputType: function() {
-        return 'Thing';
-      }
+(function (factory, require) {
+    /**
+     * Returns a datasource object that may be used to retrieve feed items
+     * for the given datasource input name.
+     *
+     * @function
+     * @param {String} datasourceName The name of the datasource input, as
+     *  defined in the template's manifest file (package.json)
+     * @return {Object} A datasource object that exposes a "find" method,
+     *  null when the datasource cannot be found,
+     *  a dummy "empty" datasource when the datasource is defined but does
+     *  not target any real datasource.
+     */
+    var getDataSource = function (datasourceName) {
+        var ds = null;
+        var ret = null;
+        var i = 0;
+
+        // Check parameters
+        if (!datasourceName ||
+          !factory ||
+          !factory.config ||
+          !factory.config.datasources ||
+          !factory.config.datasources[datasourceName]) {
+            return null;
+        }
+
+        // Retrieve the definition of the datasource from the app config
+        ds = factory.config.datasources[datasourceName];
+
+        require(['collection'], function (collectionFactory) {
+            if (Object.prototype.toString.call(ds) == '[object Array]') {
+                // The datasource is actually a set of datasources.
+
+                // The "find" method returns a feed whose items are the feeds
+                // returned by the underlying datasources. In particular, it
+                // does not return the union of the feeds returned by the
+                // underlying datasources.
+                ret = {
+                    "children": [],
+                    "find": function (options, callback) {
+                        var pending = ds.length;
+                        var errorCaught = false;
+                        var entries = [];
+                        var i = 0;
+
+                        // Callback called as soon as a "find" returns, calls the final
+                        // callback when all collections have been retrieved.
+                        var cb = function (err, data) {
+                            pending -= 1;
+                            if (errorCaught) {
+                                // Error already caught, do nothing
+                                return;
+                            }
+                            if (err) {
+                                errorCaught = true;
+                            }
+                            if (data) {
+                                entries.push(data);
+                            }
+                            if (err || (pending === 0)) {
+                                return callback(err, { "entries": entries });
+                            }
+                        };
+
+                        for (i = 0; i < ret.children.length; i++) {
+                            ret.children[i].find(options, cb);
+                        }
+                    }
+                };
+
+                // Expose the underlying datasources in the "children" property
+                // of the returned object.
+                for (i = 0; i < ds.length; i++) {
+                    // A multiple datasource may contain "null" elements depending
+                    // on whether the user entered all datasources or not
+                    ret.children[i] = collectionFactory.getCollection(ds[i]);
+                    ret.children[i].name = ds[i].name;
+                    ret.children[i].config = ds[i];
+                }
+            }
+            else {
+                ret = collectionFactory.getCollection(ds);
+                ret.name = ds.name;
+                ret.config = ds;
+            }
+        }, null, true);
+        // The "true" flag above forces require to load the code synchronously
+        // (see note in fileoverview)
+
+        return ret;
     };
 
-    // Check parameters
-    if (!datasourceName ||
-      !factory ||
-      !factory.config ||
-      !factory.config.datasources ||
-      !factory.config.datasources[datasourceName]) {
-      return null;
-    }
+    // Expose the "getDataSource" method to Joshfire.factory
+    factory.getDataSource = getDataSource;
+})(window.Joshfire.factory, require);
 
-    // Retrieve the definition of the datasource from the app config
-    ds = factory.config.datasources[datasourceName];
-
-    if (Object.prototype.toString.call(ds) == '[object Array]') {
-      // The datasource is actually a set of datasources.
-
-      // The "find" method returns a feed whose items are the feeds
-      // returned by the underlying datasources. In particular, it
-      // does not return the union of the feeds returned by the
-      // underlying datasources.
-      ret = {
-        "children": [],
-        "find": function (options, callback) {
-          var pending = ds.length;
-          var errorCaught = false;
-          var entries = [];
-          var i = 0;
-
-          // Callback called as soon as a "find" returns, calls the final
-          // callback when all collections have been retrieved.
-          var cb = function (err, data) {
-            pending -= 1;
-            if (errorCaught) {
-              // Error already caught, do nothing
-              return;
-            }
-            if (err) {
-              errorCaught = true;
-            }
-            if (data) {
-              entries.push(data);
-            }
-            if (err || (pending === 0)) {
-              return callback(err, {"entries": entries});
-            }
-          };
-
-          for (i=0; i<ret.children.length; i++) {
-            ret.children[i].find(options, cb);
-          }
-        }
-      };
-
-      // Expose the underlying datasources in the "children" property
-      // of the returned object.
-      for (i = 0; i < ds.length; i++) {
-        // A multiple datasource may contain "null" elements depending
-        // on whether the user entered all datasources or not
-        if (ds[i]) {
-          dsFactory = ds[i].runatclient ? datajs.client : datajs.proxy;
-          ret.children[i] = dsFactory.getCollection(ds[i].db, ds[i].col, ds[i].query);
-          ret.children[i].name = ds[i].name;
-
-          // Datasource should be opaque from template's point of view,
-          // but the config contains useful info, typically the type of
-          // items that will be returned (outputType), used by getOutputType
-          ret.children[i].config = ds[i];
-        }
-        else {
-          // Return an empty collection for this item
-          ret.children[i] = {
-            name: emptyds.name,
-            find: emptyds.find,
-            onLoaded: emptyds.onLoaded,
-            getDesc: emptyds.getDesc,
-            getOutputType: emptyds.getOutputType
-          };
-        }
-      }
-    }
-    else if (ds) {
-      // Atomic datasource
-      dsFactory = ds.runatclient ? datajs.client : datajs.proxy;
-      ret = dsFactory.getCollection(ds.db, ds.col, ds.query);
-      ret.name = ds.name;
-
-      // Datasource should be opaque from template's point of view,
-      // but the config contains useful info, typically the type of
-      // items that will be returned (outputType), used by getOutputType
-      ret.config = ds;
-    }
-    else {
-      // Datasource defined but not set, return an empty datasource
-      ret = {
-        name: emptyds.name,
-        find: emptyds.find,
-        onLoaded: emptyds.onLoaded,
-        getDesc: emptyds.getDesc,
-        getOutputType: emptyds.getOutputType
-      };
-    }
-
-    return ret;
-  };
-
-  // Expose the "getDataSource" method to Joshfire.factory
-  factory.getDataSource = getDataSource;
-
-})(window.Joshfire.factory, window.Joshfire.datajs);
 })();

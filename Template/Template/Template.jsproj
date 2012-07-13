@@ -44,13 +44,18 @@
     <TargetPlatformIdentifier>Windows</TargetPlatformIdentifier>
     <TargetPlatformVersion>8.0</TargetPlatformVersion>
     <DefaultLanguage>en-US</DefaultLanguage>
-    <PackageCertificateKeyFile>Template_TemporaryKey.pfx</PackageCertificateKeyFile>
     <AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
+    <AppxSymbolPackageEnabled>False</AppxSymbolPackageEnabled>
+    <PackageCertificateThumbprint>6DA656E00E803B73D89FB721A72196F349298C43</PackageCertificateThumbprint>
   </PropertyGroup>
   <ItemGroup>
     <AppxManifest Include="package.appxmanifest">
       <SubType>Designer</SubType>
     </AppxManifest>
+    <Content Include="pages\search\searchResults.css" />
+    <Content Include="pages\search\searchResults.html" />
+    <Content Include="pages\search\searchResults.js" />
+    <None Include="arthur.pfx" />
     <Content Include="css\default.css" />
     <Content Include="images\logo.png" />
     <Content Include="images\smalllogo.png" />

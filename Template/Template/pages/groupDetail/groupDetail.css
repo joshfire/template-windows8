@@ -1,7 +1,7 @@
 ﻿/* This selector is used to prevent ui-dark/light.css from overwriting changes
    to .win-surface. */
 .groupdetailpage .itemslist .win-horizontal.win-viewport .win-surface {
-    margin-left: 120px;
+    margin-left: 45px;
     margin-bottom: 20px;
 }
 
@@ -52,12 +52,15 @@
         -ms-grid-columns: 110px 1fr;
         -ms-grid-rows: 1fr;
         display: -ms-grid;
-        height: 110px;
+        height: 120px;
         width: 472px;
+        background: rgba(0, 0, 0, 0.7); 
+        padding: 5px;
     }
 
         .groupdetailpage .itemslist .win-item .item-info {
             -ms-grid-column: 2;
+            padding-left: 4%;
         }
 
             .groupdetailpage .itemslist .win-item .item-info .item-title {
@@ -103,9 +106,6 @@
         width: 272px;
     }
 
-        .groupdetailpage .itemslist .win-item .item-info {
-            padding-left: 4%;
-        }
 
         .groupdetailpage .itemslist .win-item .item-info .item-title {
             max-height: 45pt;
@@ -124,7 +124,17 @@
 }
 
 @media screen and (-ms-view-state: fullscreen-portrait) {
-    .groupdetailpage .itemslist .win-horizontal.win-viewport .win-surface {
-        margin-left: 100px;
+    
+    .groupdetailpage .itemslist .win-surface {
+        position: absolute;
+        left: 90px;
+        right: 90px;
+        width: calc(100% - 180px);
     }
+     
+    .groupdetailpage .itemslist .win-item,
+    .groupdetailpage .itemslist .win-container {
+        width: 100%!important;
+    }
+    
 }

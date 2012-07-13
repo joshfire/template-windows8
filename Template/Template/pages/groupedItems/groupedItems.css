@@ -14,6 +14,7 @@
 
 .groupeditemspage header[role=banner] img {
     max-height: 100%;
+    width: auto;
 }
 
 
@@ -120,18 +121,30 @@
     }
 
     .groupeditemspage .groupeditemslist .win-item {
-        -ms-grid-columns: 60px 1fr;
-        -ms-grid-rows: 1fr;
-        display: -ms-grid;
-        height: 60px;
+        height: 120px;
         width: 272px;
         background: rgba(0, 0, 0, 0.6);
     }
 
-    .groupeditemspage .groupeditemslist .win-item .title {
-        font-size: 18px;
-        padding-left: 20px;
-    }
+        .groupeditemspage .groupeditemslist .win-item .title {
+            font-size: 22px;
+            padding: 0 20px 20px 0;
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.7);
+            text-align: right;
+            margin: 0;
+            line-height: 200px;
+        }
+        .groupeditemspage .groupeditemslist .win-item img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+        }
 
 }
 

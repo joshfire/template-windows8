@@ -6,6 +6,11 @@
     var nav = WinJS.Navigation;
     var ui = WinJS.UI;
     var utils = WinJS.Utilities;
+    
+    var cellW = 175,
+        cellH = 250,
+        cellRowSpan = 2,
+        cellColSpan = 3;
 
 
     function templateHandler(itemPromise) {
@@ -30,18 +35,20 @@
             tplSelect = tplSelect.renderItem(itemPromise, recycled);
             var img = tplSelect.element._value.querySelector('.thumbnail');
 
-            if (currentItem.data.thumbnail.length) {
+            if ((currentItem.data.thumbnail && currentItem.data.thumbnail.length) || currentItem.data.image) {
                 var thumbs = currentItem.data.thumbnail,
                     thethumb = {height: 0, width: 0};
                 /* Find the best thumb */
                 for (var k in thumbs) {
                     if (thumbs.hasOwnProperty(k)) {
-                        if (!isLarge && (thumbs[k].height >= 250 || thumbs.width >= 175)) {
+                        /* The first one which has one dimension above cell size */
+                        if (!isLarge && (thumbs[k].height >= cellH || thumbs.width >= cellW)) {
                             thethumb = thumbs[k];
                             break;
                         }
+                        /* Biggest one or biggest one with both dimensions above cell size */
                         else if (isLarge && (
-                            (thumbs[k].height >= 500 || thumbs.width >= 525) ||
+                            (thumbs[k].height >= (cellH * cellRowSpan) || thumbs.width >= (cellW * cellColSpan)) ||
                             (thumbs[k].height > thethumb.height || thumbs[k].width > thethumb.width)
                             )) {
                             thethumb = thumbs[k];
@@ -49,25 +56,27 @@
                     }
                 }
 
-                /* Set the image accordingly */
+                if (thethumb.height == 0 && thethumb.width == 0)
+                    thethumb = currentItem.data.image;
+
+                /* Set the URL */
                 img.src = thethumb.contentURL;
-                img.width = thethumb.width;
-                img.height = thethumb.height;
 
-                /* Center it */
-                if (!isLarge) {
-                    if (thethumb.width > 175)
-                        img.style.left = ((175 - parseInt(thethumb.width)) / 2) + 'px';
-                    else
-                        img.style.left = ((parseInt(thethumb.width) - 175) / 2) + 'px';
-                    if (thethumb.height > 250)
-                        img.style.top = ((250 - parseInt(thethumb.height)) / 2) + 'px';
-                    else
-                        img.style.top = ((parseInt(thethumb.height) - 250) / 2) + 'px';
+                /* Set the image tag's dimentions and its position behind its mask */
+                if ((thethumb.height - cellH) < (thethumb.width - cellW)) {
+                    img.height = cellH;
+                    var newW = thethumb.width * (cellH/thethumb.height);
+                    if ((newW - cellW) > 0 && !isLarge)
+                        img.style.left = -((newW - cellW) / 2) + 'px';
                 }
-            }
+                else {
+                    img.width = cellW;
+                    var newH = thethumb.height * (cellW / thethumb.width);
+                    if ((newH - cellH) > 0 && !isLarge)
+                        img.style.top = -((newH - cellH) / 2) + 'px';
+                }
 
-            
+            }
 
             return tplSelect.element;
 
@@ -77,8 +86,31 @@
     function listTemplateHandler(itemPromise) {
         return itemPromise.then(function (currentItem, recycled) {
             var tplSelect = document.querySelector('.listitemtemplate').winControl;
- 
+            
+
             tplSelect = tplSelect.renderItem(itemPromise, recycled);
+
+            // Get the first item and grab its image if it has one. Display it as BG.
+            var firstItem = Data.getItemsFromGroup(currentItem).getAt(0);
+            var thethumb = null;
+
+            if (firstItem.image)
+                thethumb = firstItem.image;
+            if (firstItem.thumbnail && firstItem.thumbnail.length) {
+                var bestW = 0;
+                for (var k in firstItem.thumbnail) {
+                    if (firstItem.thumbnail[k].width > bestW) {
+                        thethumb = firstItem.thumbnail[k];
+                        bestW = firstItem.thumbnail[k].width;
+                    }
+                }
+            }
+
+            var img = tplSelect.element._value.querySelector('.tilebackground');
+
+            img.src = thethumb.contentURL;
+            img.style.top = -(thethumb.height - 120);
+            img.width = '100%';
 
             return tplSelect.element;
 

@@ -13,7 +13,13 @@
 
             var dateItem = tpl.element._value.querySelector('.item-subtitle');
             dateItem.textContent = toReadableDate(currentItem.data.datePublished);
-            
+
+            var descItem = tpl.element._value.querySelector('.item-description');
+            if (currentItem.data.description.length > 170)
+                descItem.textContent = currentItem.data.description.substr(0, 170) + '...';
+            else
+                descItem.textContent = currentItem.data.description;
+
             return tpl.element;
         });
     }
@@ -26,8 +32,7 @@
         // This function updates the ListView with new layouts
         initializeLayout: function (listView, viewState) {
             /// <param name="listView" value="WinJS.UI.ListView.prototype" />
-
-            if (viewState === appViewState.snapped) {
+            if (viewState === appViewState.snapped || viewState === appViewState.fullScreenPortrait) {
                 listView.layout = new ui.ListLayout();
             } else {
                 listView.layout = new ui.GridLayout({ groupHeaderPosition: "left" });
@@ -77,7 +82,7 @@
 
             var listView = element.querySelector(".itemslist").winControl;
             if (lastViewState !== viewState) {
-                if (lastViewState === appViewState.snapped || viewState === appViewState.snapped) {
+                if (lastViewState === appViewState.snapped || viewState === appViewState.snapped || lastViewState === appViewState.fullScreenPortrait || viewState === appViewState.fullScreenPortrait) {
                     var handler = function (e) {
                         listView.removeEventListener("contentanimating", handler, false);
                         e.preventDefault();

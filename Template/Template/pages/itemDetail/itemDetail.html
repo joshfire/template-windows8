@@ -18,25 +18,39 @@
 
     <!-- Templates -->
     <article class="videoDetailTemplate" data-win-control="WinJS.Binding.Template">
-        <div class="anitem">   
-            <!--<header>
-                <h2 class="item-title" data-win-bind="textContent: name; alt: name"></h2>
-                <h4 class="item-subtitle"></h4>
-            </header>-->
+        <div class="anitem avideo">   
             <iframe class="item-video" src="#" data-win-bind="src: embedURL"></iframe>
-            <p class="author"></p>
-            <p class="description" data-win-bind="textContent: description"></p>
+            <div class="textinfo">
+                <div class="metainfo">
+                    <div class="author">Published by <h2 class="authorname"></h2></div>
+                    <div class="date">on the <span class="datepublished"></span></div>
+                </div>
+                <p class="description" data-win-bind="textContent: description"></p>
+            </div>
         </div>
     </article>
     <article class="imageDetailTemplate" data-win-control="WinJS.Binding.Template">
-        <div class="anitem">   
-            <!--<header>
-                <h2 class="item-title" data-win-bind="textContent: name; alt: name"></h2>
-                <h4 class="item-subtitle"></h4>
-            </header>-->
+        <div class="anitem animage">  
             <img data-win-bind="src: contentURL" />
-            <p class="metainfo"><span class="author"></span></p>
-            <p class="description" data-win-bind="textContent: description"></p>
+            <div class="textinfo">
+                <div class="metainfo">
+                    <div class="author">Published by <h2 class="authorname"></h2></div>
+                    <div class="date">on the <span class="datepublished"></span></div>
+                </div>
+                <p class="description" data-win-bind="textContent: description"></p>
+            </div>
+        </div>
+    </article>
+    <article class="blogpostDetailTemplate" data-win-control="WinJS.Binding.Template">
+        <div class="anitem ablogpost">  
+            <header>
+                <div class="mask"><img src="#" data-win-bind="src: image.contentURL" /></div>
+                <div class="metainfo">
+                    <div class="author">Published by <h2 class="authorname"></h2></div>
+                    <div class="date">on the <span class="datepublished"></span></div>
+                </div>
+            </header>
+            <article class="content" data-win-bind="textContent: articleBody"></article>
         </div>
     </article>
 

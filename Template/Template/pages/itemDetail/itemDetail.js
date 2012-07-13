@@ -3,7 +3,8 @@
 
     var ui = WinJS.UI,
         utils = WinJS.Utilities,
-        _currentItem = null;
+        _currentItem = null,
+        flipView = null;
 
     var handleShare = function (e) {
         var item = _currentItem,
@@ -26,14 +27,18 @@
             requestData.properties.description = 'No description available.';
         }
 
+        if (item.data.articleBody) {
+            requestData.setText(item.data.articleBody.toString());
+            requestData.properties.description = item.data.articleBody;
+        }
+
         if (item.data.url) {
             var uri = new Windows.Foundation.Uri(item.data.url);
             requestData.setUri(uri);
         }
 
         if (item.data.thumbnail || item.data.image) {
-            var test = item.data.thumbnail;
-
+            
             getThumb(item).then(function (file) {
                 var streamReference = Windows.Storage.Streams.RandomAccessStreamReference.createFromFile(file);
 
@@ -43,7 +48,7 @@
 
                 // deferral.complete();
             });
-
+            
         }
 
     };
@@ -66,24 +71,36 @@
         // This function is called whenever a user navigates to this page. It
         // populates the page elements with the app's data.
         ready: function (element, options) {
-            var flipView = document.getElementById('detailsFlipView').winControl;
+            flipView = document.getElementById('detailsFlipView').winControl;
             ui.setOptions(flipView, {
                 itemDataSource: Data.items.dataSource,
                 itemTemplate: this.itemRenderer,
                 currentPage: options.index
             });
 
-            document.querySelector("header[role=banner] .pagetitle").textContent = Data.items.getAt(options.index).name;
-
             // Set a ref to the item for the sharing event
             _currentItem = Data.items.dataSource.itemFromIndex(options.index)._value;
 
+            // Set the title of the page
+            if(_currentItem && _currentItem.data && _currentItem.data.name)
+                document.querySelector("header[role=banner] .pagetitle").textContent = _currentItem.data.name;
 
             // Listen to share event
             var dtm = Windows.ApplicationModel.DataTransfer.DataTransferManager.getForCurrentView();
             dtm.ondatarequested = handleShare;
 
+            flipView.addEventListener("pageselected", this.itemChanged);
+
+
         },
+
+        itemChanged: function(e) {
+            // Set a ref to the item for the sharing event
+            _currentItem = Data.items.dataSource.itemFromIndex(flipView.currentPage)._value;
+            // Set the title of the page
+            document.querySelector("header[role=banner] .pagetitle").textContent = _currentItem.data.name;
+        },
+
         itemRenderer: function (itemPromise) {
 
             // Set static elements
@@ -93,34 +110,90 @@
                 var tplSelect;
                 switch (currentItem.data["@type"]) {
                     case "VideoObject":
-                        tplSelect = document.querySelector('.videoDetailTemplate').winControl;
+                        return videoRenderer(itemPromise, currentItem, recycled);
                         break;
                     case "ImageObject":
+                        return imageRenderer(itemPromise, currentItem, recycled);
+                        break;
+                    case "BlogPosting":
+                        return blogPostingRenderer(itemPromise, currentItem, recycled);
+                        break;
                     default:
-                        tplSelect = document.querySelector('.imageDetailTemplate').winControl;
+                        return blogPostingRenderer(itemPromise, currentItem, recycled);
                         break;
                 }
 
-                tplSelect = tplSelect.renderItem(itemPromise, recycled);
-                var data = currentItem.data;
-                var elem = tplSelect.element._value;
-
-                if (data.author.length) {
-                    var iauthor = elem.querySelector('.author');
-                    if (iauthor) {
-                        iauthor.textContent = 'By ' + data.author.shift().name;
-                    }
-                    if (data.datePublished) {
-                        iauthor.textContent += ' on the ' + toReadableDate(data.datePublished);
-                    }
-
-                }
-
-                return tplSelect.element;
-
             });
-        }
+        }        
     });
+
+    function blogPostingRenderer(itemPromise, currentItem, recycled) {
+        var tplSelect = document.querySelector('.blogpostDetailTemplate').winControl;
+        tplSelect = tplSelect.renderItem(itemPromise, recycled);
+        var data = currentItem.data;
+        var elem = tplSelect.element._value;
+
+        var iauthor = elem.querySelector('.authorname');
+        if (iauthor && data.author.length) {
+            iauthor.textContent = data.author[0].name;
+        }
+
+        var idate = elem.querySelector('.datepublished');
+        if (idate && data.datePublished) {
+            idate.textContent = toReadableDate(data.datePublished);
+        }
+        /* 
+        * The render is called several times ans we only want the first image to be removed (as it
+        * is grabbed by the factory and set on the left). So we set an empty image that'll be caught by the regexp next time.
+        */
+        data.articleBody = data.articleBody.replace(/<img[^>]+\>/i, '<img style="display:none">');
+        //data.articleBody = data.articleBody.replace(/<br[^>]+\>/ig, '');
+
+        utils.setInnerHTML(elem.querySelector('article'), toStaticHTML(data.articleBody));
+
+        return tplSelect.element;
+    }
+
+    function imageRenderer(itemPromise, currentItem, recycled) {
+
+        var tplSelect = document.querySelector('.imageDetailTemplate').winControl;
+        tplSelect = tplSelect.renderItem(itemPromise, recycled);
+        var data = currentItem.data;
+        var elem = tplSelect.element._value;
+
+        var iauthor = elem.querySelector('.authorname');
+        if (iauthor && data.author.length) {
+            iauthor.textContent = data.author[0].name;
+        }
+
+        var idate = elem.querySelector('.datepublished');
+        if (idate && data.datePublished) {
+            idate.textContent = toReadableDate(data.datePublished);
+        }
+
+        return tplSelect.element;
+    }
+
+    function videoRenderer(itemPromise, currentItem, recycled) {
+
+        var tplSelect = document.querySelector('.videoDetailTemplate').winControl;
+        tplSelect = tplSelect.renderItem(itemPromise, recycled);
+        var data = currentItem.data;
+        var elem = tplSelect.element._value;
+
+        var iauthor = elem.querySelector('.authorname');
+        if (iauthor && data.author.length) {
+            iauthor.textContent = data.author[0].name;
+        }
+
+        var idate = elem.querySelector('.datepublished');
+        if (idate && data.datePublished) {
+            idate.textContent = toReadableDate(data.datePublished);
+        }
+
+        return tplSelect.element;
+    }
+
     function toReadableDate(str) {
         var thedate = toDateIso(str);
         var month = thedate.getMonth().toString();

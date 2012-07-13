@@ -66,6 +66,7 @@
     // Use Joshfire Factory data sources for the moment.
     // See http://developer.joshfire.com/doc/dev/develop/datasources
     // They are defined in the bootstrap.js file
+
     var datasources = Joshfire.factory.getDataSource("main");
 
     // note that external <script> cannot be called on a local context, so no JSONP
@@ -78,6 +79,10 @@
         datasources.children[dsNb].find({}, function (g) {
            
             return function (err, data) {
+                if (err) {
+                    console.error(err.toString());
+                    return;
+                }
                 // Process data entries in data.entries
                 var k = 0;
                 g.length = data.entries.length;
