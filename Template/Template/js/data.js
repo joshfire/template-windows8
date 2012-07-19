@@ -74,7 +74,7 @@
     // http://msdn.microsoft.com/library/windows/apps/Hh465373
 
     for (var dsNb = 0; dsNb < datasources.children.length; dsNb++) {
-        var group = { key: "main" + dsNb, title: datasources.children[dsNb].name, index: dsNb, length: 0, image: datasources.children[dsNb].config.meta.image };
+        var group = { key: "main" + dsNb, title: datasources.children[dsNb].name, index: dsNb, length: 0 };
 
         datasources.children[dsNb].find({}, function (g) {
            

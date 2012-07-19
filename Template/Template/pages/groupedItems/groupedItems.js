@@ -172,7 +172,7 @@
 
             if (Data.appConfig.logo) {
                 var logo = document.createElement('img');
-                logo.src = Data.appConfig.logo;
+                logo.src = Data.appConfig.logo.contentURL;
                 element.querySelector("header[role=banner] .pagetitle").textContent = '';
                 element.querySelector("header[role=banner] .pagetitle").appendChild(logo);
             }
