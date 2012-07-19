@@ -30,7 +30,8 @@
           "marketing/tablet-screenshot2.jpg",
           "marketing/tablet-screenshot3.jpg",
           "marketing/tablet-screenshot4.jpg"          
-        ]
+        ],
+        "disablePreview": true
       },
       {
         "devices": "desktop",
@@ -40,7 +41,8 @@
           "marketing/desktop-screenshot1.jpg",
           "marketing/desktop-screenshot2.jpg",
           "marketing/desktop-screenshot3.jpg"          
-        ]
+        ],
+        "disablePreview": true
       }
     ],
     "options": {
