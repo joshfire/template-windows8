@@ -1,0 +1,67 @@
+
+{
+  "name": "window8",
+  "fullName": "Windows 8",
+  "version": "1.0.0",
+  "description": "A template to generate a Metro-styled Windows 8 application. It only works with the Windows 8 deploy",
+  "keywords": [
+    "windows",
+    "metro"
+  ],
+  "joshfire": {
+    "images": {
+      "small": "marketing/small.jpg",
+      "big": "marketing/big.jpg"
+    },
+    "datasources": {
+      "main": {
+        "title": "Main content",
+        "description": "Any type of datasources accepted.",
+        "multiple":true
+      }
+    },
+    "devices": [
+      {
+        "devices": "tablet",
+        "startfile": "Template/Template/default.html",
+        "images": "marketing/tablet.jpg",
+        "screenshots": [
+          "marketing/tablet-screenshot1.jpg",
+          "marketing/tablet-screenshot2.jpg",
+          "marketing/tablet-screenshot3.jpg",
+          "marketing/tablet-screenshot4.jpg"          
+        ]
+      },
+      {
+        "devices": "desktop",
+        "startfile": "Template/Template/default.html",
+        "images": "marketing/desktop.jpg",
+        "screenshots": [
+          "marketing/desktop-screenshot1.jpg",
+          "marketing/desktop-screenshot2.jpg",
+          "marketing/desktop-screenshot3.jpg"          
+        ]
+      }
+    ],
+    "options": {
+      "schema": {
+        "theme": {
+          "title": "Theme",
+          "type": "string",
+          "enum": [
+            "light",
+            "dark"
+           ],
+          "default":"dark",
+          "required": true
+        }
+      },
+      "form": [
+        "theme",
+        "datasources.main"
+      ]
+    },
+
+    "libraries": []
+  }
+}

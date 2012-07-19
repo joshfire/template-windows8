@@ -1,0 +1,9 @@
+README.md export-ignore
+Template/package.appxmanifest export-ignore
+Template/Template.jsproj export-ignore
+Template/Template_TemporaryKey.pfx export-ignore
+Template/Template/bld export-ignore
+Template/Template/Template.jsproj export-ignore
+Template/Template/Template.jsproj.user export-ignore
+Template/Template/Template_TemporaryKey.pfx export-ignore
+Template/Template/package.appxmanifest export-ignore
