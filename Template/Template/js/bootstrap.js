@@ -3,7 +3,7 @@
     var Joshfire = window.Joshfire || {};
     Joshfire.factory = {
         globalConfig: { "DATAVERSION": "1", "DATAHOSTPORT": "api.datajs.com", "STATSHOSTPORT": "localhost:40023", "HOSTPORT": "localhost:40021" },
-        config: { "app": { "id": "5007c853a4b04a5d180000da", "icon": null, "logo": { "height": 117, "width": 364, "encodingFormat": "png", "contentSize": 15841, "contentURL": "http://static.platform.joshfire.com.s3.amazonaws.com/8a/6ece155a4d60f5c7105e48994a8a16/Screen-shot-2012-06-25-at-6.38.31-PM.png", "itemType": "ImageObject", "name": "Screen shot 2012-06-25 at 6.38.31 PM.png", "url": "/transloadit/8a6ece155a4d60f5c7105e48994a8a16" }, "name": "TedxParis Windows 8", "version": "1.0" }, "template": { "id": "4ff2b3b2b04f076cff000192", "name": "sleek", "version": "1.1.18", "options": { "color": "gray", "tabs": ["Feed", "Flickr", "Youtube"] } } },
+        config: { "app": { "id": "5007c853a4b04a5d180000da", "icon": null, "logo": { "height": 117, "width": 364, "encodingFormat": "png", "contentSize": 15841, "contentURL": "http://static.platform.joshfire.com.s3.amazonaws.com/8a/6ece155a4d60f5c7105e48994a8a16/Screen-shot-2012-06-25-at-6.38.31-PM.png", "itemType": "ImageObject", "name": "Screen shot 2012-06-25 at 6.38.31 PM.png", "url": "/transloadit/8a6ece155a4d60f5c7105e48994a8a16" }, "name": "TedxParis Windows 8", "version": "1.0" }, "template": { "id": "4ff2b3b2b04f076cff000192", "name": "sleek", "version": "1.1.18", "options": { "theme": "dark", "color": "gray", "tabs": ["Feed", "Flickr", "Youtube"] } } },
         device: { "type": "phone" },
         plugins: {}
     };
