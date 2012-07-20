@@ -15,7 +15,7 @@
             dateItem.textContent = toReadableDate(currentItem.data.datePublished);
 
             var descItem = tpl.element._value.querySelector('.item-description');
-            if (currentItem.data.description.length > 170)
+            if (currentItem.data.description && currentItem.data.description.length > 170)
                 descItem.textContent = currentItem.data.description.substr(0, 170) + '...';
             else
                 descItem.textContent = currentItem.data.description;
