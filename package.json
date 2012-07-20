@@ -26,10 +26,9 @@
         "startfile": "Template/Template/default.html",
         "images": "marketing/tablet.jpg",
         "screenshots": [
-          "marketing/tablet-screenshot1.jpg",
-          "marketing/tablet-screenshot2.jpg",
-          "marketing/tablet-screenshot3.jpg",
-          "marketing/tablet-screenshot4.jpg"          
+          "marketing/tablet-home.jpg",
+          "marketing/tablet-portrait.png",
+          "marketing/tablet-detail.png"
         ],
         "disablePreview": true
       },
@@ -38,9 +37,11 @@
         "startfile": "Template/Template/default.html",
         "images": "marketing/desktop.jpg",
         "screenshots": [
-          "marketing/desktop-screenshot1.jpg",
-          "marketing/desktop-screenshot2.jpg",
-          "marketing/desktop-screenshot3.jpg"          
+          "marketing/desktop-home.png",
+          "marketing/desktop-detail.png",
+          "marketing/desktop-share.png",
+          "marketing/desktop-snapview.png",
+          "marketing/desktop-share.png"
         ],
         "disablePreview": true
       }
