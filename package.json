@@ -27,8 +27,8 @@
         "images": "marketing/tablet.jpg",
         "screenshots": [
           "marketing/tablet-home.jpg",
-          "marketing/tablet-portrait.png",
-          "marketing/tablet-detail.png"
+          "marketing/tablet-detail.png",
+          "marketing/tablet-portrait.png"
         ],
         "disablePreview": true
       },
@@ -37,9 +37,8 @@
         "startfile": "Template/Template/default.html",
         "images": "marketing/desktop.jpg",
         "screenshots": [
-          "marketing/desktop-home.png",
+          "marketing/desktop-home.jpg",
           "marketing/desktop-detail.png",
-          "marketing/desktop-share.png",
           "marketing/desktop-snapview.png",
           "marketing/desktop-share.png"
         ],
