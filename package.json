@@ -10,8 +10,8 @@
   ],
   "joshfire": {
     "images": {
-      "small": "marketing/small.jpg",
-      "big": "marketing/big.jpg"
+      "small": "marketing/small.png",
+      "big": "marketing/big.png"
     },
     "datasources": {
       "main": {
@@ -24,7 +24,7 @@
       {
         "devices": "tablet",
         "startfile": "Template/Template/default.html",
-        "images": "marketing/tablet.jpg",
+        "images": "marketing/tablet.png",
         "screenshots": [
           "marketing/tablet-home.jpg",
           "marketing/tablet-detail.png",
@@ -35,7 +35,7 @@
       {
         "devices": "desktop",
         "startfile": "Template/Template/default.html",
-        "images": "marketing/desktop.jpg",
+        "images": "marketing/desktop.png",
         "screenshots": [
           "marketing/desktop-home.jpg",
           "marketing/desktop-detail.png",
