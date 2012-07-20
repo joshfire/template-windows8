@@ -52,9 +52,6 @@
     <AppxManifest Include="package.appxmanifest">
       <SubType>Designer</SubType>
     </AppxManifest>
-    <Content Include="pages\search\searchResults.css" />
-    <Content Include="pages\search\searchResults.html" />
-    <Content Include="pages\search\searchResults.js" />
     <None Include="arthur.pfx" />
     <Content Include="css\default.css" />
     <Content Include="images\logo.png" />
