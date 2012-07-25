@@ -9,7 +9,7 @@
     <AppxBuildConfigurationSelection>neutral</AppxBuildConfigurationSelection>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DebuggerFlavor>AppHostRemoteDebugger</DebuggerFlavor>
-    <MachineName>192.168.1.29 (jf-win8-tablet)</MachineName>
+    <DebuggerFlavor>AppHostLocalDebugger</DebuggerFlavor>
+    <MachineName>jf-win8-tablet</MachineName>
   </PropertyGroup>
 </Project>

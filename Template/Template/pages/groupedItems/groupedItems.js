@@ -37,7 +37,7 @@
 
             if ((currentItem.data.thumbnail && currentItem.data.thumbnail.length) || currentItem.data.image) {
                 var thumbs = currentItem.data.thumbnail,
-                    thethumb = {height: 0, width: 0};
+                    thethumb = { height: 0, width: 0 };
                 /* Find the best thumb */
                 for (var k in thumbs) {
                     if (thumbs.hasOwnProperty(k)) {
@@ -46,7 +46,7 @@
                             thethumb = thumbs[k];
                             break;
                         }
-                        /* Biggest one or biggest one with both dimensions above cell size */
+                            /* Biggest one or biggest one with both dimensions above cell size */
                         else if (isLarge && (
                             (thumbs[k].height >= (cellH * cellRowSpan) || thumbs.width >= (cellW * cellColSpan)) ||
                             (thumbs[k].height > thethumb.height || thumbs[k].width > thethumb.width)
@@ -60,12 +60,13 @@
                     thethumb = currentItem.data.image;
 
                 /* Set the URL */
-                img.src = thethumb.contentURL;
+                console.log(thethumb.contentURL);
+                img.src = thethumb.contentURL || '/images/logo.png';
 
                 /* Set the image tag's dimentions and its position behind its mask */
                 if ((thethumb.height - cellH) < (thethumb.width - cellW)) {
                     img.height = cellH;
-                    var newW = thethumb.width * (cellH/thethumb.height);
+                    var newW = thethumb.width * (cellH / thethumb.height);
                     if ((newW - cellW) > 0 && !isLarge)
                         img.style.left = -((newW - cellW) / 2) + 'px';
                 }
@@ -76,6 +77,11 @@
                         img.style.top = -((newH - cellH) / 2) + 'px';
                 }
 
+            }
+            else {
+                img.src = '/images/logo.png'
+                img.width = '100%';
+                img.height = '100%';
             }
 
             return tplSelect.element;
@@ -107,8 +113,7 @@
             }
 
             var img = tplSelect.element._value.querySelector('.tilebackground');
-
-            img.src = thethumb.contentURL;
+            img.src = thethumb.contentURL || '/images/logo.png';
             img.style.top = -(thethumb.height - 120);
             img.width = '100%';
 
@@ -169,6 +174,11 @@
             // Listen to the share event
             var dtm = Windows.ApplicationModel.DataTransfer.DataTransferManager.getForCurrentView();
             dtm.ondatarequested = null;
+
+            if (Data.dataloaded) {
+                var loadingControl = document.getElementById('loadingControl');
+                loadingControl.style.display = 'none';
+            }
 
             if (Data.appConfig.logo) {
                 var logo = document.createElement('img');

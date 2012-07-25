@@ -20,6 +20,12 @@
             else
                 descItem.textContent = currentItem.data.description;
 
+            var img = tpl.element._value.querySelector('.item-image');
+            if (currentItem.data.image && currentItem.data.image.contentURL && currentItem.data.image.contentURL != "")
+                img.src = currentItem.data.image.contentURL;
+            else
+                img.src = 'images/logo.png';
+
             return tpl.element;
         });
     }

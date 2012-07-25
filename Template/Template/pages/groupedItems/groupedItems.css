@@ -17,6 +17,23 @@
     width: auto;
 }
 
+#loadingControl {
+    position: absolute;
+    top: 80px;
+    left: 400px;
+    font-family: "Segoe UI";
+    font-size: 11pt;
+    line-height: 15px;
+    color: white;
+}
+
+
+
+    #loadingControl progress {
+        color: white;
+        vertical-align: bottom;
+        margin: 0 10px;
+    }
 
     .largeitem {
         width: 545px!important;

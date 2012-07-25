@@ -23,7 +23,7 @@
     <div class="itemtemplate" data-win-control="WinJS.Binding.Template">
         <div class="regularitem">
             <div class="thumbnailViewer">
-                <img class="thumbnail" src="#" data-win-bind="src: image.contentURL; alt: name" />
+                <img class="thumbnail" src="#" data-win-bind="alt: name" />
             </div>
             <div class="item-overlay">
                 <h4 class="item-title" data-win-bind="textContent: name"></h4>
@@ -39,7 +39,7 @@
     
     <div class="largeitemtemplate" data-win-control="WinJS.Binding.Template">
         <div class="largeitem">
-            <img class="thumbnail" src="#" data-win-bind="src: image.contentURL; alt: name" />
+            <img class="thumbnail" src="#" data-win-bind="alt: name" />
             <div class="item-overlay">
                 <h4 class="item-title" data-win-bind="textContent: name"></h4>
                 <h6 class="item-subtitle win-type-ellipsis" data-win-bind="textContent: description"></h6>
@@ -54,6 +54,7 @@
             <h1 class="titlearea win-type-ellipsis">
                 <span class="pagetitle">Template</span>
             </h1>
+            <label id="loadingControl" class="progressBarText">Loading data <progress class="win-ring withText"></progress></label>
         </header>
         <section aria-label="Main content" role="main">
             <div class="groupeditemslist" aria-label="List of groups" data-win-control="WinJS.UI.ListView" data-win-options="{ selectionMode: 'none',

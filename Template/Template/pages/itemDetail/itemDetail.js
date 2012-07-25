@@ -38,7 +38,7 @@
         }
 
         if (item.data.thumbnail || item.data.image) {
-            
+
             getThumb(item).then(function (file) {
                 var streamReference = Windows.Storage.Streams.RandomAccessStreamReference.createFromFile(file);
 
@@ -48,9 +48,8 @@
 
                 // deferral.complete();
             });
-            
-        }
 
+        }
     };
 
     var getThumb = function (item) {
@@ -148,6 +147,14 @@
         */
         data.articleBody = data.articleBody.replace(/<img[^>]+\>/i, '<img style="display:none">');
         //data.articleBody = data.articleBody.replace(/<br[^>]+\>/ig, '');
+
+        var iimg = elem.querySelector('.mask img');
+        if (data.image) {
+            iimg.src = data.image.contentURL;
+        }
+        else {
+            iimg.src = 'images/logo.png';
+        }
 
         utils.setInnerHTML(elem.querySelector('article'), toStaticHTML(data.articleBody));
 

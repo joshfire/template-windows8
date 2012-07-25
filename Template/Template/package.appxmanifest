@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/2010/manifest">
-  <Identity Name="9d9c5df0-fe97-4818-af0b-2699ac20b735" Version="0.1.0.4" Publisher="CN=Arthur" />
+  <Identity Name="9d9c5df0-fe97-4818-af0b-2699ac20b735" Version="0.1.0.5" Publisher="CN=Arthur" />
   <Properties>
     <DisplayName>Template</DisplayName>
     <PublisherDisplayName>Steren</PublisherDisplayName>

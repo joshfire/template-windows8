@@ -3,17 +3,17 @@
     var Joshfire = window.Joshfire || {};
     Joshfire.factory = {
         globalConfig: { "DATAVERSION": "1", "DATAHOSTPORT": "api.datajs.com", "STATSHOSTPORT": "localhost:40023", "HOSTPORT": "localhost:40021" },
-        config: { "app": { "id": "5007c853a4b04a5d180000da", "icon": null, "logo": { "height": 117, "width": 364, "encodingFormat": "png", "contentSize": 15841, "contentURL": "http://static.platform.joshfire.com.s3.amazonaws.com/8a/6ece155a4d60f5c7105e48994a8a16/Screen-shot-2012-06-25-at-6.38.31-PM.png", "itemType": "ImageObject", "name": "Screen shot 2012-06-25 at 6.38.31 PM.png", "url": "/transloadit/8a6ece155a4d60f5c7105e48994a8a16" }, "name": "TedxParis Windows 8", "version": "1.0" }, "template": { "id": "4ff2b3b2b04f076cff000192", "name": "sleek", "version": "1.1.18", "options": { "theme": "dark", "color": "gray", "tabs": ["Feed", "Flickr", "Youtube"] } } },
-        device: { "type": "phone" },
-        plugins: {}
+        config: { "app": { "id": "5009251059d8720000000189", "icon": null, "logo": { "height": 352, "width": 1072, "encodingFormat": "png", "contentSize": 13855, "contentURL": "http://static.platform.joshfire.com.s3.amazonaws.com/f4/f3cbb3030d91b8689f982b2d812a12/TEDx_logo_place_RGB_CS5-1line-K-01.png", "itemType": "ImageObject", "name": "TEDx_logo_place_RGB_CS5-1line-K-01.png", "url": "/transloadit/f4f3cbb3030d91b8689f982b2d812a12" }, "name": "TEDxParis", "version": "1.0" }, "template": { "id": "4ff2b3b2b04f076cff000192", "name": "sleek", "version": "1.1.18", "options": { "tabs": ["Feed", "2011 Videos", "Photos 2011"], "color": "gray" }, "hooks": [] } },
+        device: { "type": "phone" }
     };
     Joshfire.factory.config.deploy = { "env": "dev", "type": "local", "id": "" };
-    Joshfire.factory.config.datasources = { "main": [{ "name": "Feed", "db": "feed", "col": "rss", "query": { "filter": { "url": "blog.steren.fr" } }, "runatclient": false, "missingKeys": [], "outputType": "BlogPosting", "runtime": "hosted" }, { "name": "Flickr", "db": "flickr", "col": "photos", "query": { "filter": { "search": "joshfire" } }, "missingKeys": ["api_key"], "outputType": "ImageObject", "runtime": "win8" }, { "name": "Youtube", "db": "youtube", "col": "videos", "query": { "filter": { "search": "joshfire" } }, "missingKeys": [], "outputType": "VideoObject", "runtime": "win8" }] };
+    Joshfire.factory.config.datasources = { "main": [{ "name": "Blog", "db": "feed", "col": "rss", "query": { "filter": { "url": "http://www.tedxparis.com/" }, "options": {} }, "runatclient": false, "missingKeys": [], "outputType": "BlogPosting", "runtime": "hosted" }, { "name": "Vidéos 2011", "db": "youtube", "col": "videos", "query": { "filter": { "playlist": "http://www.youtube.com/playlist?list=PLEB4E907286FE3EC2" }, "options": {} }, "missingKeys": [], "outputType": "VideoObject", "runtime": "win8" }, { "name": "Photos 2011", "db": "flickr", "col": "photos", "query": { "filter": { "search": "tedxparis 2011" } }, "missingKeys": ["api_key"], "outputType": "ImageObject", "runtime": "win8" }] };
+    Joshfire.factory.config.addons = [];
     window.Joshfire = Joshfire;
 
 })();
 (function () {
-    (function (a) { a.factory.deviceReady = !1; var b = []; a.factory.onDeviceReady = function (c) { if (a.factory.deviceReady) return c(); b.push(c) }; var c = function (a) { if (typeof PhoneGap != "undefined") document.addEventListener("deviceready", a, !1); else if (window.addEventListener) window.addEventListener("load", a, !1); else if (document.addEventListener) document.addEventListener("load", a, !1); else if (window.attachEvent) window.attachEvent("onload", a); else if (typeof window.onload != "function") window.onload = a; else { var b = window.onload; window.onload = function () { b(), a() } } }; c(function () { a.factory.deviceReady = !0; for (var c = 0, d = b.length; c < d; c++) b.pop()() }, !1) })(Joshfire);
+    (function (a) { a.factory.ready = !1; var b = []; a.factory.onReady = function (c) { if (a.factory.ready) return c(); b.push(c) }; var c = function (a) { if (typeof cordova != "undefined") document.addEventListener("deviceready", a, !1); else if (window.addEventListener) window.addEventListener("load", a, !1); else if (document.addEventListener) document.addEventListener("load", a, !1); else if (window.attachEvent) window.attachEvent("onload", a); else if (typeof window.onload != "function") window.onload = a; else { var b = window.onload; window.onload = function () { b(), a() } } }; c(function () { a.factory.ready = !0; for (var c = 0, d = b.length; c < d; c++) b.pop()(); var e = function () { var b = 0; if (a.factory.config && a.factory.config.template && a.factory.config.template.hooks) { b = a.factory.config.template.hooks; for (c = 0; c < b.length; c++) if (b[c] === "loaded") return !1 } return !0 }(); e && a.factory.getAddOns("loaded").run(), typeof cordova != "undefined" && cordova.exec(null, null, "SplashScreen", "hide", []) }, !1) })(Joshfire);
     (function (a, b, c) { var d = "http://" + c.globalConfig.STATSHOSTPORT, e = function () { return }, f = function (a) { var b = []; for (var c in a) a.hasOwnProperty(c) && b.push(c + "=" + encodeURIComponent(a[c])); var f = new Image(1, 1); f.src = d + "/pixel.gif?" + b.join("&"), f.onload = function () { e() } }, g = function () { return { tz: (new Date).getTimezoneOffset(), url: b.location.toString(), ref: a.referrer, app: c.config.app.id, appv: c.config.app.version, tpl: c.config.template.id, dev: c.device.type, env: (c.config.deploy || {}).env || "preview", dp: (c.config.deploy || {}).id, dpr: (c.config.deploy || {}).type, id: "" } }; c.stats = {}, c.stats.event = function (a) { var b = g(); b.type = a, f(b) }, c.stats.event("open"), a.addEventListener && a.addEventListener("resume", function () { c.stats.event("resume") }, !1) })(document, window, Joshfire.factory);
 
     /**
@@ -2398,6 +2398,59 @@
         return _;
 
     });
+    define('databases/youtube/lib/api', ['datajslib!http', 'datajslib!underscore'], function (http, _) {
+
+        var api = {};
+
+
+        // Options: handle mongo's like options
+
+        api.options = function (query) {
+            var ret = {};
+            if (query.skip) ret["start-index"] = query.skip + 1;
+            if (query.limit) ret['max-results'] = query.limit;
+
+            return ret;
+        };
+
+
+        // Generate final URL 
+
+        api.generateUrl = function (url, params) {
+            for (var param in params) {
+                var newUrl = url.replace(new RegExp(':' + param), params[param]);
+                if (newUrl != url)
+                    url = newUrl;
+                else
+                    url += ((url.indexOf('?') == -1) ? '?' : '&') + param + (params[param] ? ('=' + params[param]) : '');
+            }
+            return url;
+        };
+
+
+        // Call API 
+
+        api.request = function (url, cb) {
+
+            var baseUrl = 'http://gdata.youtube.com/feeds/api/';
+
+            // We add default parameter
+            url = baseUrl + api.generateUrl(url, { alt: 'json-in-script', v: 2 });
+
+            // console.log("url",url);
+            http.request({
+                'url': url,
+                'dataType': 'jsonp'
+            }, cb);
+        };
+
+
+        // Export --------------------------------------------------------------------
+
+        return api;
+
+    });
+
     /**
      * @fileoverview ISO8601 conversion functions.
      *
@@ -2671,6 +2724,309 @@
 
 
     });
+    define('databases/youtube/videos', [
+      './lib/api',
+      'datajslib!underscore',
+      'datajslib!iso8601'
+    ], function (api, _, iso8601) {
+
+        return {
+            /**
+             * Description of the datasource for the factory
+             */
+            desc: {
+                "options": {
+                    "schema": {
+                        "playlist": {
+                            "type": "string",
+                            "title": "Playlist URL",
+                            "description": "You may also enter the ID of the playlist"
+                        },
+                        "search": {
+                            "type": "string",
+                            "title": "Search text",
+                            "description": "Keep in mind that the list of videos featured in the final app will be the results of the search when the app is run. Consider using playlists if you need more consistent results."
+                        },
+                        "feed": {
+                            "type": "string",
+                            "title": "Feed",
+                            "enum": [
+                              "",
+                              "top_rated",
+                              "most_viewed",
+                              "most_shared",
+                              "most_popular",
+                              "most_recent",
+                              "most_discussed",
+                              "most_responded",
+                              "recently_featured",
+                              "on_the_web"
+                            ]
+                        },
+                        "user": {
+                            "type": "string",
+                            "title": "Username",
+                            "description": "Filter results by username"
+                        }
+                    },
+                    "form": [
+                      {
+                          "type": "selectfieldset",
+                          "title": "Search by",
+                          "items": [
+                            {
+                                "type": "optionfieldset",
+                                "legend": "Text",
+                                "items": [
+                                  "search"
+                                ]
+                            },
+                            {
+                                "type": "optionfieldset",
+                                "legend": "Playlist",
+                                "items": [
+                                  "playlist"
+                                ]
+                            },
+                            {
+                                "type": "optionfieldset",
+                                "legend": "Username",
+                                "items": [
+                                  "user"
+                                ]
+                            },
+                            {
+                                "type": "optionfieldset",
+                                "legend": "Feed",
+                                "items": [
+                                  "feed"
+                                ]
+                            }
+                          ]
+                      }
+                    ]
+                },
+                "runtimes": ["browser", "nodejs", "win8"],
+                "outputType": "VideoObject"
+            },
+
+
+            /**
+             * Fetches feed items from the source provider.
+             * @function
+             * @param {Object} query Query parameters. Must define a 'filter' property
+             *   with a 'url' property that contains the absolute URL to the page.
+             * @param {function(Object, Object)} callback Callback function.
+             *   Returns a text.
+             */
+            fetch: function (query, callback) {
+                // See Youtube API at http://code.google.com/apis/youtube/2.0/reference.html
+                var filter = (query && query.filter) ? query.filter : {};
+                var validFeed = this.desc.options.schema.feed["enum"];
+                var url = null;
+
+                if (filter.search) {
+                    url = 'videos';
+                    filter = _.extend({ q: encodeURI(filter.search) }, filter.user ? { author: filter.user } : {});
+                }
+                else if (filter.feed) {
+                    url = 'standardfeeds/:feed';
+                    if (_.indexOf(validFeed, filter.feed) == -1) return callback('Invalid feed type "' + filter.feed + '".');
+                    filter = _.extend({ feed: filter.feed }, filter.user ? { author: filter.user } : {});
+                }
+                else if (filter.playlist) {
+                    url = 'playlists/:playlist';
+
+                    /* Playlist should be 16-char String
+                      Clean up user input : often PL{playlistId} or http://youtube.com/xxxxx
+                      */
+                    //console.warn('playlist ?','input', filter.playlist);
+                    if (filter.playlist.length > 16) {
+                        //full url ?
+                        var matches = filter.playlist.match(/http(s?):\/\/(www\.?)(youtube\.com\/playlist\?).*(list=)([A-Z0-9]*)/i);
+                        if (matches.length) {
+                            filter.playlist = matches.pop();
+                        }
+                        if (filter.playlist.length > 16) {
+                            //strip heading PL ... and any further arguments
+                            filter.playlist = filter.playlist.replace(/^PL/, '').substring(0, 16);
+                        }
+                        //console.warn('playlist !','output', filter.playlist);
+                    }
+
+                    filter = _.extend({ playlist: filter.playlist }, filter.user ? { author: filter.user } : {});
+                }
+                else if (filter.user) {
+                    url = 'users/:user/uploads';
+                }
+                else { // if nothing was specified
+                    return callback(null, null);
+                }
+                // use url = 'videos'; to display most popular videos
+
+                url = api.generateUrl(url, _.extend({}, filter, api.options(query)));
+
+                api.request(url, function (err, data) {
+                    return callback(err, data);
+                });
+            },
+
+            /**
+             * Normalizes the data received from the source provider.
+             * @function
+             * @param {Object} data The data that was received
+             *(typically the object given to the callback method at the end of a "fetch")
+             * @param {Object} query Query parameters (which could include filtering options)
+             * @param {function(Object, Object)} callback Callback function.
+             *   The second argument of the callback is an object with an "entries" property
+             *   that contains the list of items normalized according to the schema.org hierarchy.
+             */
+            process: function (data, query, callback) {
+                if (!data || !data.feed || !data.feed.entry) {
+                    return callback(null, { "entries": [] });
+                }
+                var videos = data.feed.entry;
+                var point = null;
+                var id = null;
+
+                for (var i = 0, l = videos.length; i < l; i++) {
+                    var vid = videos[i];
+
+                    if (vid.media$group && vid.media$group.media$content) {
+                        var url = vid.media$group.media$content[0].url;
+
+                        var match = url.match(/^https?:\/\/(www\.)?youtube\.com\/v\/([a-z0-9_\-]+).*$/i);
+
+                        if (match) {
+                            id = match[2];
+                        }
+                    }
+
+
+                    videos[i] = {
+                        '@type': 'VideoObject',
+                        'itemType': 'VideoObject',
+                        'url': vid.link[0].href.replace(/\&.*$/, ''), // to remove the extra parameters (&feature=youtube_gdata)
+                        'name': vid.title.$t,
+                        'playerType': id ? 'iframe' : null,
+                        'embedURL': id ? 'http://www.youtube-nocookie.com/embed/' + id + '?rel=0' : null,
+                        'publisher': {
+                            '@type': 'Organization',
+                            'itemType': 'Organization',
+                            'url': 'http://www.youtube.com',
+                            'name': 'Youtube'
+                        },
+                        'description': (vid.media$group && vid.media$group.media$description) ? vid.media$group.media$description.$t : '',
+                        'author': [],
+                        'genre': (vid.media$group && vid.media$group.media$category && vid.media$group.media$category.$t) ? vid.media$group.media$category.$t : '',
+                        'thumbnail': [],
+                        'datePublished': vid.published ? vid.published.$t : (vid.media$group && vid.media$group.yt$uploaded ? vid.media$group.yt$uploaded.$t : ''),
+                        'uploadDate': (vid.media$group && vid.media$group.yt$uploaded) ? vid.media$group.yt$uploaded.$t : '',
+                        'duration': (vid.media$group && vid.media$group.yt$duration) ? iso8601.fromDuration(Number(vid.media$group.yt$duration.seconds) * 1000) : ''
+                    };
+                    // Other possibilities: keywords, license when defined in schema.org.
+                    // Add ",'meta': vid" to the above code snipped to view all the information returned by Youtube
+                    // Note that vid.updated always returns the current date which is not particularly useful, discarded here.
+
+                    // Complete the list of authors
+                    if (vid.author) {
+                        for (var k = 0, kl = vid.author.length; k < kl; k++) {
+                            if (vid.author[k].uri && vid.author[k].name) {
+                                videos[i].author.push({
+                                    '@type': 'Person',
+                                    'itemType': 'Person',
+                                    'url': vid.author[k].uri.$t,
+                                    'name': vid.author[k].name.$t
+                                });
+                            }
+                        }
+                    }
+
+                    // Complete the list of thumbnails
+                    if (vid.media$group && vid.media$group.media$thumbnail) {
+                        for (var k2 = 0, kl2 = vid.media$group.media$thumbnail.length; k2 < kl2; k2++) {
+                            var thumbnail = vid.media$group.media$thumbnail[k2];
+                            videos[i].thumbnail.push({
+                                '@type': 'ImageObject',
+                                'itemType': 'ImageObject',
+                                'url': thumbnail.url,
+                                'name': thumbnail.yt$name,
+                                'contentURL': thumbnail.url,
+                                'width': thumbnail.width,
+                                'height': thumbnail.height
+                            });
+                        }
+                        if (videos[i].thumbnail[0]) {
+                            videos[i].image = _.clone(videos[i].thumbnail[0]);
+                        }
+                    }
+
+                    // Location
+                    if (vid.georss$where &&
+                      vid.georss$where.gml$Point &&
+                      vid.georss$where.gml$Point.gml$pos &&
+                      vid.georss$where.gml$Point.gml$pos.$t) {
+                        point = vid.georss$where.gml$Point.gml$pos.$t.split(' ');
+                        if (point.length === 2) {
+                            videos[i].contentLocation = {
+                                '@type': 'Place',
+                                'itemType': 'Place',
+                                'geo': {
+                                    '@type': 'GeoCoordinates',
+                                    'itemType': 'GeoCoordinates',
+                                    'latitude': parseFloat(point[0], 10),
+                                    'longitude': parseFloat(point[1], 10)
+                                }
+                            };
+                        }
+                    }
+                    if (vid.yt$location && vid.yt$location.$t) {
+                        if (!videos[i].contentLocation) {
+                            videos[i].contentLocation = {
+                                '@type': 'Place',
+                                'itemType': 'Place'
+                            };
+                        }
+                        videos[i].contentLocation.name = vid.yt$location.$t;
+                    }
+
+                    // Aspect ratio
+                    // (remains in Youtube namespace since not a standard property)
+                    if (vid.media$group &&
+                      vid.media$group.yt$aspectRatio &&
+                      vid.media$group.yt$aspectRatio.$t) {
+                        videos[i]['yt:aspectRatio'] = vid.media$group.yt$aspectRatio.$t;
+                    }
+                }
+
+                callback(null, { "entries": videos });
+            },
+
+
+            /**
+             * Fetches and normalizes the data.
+             * @function
+             * @param {Object} query Query parameters. Feed specific object.
+             * @param {function(Object, Object)} callback Callback function.
+             *   receives the error or the normalized feed.
+             */
+            find: function (query, callback) {
+                // Implementation note: same code as example/news
+                var self = this;
+                self.fetch(query, function (err, data) {
+                    if (err) {
+                        return callback(err, null);
+                    }
+                    else {
+                        self.process(data, query, function (err, convertedData) {
+                            return callback(err, convertedData);
+                        });
+                    }
+                });
+            }
+        };
+    });
+
     /**
      * @fileoverview Pagination algorithms
      * See http://jsfiddle.net/TaxuS/5/ & http://jsfiddle.net/7XKCJ/1/
@@ -3220,362 +3576,8 @@
                 });
             }
         };
-    });
-    define('databases/youtube/lib/api', ['datajslib!http', 'datajslib!underscore'], function (http, _) {
-
-        var api = {};
-
-
-        // Options: handle mongo's like options
-
-        api.options = function (query) {
-            var ret = {};
-            if (query.skip) ret["start-index"] = query.skip + 1;
-            if (query.limit) ret['max-results'] = query.limit;
-
-            return ret;
-        };
-
-
-        // Generate final URL 
-
-        api.generateUrl = function (url, params) {
-            for (var param in params) {
-                var newUrl = url.replace(new RegExp(':' + param), params[param]);
-                if (newUrl != url)
-                    url = newUrl;
-                else
-                    url += ((url.indexOf('?') == -1) ? '?' : '&') + param + (params[param] ? ('=' + params[param]) : '');
-            }
-            return url;
-        };
-
-
-        // Call API 
-
-        api.request = function (url, cb) {
-
-            var baseUrl = 'http://gdata.youtube.com/feeds/api/';
-
-            // We add default parameter
-            url = baseUrl + api.generateUrl(url, { alt: 'json-in-script', v: 2 });
-
-            // console.log("url",url);
-            http.request({
-                'url': url,
-                'dataType': 'jsonp'
-            }, cb);
-        };
-
-
-        // Export --------------------------------------------------------------------
-
-        return api;
-
-    });
-
-    define('databases/youtube/videos', [
-      './lib/api',
-      'datajslib!underscore',
-      'datajslib!iso8601'
-    ], function (api, _, iso8601) {
-
-        return {
-            /**
-             * Description of the datasource for the factory
-             */
-            desc: {
-                "options": {
-                    "schema": {
-                        "playlist": {
-                            "type": "string",
-                            "title": "Playlist URL",
-                            "description": "You may also enter the ID of the playlist"
-                        },
-                        "search": {
-                            "type": "string",
-                            "title": "Search text",
-                            "description": "Keep in mind that the list of videos featured in the final app will be the results of the search when the app is run. Consider using playlists if you need more consistent results."
-                        },
-                        "feed": {
-                            "type": "string",
-                            "title": "Feed",
-                            "enum": [
-                              "",
-                              "top_rated",
-                              "most_viewed",
-                              "most_shared",
-                              "most_popular",
-                              "most_recent",
-                              "most_discussed",
-                              "most_responded",
-                              "recently_featured",
-                              "on_the_web"
-                            ]
-                        },
-                        "user": {
-                            "type": "string",
-                            "title": "Username",
-                            "description": "Filter results by username"
-                        }
-                    },
-                    "form": [
-                      {
-                          "type": "selectfieldset",
-                          "title": "Search by",
-                          "items": [
-                            {
-                                "type": "optionfieldset",
-                                "legend": "Text",
-                                "items": [
-                                  "search"
-                                ]
-                            },
-                            {
-                                "type": "optionfieldset",
-                                "legend": "Playlist",
-                                "items": [
-                                  "playlist"
-                                ]
-                            },
-                            {
-                                "type": "optionfieldset",
-                                "legend": "Username",
-                                "items": [
-                                  "user"
-                                ]
-                            },
-                            {
-                                "type": "optionfieldset",
-                                "legend": "Feed",
-                                "items": [
-                                  "feed"
-                                ]
-                            }
-                          ]
-                      }
-                    ]
-                },
-                "runtimes": ["browser", "nodejs", "win8"],
-                "outputType": "VideoObject"
-            },
-
-
-            /**
-             * Fetches feed items from the source provider.
-             * @function
-             * @param {Object} query Query parameters. Must define a 'filter' property
-             *   with a 'url' property that contains the absolute URL to the page.
-             * @param {function(Object, Object)} callback Callback function.
-             *   Returns a text.
-             */
-            fetch: function (query, callback) {
-                // See Youtube API at http://code.google.com/apis/youtube/2.0/reference.html
-                var filter = (query && query.filter) ? query.filter : {};
-                var validFeed = this.desc.options.schema.feed["enum"];
-                var url = null;
-
-                if (filter.search) {
-                    url = 'videos';
-                    filter = _.extend({ q: encodeURI(filter.search) }, filter.user ? { author: filter.user } : {});
-                }
-                else if (filter.feed) {
-                    url = 'standardfeeds/:feed';
-                    if (_.indexOf(validFeed, filter.feed) == -1) return callback('Invalid feed type "' + filter.feed + '".');
-                    filter = _.extend({ feed: filter.feed }, filter.user ? { author: filter.user } : {});
-                }
-                else if (filter.playlist) {
-                    url = 'playlists/:playlist';
-
-                    /* Playlist should be 16-char String
-                      Clean up user input : often PL{playlistId} or http://youtube.com/xxxxx
-                      */
-                    //console.warn('playlist ?','input', filter.playlist);
-                    if (filter.playlist.length > 16) {
-                        //full url ?
-                        var matches = filter.playlist.match(/http(s?):\/\/(www\.?)(youtube\.com\/playlist\?).*(list=)([A-Z0-9]*)/i);
-                        if (matches.length) {
-                            filter.playlist = matches.pop();
-                        }
-                        if (filter.playlist.length > 16) {
-                            //strip heading PL ... and any further arguments
-                            filter.playlist = filter.playlist.replace(/^PL/, '').substring(0, 16);
-                        }
-                        //console.warn('playlist !','output', filter.playlist);
-                    }
-
-                    filter = _.extend({ playlist: filter.playlist }, filter.user ? { author: filter.user } : {});
-                }
-                else if (filter.user) {
-                    url = 'users/:user/uploads';
-                }
-                else { // if nothing was specified
-                    return callback(null, null);
-                }
-                // use url = 'videos'; to display most popular videos
-
-                url = api.generateUrl(url, _.extend({}, filter, api.options(query)));
-
-                api.request(url, function (err, data) {
-                    return callback(err, data);
-                });
-            },
-
-            /**
-             * Normalizes the data received from the source provider.
-             * @function
-             * @param {Object} data The data that was received
-             *(typically the object given to the callback method at the end of a "fetch")
-             * @param {Object} query Query parameters (which could include filtering options)
-             * @param {function(Object, Object)} callback Callback function.
-             *   The second argument of the callback is an object with an "entries" property
-             *   that contains the list of items normalized according to the schema.org hierarchy.
-             */
-            process: function (data, query, callback) {
-                if (!data || !data.feed || !data.feed.entry) {
-                    return callback(null, { "entries": [] });
-                }
-                var videos = data.feed.entry;
-                var point = null;
-                var id = null;
-
-                for (var i = 0, l = videos.length; i < l; i++) {
-                    var vid = videos[i];
-
-                    if (vid.media$group && vid.media$group.media$content) {
-                        var url = vid.media$group.media$content[0].url;
-
-                        var match = url.match(/^https?:\/\/(www\.)?youtube\.com\/v\/([a-z0-9_\-]+).*$/i);
-
-                        if (match) {
-                            id = match[2];
-                        }
-                    }
-
-
-                    videos[i] = {
-                        '@type': 'VideoObject',
-                        'itemType': 'VideoObject',
-                        'url': vid.link[0].href.replace(/\&.*$/, ''), // to remove the extra parameters (&feature=youtube_gdata)
-                        'name': vid.title.$t,
-                        'playerType': id ? 'iframe' : null,
-                        'embedURL': id ? 'http://www.youtube-nocookie.com/embed/' + id + '?rel=0' : null,
-                        'publisher': {
-                            '@type': 'Organization',
-                            'itemType': 'Organization',
-                            'url': 'http://www.youtube.com',
-                            'name': 'Youtube'
-                        },
-                        'description': (vid.media$group && vid.media$group.media$description) ? vid.media$group.media$description.$t : '',
-                        'author': [],
-                        'genre': (vid.media$group && vid.media$group.media$category && vid.media$group.media$category.$t) ? vid.media$group.media$category.$t : '',
-                        'thumbnail': [],
-                        'datePublished': vid.published ? vid.published.$t : (vid.media$group && vid.media$group.yt$uploaded ? vid.media$group.yt$uploaded.$t : ''),
-                        'uploadDate': (vid.media$group && vid.media$group.yt$uploaded) ? vid.media$group.yt$uploaded.$t : '',
-                        'duration': (vid.media$group && vid.media$group.yt$duration) ? iso8601.fromDuration(Number(vid.media$group.yt$duration.seconds) * 1000) : ''
-                    };
-                    // Other possibilities: keywords, license when defined in schema.org.
-                    // Add ",'meta': vid" to the above code snipped to view all the information returned by Youtube
-                    // Note that vid.updated always returns the current date which is not particularly useful, discarded here.
-
-                    // Complete the list of authors
-                    if (vid.author) {
-                        for (var k = 0, kl = vid.author.length; k < kl; k++) {
-                            if (vid.author[k].uri && vid.author[k].name) {
-                                videos[i].author.push({
-                                    '@type': 'Person',
-                                    'itemType': 'Person',
-                                    'url': vid.author[k].uri.$t,
-                                    'name': vid.author[k].name.$t
-                                });
-                            }
-                        }
-                    }
-
-                    // Complete the list of thumbnails
-                    if (vid.media$group && vid.media$group.media$thumbnail) {
-                        for (var k2 = 0, kl2 = vid.media$group.media$thumbnail.length; k2 < kl2; k2++) {
-                            var thumbnail = vid.media$group.media$thumbnail[k2];
-                            videos[i].thumbnail.push({
-                                '@type': 'ImageObject',
-                                'itemType': 'ImageObject',
-                                'url': thumbnail.url,
-                                'name': thumbnail.yt$name,
-                                'contentURL': thumbnail.url,
-                                'width': thumbnail.width,
-                                'height': thumbnail.height
-                            });
-                        }
-                        if (videos[i].thumbnail[0]) {
-                            videos[i].image = _.clone(videos[i].thumbnail[0]);
-                        }
-                    }
-
-                    // Location
-                    if (vid.georss$where &&
-                      vid.georss$where.gml$Point &&
-                      vid.georss$where.gml$Point.gml$pos &&
-                      vid.georss$where.gml$Point.gml$pos.$t) {
-                        point = vid.georss$where.gml$Point.gml$pos.$t.split(' ');
-                        if (point.length === 2) {
-                            videos[i].contentLocation = {
-                                '@type': 'Place',
-                                'itemType': 'Place',
-                                'geo': {
-                                    '@type': 'GeoCoordinates',
-                                    'itemType': 'GeoCoordinates',
-                                    'latitude': parseFloat(point[0], 10),
-                                    'longitude': parseFloat(point[1], 10)
-                                }
-                            };
-                        }
-                    }
-                    if (vid.yt$location && vid.yt$location.$t) {
-                        if (!videos[i].contentLocation) {
-                            videos[i].contentLocation = {
-                                '@type': 'Place',
-                                'itemType': 'Place'
-                            };
-                        }
-                        videos[i].contentLocation.name = vid.yt$location.$t;
-                    }
-
-                    // Aspect ratio
-                    // (remains in Youtube namespace since not a standard property)
-                    if (vid.media$group &&
-                      vid.media$group.yt$aspectRatio &&
-                      vid.media$group.yt$aspectRatio.$t) {
-                        videos[i]['yt:aspectRatio'] = vid.media$group.yt$aspectRatio.$t;
-                    }
-                }
-
-                callback(null, { "entries": videos });
-            },
-
-
-            /**
-             * Fetches and normalizes the data.
-             * @function
-             * @param {Object} query Query parameters. Feed specific object.
-             * @param {function(Object, Object)} callback Callback function.
-             *   receives the error or the normalized feed.
-             */
-            find: function (query, callback) {
-                // Implementation note: same code as example/news
-                var self = this;
-                self.fetch(query, function (err, data) {
-                    if (err) {
-                        return callback(err, null);
-                    }
-                    else {
-                        self.process(data, query, function (err, convertedData) {
-                            return callback(err, convertedData);
-                        });
-                    }
-                });
-            }
-        };
-    });
+    });;
     ;
     ; (function (a, b) { var c = function (c) { var d = null, e = null, f = 0; return !c || !a || !a.config || !a.config.datasources || !a.config.datasources[c] ? null : (d = a.config.datasources[c], b(["datajslib!collection"], function (a) { if (Object.prototype.toString.call(d) == "[object Array]") { e = { children: [], find: function (a, b) { var c = d.length, f = !1, g = [], h = 0, i = function (a, d) { c -= 1; if (f) return; a && (f = !0), d && g.push(d); if (a || c === 0) return b(a, { entries: g }) }; for (h = 0; h < e.children.length; h++) e.children[h].find(a, i) } }; for (f = 0; f < d.length; f++) e.children[f] = a.getCollection(d[f]), e.children[f].name = d[f].name, e.children[f].config = d[f] } else e = a.getCollection(d), e.name = d.name, e.config = d }, null, !0), e) }; a.getDataSource = c })(window.Joshfire.factory, require);
+    (function (a, b) { var c = function (a) { return a = a || document.getElementById("body") || document.documentElement, Object.prototype.toString.call(a) === "[object String]" ? document.querySelector ? document.querySelector(a) : document.getElementById(a) : a }, d = function (b) { var d = [], f = null, g, h, i = []; if (!b) return []; d = a.config.addons || []; for (g = 0; g < d.length; g++) { f = d[g]; for (h = 0; h < f.hooks.length; h++) if (b === f.hooks[h]) { i.push(new e(f, b)); break } } return i.run = i.render = function (a, b, d) { var e = 0, f = c(a), g = null; d = d || function () { return }; var h = 0, j = function (a) { a && (g = a), h += 1; if (h === i.length) return d(g) }; b = b || {}, b.replaceContent && delete b.replaceContent; for (e = 0; e < i.length; e++) i[e].render(f, b, j) }, i.startActivity = function (a, b, c) { a = a || {}, b = b || function () { return }, c = c || function () { return }; if (i.length > 0) i[0].startActivity(a, b, c); else if (c) return c("No installed add-on for the given intent") }, i }, e = function (a, d) { var e = this, f = !1, g = [], h = function (a) { f ? a() : g.push(a) }; this.config = a, this.intent = a.intent, this.run = this.render = function (a, b, d) { b = b || {}, d = d || function () { return }, h(function () { if (!e.addon) return d("Add-on not available"); if (!e.addon.generate) return d("Invalid add-on, no generate function"); var f = c(a), g = f; e.addon.generate(b, function (a, c) { return a ? d(a) : (c ? (b.replaceContent ? e.setContent(g, c) : (g = document.createElement("div"), e.setContent(g, c), f.appendChild(g)), e.addon.enhance && e.addon.enhance(g, b)) : b.replaceContent && e.setContent(g, ""), d()) }) }) }, this.generate = function (a, b) { a = a || {}, b = b || function () { return }, h(function () { if (!e.addon) return b("Add-on not available"); if (!e.addon.generate) return b("Invalid add-on, no generate function"); e.addon.generate(a, b) }) }, this.setContent = function (a, b) { function e(a, b) { b(a); for (var c in a.childNodes) e(a.childNodes[c], b) } function f(a, b) { return a.nodeName && a.nodeName.toUpperCase() === b.toUpperCase() } function g(a) { var b = a.text || a.textContent || a.innerHTML || "", c = a.getAttribute("src"), d = document.getElementsByTagName("head")[0] || document.documentElement, e = document.createElement("script"); e.type = "text/javascript", c && e.setAttribute("src", c), b && e.appendChild(document.createTextNode(b)), d.insertBefore(e, d.firstChild), a.parentNode && a.parentNode.removeChild(a) } var d = c(a); d.innerHTML = ("" + b).trim(); var h = [], i = null; e(d, function (a) { a.nodeName && a.nodeName.toUpperCase() === "SCRIPT" && (!a.type || a.type === "text/javascript") && h.push(a) }); for (i in h) g(h[i]) }, this.enhance = function (a, b) { b = b || {}; if (!this.addon) return; if (!this.addon.enhance) return; var d = c(a); this.addon.enhance(d, b) }, this.startActivity = function (a, b, c) { a = a || {}, b = b || function () { return }, c = c || function () { return }, h(function () { if (!e.addon) return c("Add-on not available"); if (!e.addon.startActivity) return c("Add-on does not implement a startActivity function"); e.addon.startActivity(a, b, c) }) }, b(["addons/" + this.config.name + "/" + d], function (a) { e.addon = a(e.config.options || {}), f = !0; for (var b = 0, c = g.length; b < c; b++) g.pop()() }) }; a.getAddOns = d })(window.Joshfire.factory, require);
 })();

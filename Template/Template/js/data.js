@@ -1,6 +1,8 @@
 ﻿(function () {
     "use strict";
 
+    var dataloaded = false;
+
     // Get a reference for an item, using the group key and item title as a
     // unique reference to the item that can be easily serialized.
     function getItemReference(item) {
@@ -72,6 +74,8 @@
     // note that external <script> cannot be called on a local context, so no JSONP
     // http://msdn.microsoft.com/library/windows/apps/Hh452745
     // http://msdn.microsoft.com/library/windows/apps/Hh465373
+    
+    var queryCompleteCounter = 0;
 
     for (var dsNb = 0; dsNb < datasources.children.length; dsNb++) {
         var group = { key: "main" + dsNb, title: datasources.children[dsNb].name, index: dsNb, length: 0 };
@@ -79,6 +83,16 @@
         datasources.children[dsNb].find({}, function (g) {
            
             return function (err, data) {
+                queryCompleteCounter++;
+
+                if (queryCompleteCounter == datasources.children.length) {
+                    setTimeout(function () {
+                        var loadingControl = document.getElementById('loadingControl');
+                        Data.dataloaded = true;
+                        loadingControl.style.display = 'none';
+                    }, 1400);
+                }
+
                 if (err) {
                     console.error(err.toString());
                     return;
@@ -106,6 +120,8 @@
         getItemReference: getItemReference,
         resolveGroupReference: resolveGroupReference,
         resolveItemReference: resolveItemReference,
+
+        dataloaded: dataloaded,
 
         homeItems: getxItems,
         getHomeItemReference: getHomeItemReference,
