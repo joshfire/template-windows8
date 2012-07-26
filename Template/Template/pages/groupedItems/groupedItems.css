@@ -46,8 +46,8 @@
     }
 
         .largeitem img {
-            min-height: 500px;
-            min-width: 525px;
+            min-height: 510px;
+            min-width: 545px;
             -ms-interpolation-mode: bicubic;
             position: absolute;
         }

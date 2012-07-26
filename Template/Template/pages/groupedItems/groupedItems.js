@@ -81,9 +81,18 @@
 
             }
             else {
-                img.src = '/images/placeholders/' + currentItem.data['@type'] + 'Placeholder.png'
-                img.width = '100%';
-                img.height = '100%';
+                img.src = '/images/placeholders/' + currentItem.data['@type'] + 'Placeholder.png';
+                if (isLarge) {
+                    //img.style.left = "10px";
+                    //img.style.top = "5px";
+                }
+                else {
+                    /* Set the image tag's dimentions and its position behind its mask */
+                    //img.height = cellH;
+                    //var newW = 525 * (cellH / 500);
+                    img.style.left = -((545 - cellW) / 2) + 'px';
+                    img.style.top = -((510 - cellH) / 2) + 'px';
+                }
             }
 
             return tplSelect.element;
