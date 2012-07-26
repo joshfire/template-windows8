@@ -60,7 +60,10 @@
                     thethumb = currentItem.data.image;
 
                 /* Set the URL */
-                img.src = thethumb.contentURL || '/images/placeholders/' + currentItem.data['@type'] + 'Placeholder.png'
+                img.src = thethumb.contentURL;
+                if (img.src.indexOf('http://') < 0 || (img.src.indexOf('jpg') < 0 && img.src.indexOf('png') < 0)) {
+                    img.src = '/images/placeholders/' + currentItem.data['@type'] + 'Placeholder.png';
+                }
 
                 /* Set the image tag's dimentions and its position behind its mask */
                 if ((thethumb.height - cellH) < (thethumb.width - cellW)) {
