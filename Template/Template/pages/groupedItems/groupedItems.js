@@ -60,8 +60,7 @@
                     thethumb = currentItem.data.image;
 
                 /* Set the URL */
-                console.log(thethumb.contentURL);
-                img.src = thethumb.contentURL || '/images/logo.png';
+                img.src = thethumb.contentURL || '/images/placeholders/' + currentItem.data['@type'] + 'Placeholder.png'
 
                 /* Set the image tag's dimentions and its position behind its mask */
                 if ((thethumb.height - cellH) < (thethumb.width - cellW)) {
@@ -79,7 +78,7 @@
 
             }
             else {
-                img.src = '/images/logo.png'
+                img.src = '/images/placeholders/' + currentItem.data['@type'] + 'Placeholder.png'
                 img.width = '100%';
                 img.height = '100%';
             }
@@ -113,7 +112,7 @@
             }
 
             var img = tplSelect.element._value.querySelector('.tilebackground');
-            img.src = thethumb.contentURL || '/images/logo.png';
+            img.src = thethumb.contentURL || '/images/' + currentItem.data['@type'] + 'Placeholder.png';
             img.style.top = -(thethumb.height - 120);
             img.width = '100%';
 

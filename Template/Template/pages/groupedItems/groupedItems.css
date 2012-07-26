@@ -15,18 +15,18 @@
 .groupeditemspage header[role=banner] img {
     max-height: 100%;
     width: auto;
+    float: left;
 }
 
 #loadingControl {
-    position: absolute;
-    top: 80px;
-    left: 400px;
+    display: inline-block;
     font-family: "Segoe UI";
     font-size: 11pt;
     line-height: 15px;
     color: white;
+    float: left;
+    margin-top: 25px;
 }
-
 
 
     #loadingControl progress {

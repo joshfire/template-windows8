@@ -54,6 +54,9 @@
     </AppxManifest>
     <None Include="arthur.pfx" />
     <Content Include="css\default.css" />
+    <Content Include="images\VideoObjectPlaceholder.png" />
+    <Content Include="images\ImageObjectPlaceholder.png" />
+    <Content Include="images\BlogPostingPlaceholder.png" />
     <Content Include="images\logo.png" />
     <Content Include="images\smalllogo.png" />
     <Content Include="images\splashscreen.png" />

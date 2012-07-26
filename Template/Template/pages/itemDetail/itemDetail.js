@@ -153,7 +153,7 @@
             iimg.src = data.image.contentURL;
         }
         else {
-            iimg.src = 'images/logo.png';
+            iimg.src = '/images/placeholders/' + currentItem.data['@type'] + 'Placeholder.png';
         }
 
         utils.setInnerHTML(elem.querySelector('article'), toStaticHTML(data.articleBody));

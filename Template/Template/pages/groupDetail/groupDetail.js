@@ -24,7 +24,7 @@
             if (currentItem.data.image && currentItem.data.image.contentURL && currentItem.data.image.contentURL != "")
                 img.src = currentItem.data.image.contentURL;
             else
-                img.src = 'images/logo.png';
+                img.src = '/images/placeholders/' + currentItem.data['@type'] + 'Placeholder.png';
 
             return tpl.element;
         });
