@@ -61,19 +61,23 @@
 
                 /* Set the URL */
                 img.src = thethumb.contentURL;
-                if (img.src.indexOf('http://') < 0 || (img.src.indexOf('jpg') < 0 && img.src.indexOf('png') < 0)) {
+                if (img.src.indexOf('http://') < 0) {
                     img.src = '/images/placeholders/' + currentItem.data['@type'] + 'Placeholder.png';
+                    img.style.left = -((545 - cellW) / 2) + 'px';
+                    img.style.top = -((510 - cellH) / 2) + 'px';
                 }
 
                 /* Set the image tag's dimentions and its position behind its mask */
-                if ((thethumb.height - cellH) < (thethumb.width - cellW)) {
+                if (!thethumb.height || !thethumb.width || (thethumb.height - cellH) < (thethumb.width - cellW)) {
                     img.height = cellH;
+                    // center the image
                     var newW = thethumb.width * (cellH / thethumb.height);
                     if ((newW - cellW) > 0 && !isLarge)
                         img.style.left = -((newW - cellW) / 2) + 'px';
                 }
                 else {
                     img.width = cellW;
+                    // center
                     var newH = thethumb.height * (cellW / thethumb.width);
                     if ((newH - cellH) > 0 && !isLarge)
                         img.style.top = -((newH - cellH) / 2) + 'px';
