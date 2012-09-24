@@ -190,22 +190,29 @@
             var dtm = Windows.ApplicationModel.DataTransfer.DataTransferManager.getForCurrentView();
             dtm.ondatarequested = null;
 
+            // if data have all been loaded, remove spinner (for example, when going to the home page after from a detail page, after a full load)
             if (Data.dataloaded) {
                 var loadingControl = document.getElementById('loadingControl');
                 loadingControl.style.display = 'none';
             }
 
+            // add app title in the header
+            if (Data.appConfig.name) {
+                element.querySelector("header[role=banner] .pagetitle").textContent = Data.appConfig.name;
+            }
+
+            // replace the application title with the application logo if exists.
             if (Data.appConfig.logo) {
                 var logo = document.createElement('img');
+                // replace only after loading, we may be in offline mode.
+                logo.onload = function () {
+                    element.querySelector("header[role=banner] .pagetitle").textContent = '';
+                    element.querySelector("header[role=banner] .pagetitle").appendChild(logo);
+                };
                 logo.src = Data.appConfig.logo.contentURL;
-                element.querySelector("header[role=banner] .pagetitle").textContent = '';
-                element.querySelector("header[role=banner] .pagetitle").appendChild(logo);
+                
             }
-            else {
-                if (Data.appConfig.name) {
-                    element.querySelector("header[role=banner] .pagetitle").textContent = Data.appConfig.name;
-                }
-            }
+
 
             this.initializeLayout(listView, appView.value);
         },

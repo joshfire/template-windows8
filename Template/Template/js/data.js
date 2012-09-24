@@ -33,6 +33,7 @@
         return list.createFiltered(function (item) { return item.group.key === group.key; });
     }
 
+    // all our data are stored inside an unique list
     var list = new WinJS.Binding.List();
 
     var groupedItems = list.createGrouped(
@@ -40,6 +41,9 @@
         function groupDataSelector(item) { return item.group; }
     );
 
+    /**
+     *  Get a filtered list with items having an index inferior to the given x parameter
+     */
     var getxItems = function (x) {
 
         var ltdList = list.createFiltered(function (item) {
@@ -75,6 +79,7 @@
     // http://msdn.microsoft.com/library/windows/apps/Hh452745
     // http://msdn.microsoft.com/library/windows/apps/Hh465373
     
+    // a counter to the number of datasources loaded
     var queryCompleteCounter = 0;
 
     for (var dsNb = 0; dsNb < datasources.children.length; dsNb++) {
@@ -85,6 +90,7 @@
             return function (err, data) {
                 queryCompleteCounter++;
 
+                // If all datasources have been loaded, remove the loading spinner
                 if (queryCompleteCounter == datasources.children.length) {
                     setTimeout(function () {
                         var loadingControl = document.getElementById('loadingControl');
@@ -97,7 +103,7 @@
                     console.error(err.toString());
                     return;
                 }
-                // Process data entries in data.entries
+                // Add received data entries into the data list
                 var k = 0;
                 g.length = data.entries.length;
                 data.entries.forEach(function (item) {
