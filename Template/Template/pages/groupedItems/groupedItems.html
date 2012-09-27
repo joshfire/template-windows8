@@ -57,6 +57,9 @@
             </h1>
         </header>
         <section aria-label="Main content" role="main">
+            <!-- "No internet" message. It is a lie, we may have been able to fetch content -->
+            <div id="no-internet-message" class="warning-message" style="display:none;">Cannot fetch content because connection is unavailable, please connect your device to the internet.</div>
+
             <div class="groupeditemslist" aria-label="List of groups" data-win-control="WinJS.UI.ListView" data-win-options="{ selectionMode: 'none',
                     itemDataSource: Data.items.dataSource, 
                     groupDataSource: Data.groups.dataSource }"></div>

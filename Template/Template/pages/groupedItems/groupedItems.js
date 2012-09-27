@@ -145,6 +145,27 @@
         };
     }
 
+    /**
+     * Checks internet status and display a warning message
+     */
+    var checkInternet = function () {
+        var internetConnection = Windows.Networking.Connectivity.NetworkInformation.getInternetConnectionProfile();
+        var messageElement = document.getElementById("no-internet-message");
+
+        if (internetConnection && internetConnection.getNetworkConnectivityLevel() === Windows.Networking.Connectivity.NetworkConnectivityLevel.internetAccess) {
+            if (messageElement) {
+                messageElement.style.display = 'none';
+            }
+            if (!Data.dataloaded && !Data.dataloading) {
+                Data.update();
+            }
+        } else {
+            if (messageElement) {
+                messageElement.style.display = 'block';
+            }
+        }
+    }
+
     ui.Pages.define("/pages/groupedItems/groupedItems.html", {
 
         // This function updates the ListView with new layouts
@@ -213,6 +234,10 @@
                 
             }
 
+            // check for internet changes 
+            Windows.Networking.Connectivity.NetworkInformation.addEventListener("networkstatuschanged", checkInternet);
+            // also check now
+            checkInternet();
 
             this.initializeLayout(listView, appView.value);
         },

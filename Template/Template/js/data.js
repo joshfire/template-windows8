@@ -1,8 +1,6 @@
 ﻿(function () {
     "use strict";
 
-    var dataloaded = false;
-
     // Get a reference for an item, using the group key and item title as a
     // unique reference to the item that can be easily serialized.
     function getItemReference(item) {
@@ -69,54 +67,65 @@
     // Expose the config for general use through the app.
     var factoryconfig = Joshfire.factory.config;
 
-    // Use Joshfire Factory data sources for the moment.
-    // See http://developer.joshfire.com/doc/dev/develop/datasources
-    // They are defined in the bootstrap.js file
+    var populateListFromDataSource = function () {
+        Data.dataloading = true;
 
-    var datasources = Joshfire.factory.getDataSource("main");
+        // Use Joshfire Factory data sources for the moment.
+        // See http://developer.joshfire.com/doc/dev/develop/datasources
+        // They are defined in the bootstrap.js file
+        var datasources = Joshfire.factory.getDataSource("main");
 
-    // note that external <script> cannot be called on a local context, so no JSONP
-    // http://msdn.microsoft.com/library/windows/apps/Hh452745
-    // http://msdn.microsoft.com/library/windows/apps/Hh465373
-    
-    // a counter to the number of datasources loaded
-    var queryCompleteCounter = 0;
+        // note that external <script> cannot be called on a local context, so no JSONP
+        // http://msdn.microsoft.com/library/windows/apps/Hh452745
+        // http://msdn.microsoft.com/library/windows/apps/Hh465373
 
-    for (var dsNb = 0; dsNb < datasources.children.length; dsNb++) {
-        var group = { key: "main" + dsNb, title: datasources.children[dsNb].name, index: dsNb, length: 0 };
+        // a counter of the number of datasources asked
+        var queryCompleteCounter = 0;
+        // a counter of the number of datasources successfully received from the servers
+        var successCounter = 0;
 
-        datasources.children[dsNb].find({}, function (g) {
-           
-            return function (err, data) {
-                queryCompleteCounter++;
+        var dsWaitingForResponse
 
-                // If all datasources have been loaded, remove the loading spinner
-                if (queryCompleteCounter == datasources.children.length) {
-                    setTimeout(function () {
-                        var loadingControl = document.getElementById('loadingControl');
-                        Data.dataloaded = true;
-                        loadingControl.style.display = 'none';
-                    }, 1400);
-                }
+        for (var dsNb = 0; dsNb < datasources.children.length; dsNb++) {
+            var group = { key: "main" + dsNb, title: datasources.children[dsNb].name, index: dsNb, length: 0 };
 
-                if (err) {
-                    console.error(err.toString());
-                    return;
-                }
-                // Add received data entries into the data list
-                var k = 0;
-                g.length = data.entries.length;
-                data.entries.forEach(function (item) {
-                    item.group = g;
-                    // index inside its datasource
-                    item.innerIndex = k;
-                    list.push(item);
+            datasources.children[dsNb].find({}, function (g) {
 
-                    k++;
-                });
-            };
-        }(group)
-        );
+                return function (err, data) {
+                    queryCompleteCounter++;
+                    if (queryCompleteCounter == datasources.children.length) {
+                        Data.dataloading = false;
+                    }
+                    if (err) {
+                        console.error(err.toString());
+                        return;
+                    }
+
+                    successCounter++;
+                    // If all datasources have been loaded, remove the loading spinner
+                    if (successCounter == datasources.children.length) {
+                        setTimeout(function () {
+                            var loadingControl = document.getElementById('loadingControl');
+                            Data.dataloaded = true;
+                            loadingControl.style.display = 'none';
+                        }, 1400);
+                    }
+
+                    // Add received data entries into the data list
+                    var k = 0;
+                    g.length = data.entries.length;
+                    data.entries.forEach(function (item) {
+                        item.group = g;
+                        // index inside its datasource
+                        item.innerIndex = k;
+                        list.push(item);
+
+                        k++;
+                    });
+                };
+            }(group)
+            );
+        }
     }
 
     WinJS.Namespace.define("Data", {
@@ -127,11 +136,16 @@
         resolveGroupReference: resolveGroupReference,
         resolveItemReference: resolveItemReference,
 
-        dataloaded: dataloaded,
+        dataloading: false,
+        dataloaded: false,
 
         homeItems: getxItems,
         getHomeItemReference: getHomeItemReference,
 
-        appConfig: factoryconfig.app
+        appConfig: factoryconfig.app,
+
+        update: populateListFromDataSource
     });
+
+    populateListFromDataSource();
 })();

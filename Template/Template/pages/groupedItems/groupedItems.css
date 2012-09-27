@@ -5,6 +5,16 @@
     margin-bottom: 60px;
 }
 
+.groupeditemspage .warning-message {
+    margin-left: 120px;
+    margin-bottom: 15px;
+}
+
+.groupeditemspage .groupeditemslist .win-horizontal.win-viewport .win-surface {
+    margin-left: 45px;
+    margin-bottom: 60px;
+}
+
 .groupeditemspage .groupeditemslist {
     height: 100%;
     position: relative;
