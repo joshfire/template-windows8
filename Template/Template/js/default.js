@@ -40,5 +40,15 @@
         app.sessionState.history = nav.history;
     };
 
+    // Add a privacy policy, support link / email and about page in the settings
+    app.onsettings = function (e) {
+        e.detail.applicationcommands = {
+            "support": { title: "Support", href: "/pages/settings/support.html" },
+            "privacy": { title: "Privacy policy", href: "/pages/settings/privacy.html" },
+            "about"  : { title: "About", href: "/pages/settings/about.html" }
+        };
+        WinJS.UI.SettingsFlyout.populateSettings(e);
+    };
+
     app.start();
 })();

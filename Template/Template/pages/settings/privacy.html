@@ -1,0 +1,24 @@
+﻿<!doctype HTML>
+<html>
+    <head>
+        <title>Help settings flyout</title>
+    </head>
+    <body>
+        <!-- BEGINSETTINGFLYOUT -->
+        <div data-win-control="WinJS.UI.SettingsFlyout" aria-label="Help settings flyout" data-win-options="{settingsCommandId:'privacy',width:'wide'}">
+            <div class="win-ui-light win-header" style="background-color:#FF0000"> <!-- Background color reflects app's personality -->
+               <button type="button" onclick="WinJS.UI.SettingsFlyout.show()" class="win-backbutton"></button>
+               <div class="win-label">Privacy Policy</div>
+            </div>                
+            <div class="win-content">
+                <div class="win-settings-section">                    
+                    <div id="onlineHelp"> 
+                        <iframe src="http://factory.joshfire.com/privacy" width="566" height="600"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+        <!-- ENDSETTINGSFLYOUT -->
+    </body>
+</html>
