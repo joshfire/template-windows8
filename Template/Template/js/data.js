@@ -128,10 +128,30 @@
         }
     }
 
+    /** Get the first item and grab its image if it has one */
+    function getImageFromGroup(groupItem) {
+        var firstItem = this.getItemsFromGroup(groupItem).getAt(0);
+        var thethumb = null;
+
+        if (firstItem.image)
+            thethumb = firstItem.image;
+        if (firstItem.thumbnail && firstItem.thumbnail.length) {
+            var bestW = 0;
+            for (var k in firstItem.thumbnail) {
+                if (firstItem.thumbnail[k].width > bestW) {
+                    thethumb = firstItem.thumbnail[k];
+                    bestW = firstItem.thumbnail[k].width;
+                }
+            }
+        }
+        return thethumb;
+    }
+
     WinJS.Namespace.define("Data", {
         items: groupedItems,
         groups: groupedItems.groups,
         getItemsFromGroup: getItemsFromGroup,
+        getImageFromGroup: getImageFromGroup,
         getItemReference: getItemReference,
         resolveGroupReference: resolveGroupReference,
         resolveItemReference: resolveItemReference,

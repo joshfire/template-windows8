@@ -15,11 +15,14 @@
 </head>
 <body>
     <!-- These templates are used to display each item in the ListView declared below. -->
+    
+    <!-- Template for group title in main list -->
     <div class="headerTemplate" data-win-control="WinJS.Binding.Template">
         <p class="group-title win-type-x-large" data-win-bind="textContent: title; groupKey: key" 
             onclick="WinJS.Navigation.navigate('/pages/groupDetail/groupDetail.html', { groupKey: event.srcElement.groupKey })" role="link"></p>
     </div>
-    
+
+    <!-- Template for small item in main list -->
     <div class="itemtemplate" data-win-control="WinJS.Binding.Template">
         <div class="regularitem">
             <div class="thumbnailViewer">
@@ -32,11 +35,7 @@
         </div>
     </div>
 
-    <div class="listitemtemplate" data-win-control="WinJS.Binding.Template">
-        <img class = "tilebackground" src = "#" />
-        <p class="title" data-win-bind="textContent: title"></p>
-    </div>
-    
+    <!-- Template for large item in main list -->
     <div class="largeitemtemplate" data-win-control="WinJS.Binding.Template">
         <div class="largeitem">
             <img class="thumbnail" src="#" data-win-bind="alt: name" />
@@ -45,6 +44,22 @@
                 <h6 class="item-subtitle win-type-ellipsis" data-win-bind="textContent: description"></h6>
             </div>
         </div>
+    </div>
+
+    <!-- Template for zoomed out group items -->
+    <div id="zoomedOutItemTemplate" data-win-control="WinJS.Binding.Template">
+        <div class="zoomedOutItem">
+            <img class="tilebackground" src="#" data-win-bind="alt: title" />
+            <div class="item-overlay">
+                <h4 class="item-title" data-win-bind="textContent: title"></h4>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Template for snap view group items -->
+    <div class="listitemtemplate" data-win-control="WinJS.Binding.Template">
+        <img class = "tilebackground" src = "#" />
+        <p class="title" data-win-bind="textContent: title"></p>
     </div>
 
     <!-- The content that will be loaded and displayed. -->
@@ -60,9 +75,18 @@
             <!-- "No internet" message. It is a lie, we may have been able to fetch content -->
             <div id="no-internet-message" class="warning-message" style="display:none;">Cannot fetch content because connection is unavailable, please connect your device to the internet.</div>
 
-            <div class="groupeditemslist" aria-label="List of groups" data-win-control="WinJS.UI.ListView" data-win-options="{ selectionMode: 'none',
-                    itemDataSource: Data.items.dataSource, 
-                    groupDataSource: Data.groups.dataSource }"></div>
+			<div class="lists" data-win-control="WinJS.UI.SemanticZoom">
+                <!-- The zoomed-in view. --> 
+                <div class="groupeditemslist" aria-label="List of first items of every groups" data-win-control="WinJS.UI.ListView" data-win-options="{ selectionMode: 'none',
+                        itemDataSource: Data.items.dataSource, 
+                        groupDataSource: Data.groups.dataSource }">
+                </div>
+
+                <!--- The zoomed-out view. -->
+                <div class="zoomedOutGroupeditemslist" aria-label="List of groups" data-win-control="WinJS.UI.ListView" data-win-options="{ selectionMode: 'none',
+                        itemDataSource: Data.groups.dataSource }"></div>
+			</div>
+
         </section>
     </div>
 </body>

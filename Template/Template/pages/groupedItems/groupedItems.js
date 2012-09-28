@@ -12,7 +12,6 @@
         cellRowSpan = 2,
         cellColSpan = 3;
 
-
     function templateHandler(itemPromise) {
         return itemPromise.then(function (currentItem, recycled) {
 
@@ -107,25 +106,26 @@
     function listTemplateHandler(itemPromise) {
         return itemPromise.then(function (currentItem, recycled) {
             var tplSelect = document.querySelector('.listitemtemplate').winControl;
-            
-
             tplSelect = tplSelect.renderItem(itemPromise, recycled);
 
             // Get the first item and grab its image if it has one. Display it as BG.
-            var firstItem = Data.getItemsFromGroup(currentItem).getAt(0);
-            var thethumb = null;
+            var thethumb = Data.getImageFromGroup(currentItem);
 
-            if (firstItem.image)
-                thethumb = firstItem.image;
-            if (firstItem.thumbnail && firstItem.thumbnail.length) {
-                var bestW = 0;
-                for (var k in firstItem.thumbnail) {
-                    if (firstItem.thumbnail[k].width > bestW) {
-                        thethumb = firstItem.thumbnail[k];
-                        bestW = firstItem.thumbnail[k].width;
-                    }
-                }
-            }
+            var img = tplSelect.element._value.querySelector('.tilebackground');
+            img.src = thethumb.contentURL || '/images/' + currentItem.data['@type'] + 'Placeholder.png';
+            img.style.top = -(thethumb.height - 120);
+            img.width = '100%';
+            return tplSelect.element;
+        });
+    }
+
+    function zoomedOutTemplateHandler(itemPromise) {
+        return itemPromise.then(function (currentItem, recycled) {
+            var tplSelect = document.querySelector('#zoomedOutItemTemplate').winControl;
+            tplSelect = tplSelect.renderItem(itemPromise, recycled);
+
+            // Get the first item and grab its image if it has one. Display it as BG.
+            var thethumb = Data.getImageFromGroup(currentItem);
 
             var img = tplSelect.element._value.querySelector('.tilebackground');
             img.src = thethumb.contentURL || '/images/' + currentItem.data['@type'] + 'Placeholder.png';
@@ -133,7 +133,6 @@
             img.width = '100%';
 
             return tplSelect.element;
-
         });
     }
 
@@ -206,6 +205,11 @@
             var listView = element.querySelector(".groupeditemslist").winControl;
             listView.groupHeaderTemplate = element.querySelector(".headerTemplate");
             listView.oniteminvoked = this.itemInvoked.bind(this);
+            this.initializeLayout(listView, appView.value);
+
+            var zoomedOutListView = element.querySelector(".zoomedOutGroupeditemslist").winControl;
+            zoomedOutListView.itemTemplate = zoomedOutTemplateHandler;
+            //zoomedOutListView.layout = new ui.ListLayout();
 
             // Listen to the share event
             var dtm = Windows.ApplicationModel.DataTransfer.DataTransferManager.getForCurrentView();
@@ -231,15 +235,12 @@
                     element.querySelector("header[role=banner] .pagetitle").appendChild(logo);
                 };
                 logo.src = Data.appConfig.logo.contentURL;
-                
             }
 
             // check for internet changes 
             Windows.Networking.Connectivity.NetworkInformation.addEventListener("networkstatuschanged", checkInternet);
             // also check now
             checkInternet();
-
-            this.initializeLayout(listView, appView.value);
         },
 
         // This function updates the page layout in response to viewState changes.
