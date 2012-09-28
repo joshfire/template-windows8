@@ -5,9 +5,9 @@
     <title>Template</title>
 
     <!-- WinJS references -->
-    <!-- <link href="//Microsoft.WinJS.1.0.RC/css/ui-light.css" rel="stylesheet" />-->
-    <script src="//Microsoft.WinJS.1.0.RC/js/base.js"></script>
-    <script src="//Microsoft.WinJS.1.0.RC/js/ui.js"></script>
+    <!-- <link href="//Microsoft.WinJS.1.0/css/ui-light.css" rel="stylesheet" />-->
+    <script src="//Microsoft.WinJS.1.0/js/base.js"></script>
+    <script src="//Microsoft.WinJS.1.0/js/ui.js"></script>
 
     <!-- Joshfire Factory bootstrap script: Data are loaded using this script for the moment.
         it exposes a Joshfire.factory.data object to querry data -->
@@ -17,7 +17,7 @@
         // Create the CSS link dynamically, depending on which theme has been chosen in the template config
         var theme = Joshfire.factory.config.template.options.theme || 'dark';
         var link = document.createElement('link');
-        link.href = "//Microsoft.WinJS.1.0.RC/css/ui-" + theme + ".css";
+        link.href = "//Microsoft.WinJS.1.0/css/ui-" + theme + ".css";
         link.rel = "stylesheet";
 
         document.getElementsByTagName('head')[0].appendChild(link);
