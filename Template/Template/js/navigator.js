@@ -122,6 +122,9 @@
                     get: function () { return this.element.firstElementChild; }
                 }
             }
-        )
+        ),
+        nothingToShare: function (e) {
+            e.request.failWithDisplayText("You can share an item from its detail page.");
+        }
     });
 })();

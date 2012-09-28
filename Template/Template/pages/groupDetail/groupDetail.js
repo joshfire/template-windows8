@@ -71,9 +71,9 @@
             this.initializeLayout(listView, Windows.UI.ViewManagement.ApplicationView.value);
             listView.element.focus();
 
-            // Listen to the share event
+            // Listen to the share event and send nothing
             var dtm = Windows.ApplicationModel.DataTransfer.DataTransferManager.getForCurrentView();
-            dtm.ondatarequested = null;
+            dtm.ondatarequested = Application.nothingToShare;
         },
 
         unload: function () {

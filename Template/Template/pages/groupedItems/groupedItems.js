@@ -211,9 +211,9 @@
             zoomedOutListView.itemTemplate = zoomedOutTemplateHandler;
             //zoomedOutListView.layout = new ui.ListLayout();
 
-            // Listen to the share event
+            // Listen to the share event and display nothing
             var dtm = Windows.ApplicationModel.DataTransfer.DataTransferManager.getForCurrentView();
-            dtm.ondatarequested = null;
+            dtm.ondatarequested = Application.nothingToShare;
 
             // if data have all been loaded, remove spinner (for example, when going to the home page after from a detail page, after a full load)
             if (Data.dataloaded) {
