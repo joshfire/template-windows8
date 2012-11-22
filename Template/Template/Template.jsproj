@@ -52,6 +52,9 @@
     <AppxManifest Include="package.appxmanifest">
       <SubType>Designer</SubType>
     </AppxManifest>
+    <Content Include="pages\settings\about.js" />
+    <Content Include="pages\settings\privacy.js" />
+    <Content Include="pages\settings\support.js" />
     <Content Include="pages\settings\support.html" />
     <Content Include="pages\settings\privacy.html" />
     <Content Include="pages\settings\about.html" />
