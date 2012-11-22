@@ -1,4 +1,3 @@
-
 {
   "name": "window8",
   "fullName": "Windows 8 Metro",
@@ -56,11 +55,36 @@
            ],
           "default":"dark",
           "required": true
+        },
+        "abouthtml": {
+          "title": "About",
+          "type": "string",
+          "default":"<p>This application was generated with the <a href='http://factory.joshfire.com'>Joshfire Factory</a></p>"
+        },
+        "privacyhtml": {
+          "title": "About",
+          "type": "string"
+        },
+        "supporthtml": {
+          "title": "About",
+          "type": "string"
         }
       },
       "form": [
+        "datasources.main",
         "theme",
-        "datasources.main"
+        {
+          "key": "abouthtml",
+          "type": "wysihtml5"
+        },
+        {
+          "key": "privacyhtml",
+          "type": "wysihtml5"
+        },
+        {
+          "key": "supporthtml",
+          "type": "wysihtml5"
+        }
       ]
     },
 
