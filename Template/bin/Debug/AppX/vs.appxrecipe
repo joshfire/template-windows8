@@ -1,0 +1,116 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Machine>WEBTRON1</Machine>
+    <WindowsUser>Ali</WindowsUser>
+    <SolutionConfiguration>Debug|AnyCPU</SolutionConfiguration>
+    <PackageArchitecture>neutral</PackageArchitecture>
+    <RegisteredManifestChecksum>57617B2E8CFABA968A6A5CE0C281631A4C092E0CA0B3C66A9B5DA3F960674165</RegisteredManifestChecksum>
+    <RegisteredPackageMoniker>cc334e46-990e-466d-b5a7-292e68169853_1.0.0.0_neutral__7dxrktcvvny8t</RegisteredPackageMoniker>
+    <RegisteredUserModeAppID>cc334e46-990e-466d-b5a7-292e68169853_7dxrktcvvny8t!App</RegisteredUserModeAppID>
+    <RegisteredPackageID>cc334e46-990e-466d-b5a7-292e68169853</RegisteredPackageID>
+    <RegisteredPackagePublisher>CN=Ali</RegisteredPackagePublisher>
+    <RegisteredVersion>1.0.0.0</RegisteredVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <AppXManifest Include="C:\Users\Ali\Documents\msdev\template\Template\Template\bin\Debug\AppxManifest.xml">
+      <PackagePath>AppxManifest.xml</PackagePath>
+      <Modified>2012-05-28T12:04:10.747</Modified>
+    </AppXManifest>
+  </ItemGroup>
+  <ItemGroup>
+    <AppxPackagedFile Include="C:\Users\Ali\Documents\msdev\template\Template\Template\default.html">
+      <PackagePath>default.html</PackagePath>
+      <Modified>2012-05-26T21:38:13.018</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Ali\Documents\msdev\template\Template\Template\html\groupDetailPage.html">
+      <PackagePath>html\groupDetailPage.html</PackagePath>
+      <Modified>2012-05-26T21:01:00.467</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Ali\Documents\msdev\template\Template\Template\html\itemDetailPage.html">
+      <PackagePath>html\itemDetailPage.html</PackagePath>
+      <Modified>2012-05-26T21:00:41.321</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Ali\Documents\msdev\template\Template\Template\html\groupedItemsPage.html">
+      <PackagePath>html\groupedItemsPage.html</PackagePath>
+      <Modified>2012-05-26T21:01:14.207</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Ali\Documents\msdev\template\Template\Template\css\groupDetailPage.css">
+      <PackagePath>css\groupDetailPage.css</PackagePath>
+      <Modified>2012-05-26T19:46:32.536</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Ali\Documents\msdev\template\Template\Template\css\default.css">
+      <PackagePath>css\default.css</PackagePath>
+      <Modified>2012-05-28T12:08:37.440</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Ali\Documents\msdev\template\Template\Template\css\itemDetailPage.css">
+      <PackagePath>css\itemDetailPage.css</PackagePath>
+      <Modified>2012-05-26T19:46:32.542</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Ali\Documents\msdev\template\Template\Template\css\groupedItemsPage.css">
+      <PackagePath>css\groupedItemsPage.css</PackagePath>
+      <Modified>2012-05-26T19:46:32.548</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Ali\Documents\msdev\template\Template\Template\images\background.jpg">
+      <PackagePath>images\background.jpg</PackagePath>
+      <Modified>2012-05-26T21:47:25.096</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Ali\Documents\msdev\template\Template\Template\images\check.png">
+      <PackagePath>images\check.png</PackagePath>
+      <Modified>2012-04-17T15:05:52.487</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Ali\Documents\msdev\template\Template\Template\images\logo.png">
+      <PackagePath>images\logo.png</PackagePath>
+      <Modified>2012-05-26T17:56:09.006</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Ali\Documents\msdev\template\Template\Template\images\smalllogo.png">
+      <PackagePath>images\smalllogo.png</PackagePath>
+      <Modified>2012-05-26T17:56:54.118</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Ali\Documents\msdev\template\Template\Template\images\splashscreen.png">
+      <PackagePath>images\splashscreen.png</PackagePath>
+      <Modified>2012-05-26T21:30:01.201</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Ali\Documents\msdev\template\Template\Template\images\storelogo.png">
+      <PackagePath>images\storelogo.png</PackagePath>
+      <Modified>2012-05-26T17:56:28.579</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Ali\Documents\msdev\template\Template\Template\js\groupDetailPage.js">
+      <PackagePath>js\groupDetailPage.js</PackagePath>
+      <Modified>2012-05-26T19:46:32.569</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Ali\Documents\msdev\template\Template\Template\js\default.js">
+      <PackagePath>js\default.js</PackagePath>
+      <Modified>2012-05-26T19:46:32.496</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Ali\Documents\msdev\template\Template\Template\js\navigator.js">
+      <PackagePath>js\navigator.js</PackagePath>
+      <Modified>2012-05-26T19:46:32.583</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Ali\Documents\msdev\template\Template\Template\js\data.js">
+      <PackagePath>js\data.js</PackagePath>
+      <Modified>2012-05-26T20:37:52.444</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Ali\Documents\msdev\template\Template\Template\js\itemDetailPage.js">
+      <PackagePath>js\itemDetailPage.js</PackagePath>
+      <Modified>2012-05-26T19:46:32.621</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Ali\Documents\msdev\template\Template\Template\js\groupedItemsPage.js">
+      <PackagePath>js\groupedItemsPage.js</PackagePath>
+      <Modified>2012-05-26T19:46:32.572</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Ali\Documents\msdev\template\Template\Template\bin\Debug\resources.pri">
+      <PackagePath>resources.pri</PackagePath>
+      <Modified>2012-05-26T21:24:34.863</Modified>
+    </AppxPackagedFile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResolvedSDKReference Include="C:\Program Files (x86)\Microsoft SDKs\Windows\v8.0\ExtensionSDKs\Microsoft.WinJS\0.6\">
+      <Name>Microsoft.WinJS.0.6.Debug</Name>
+      <Version>0.6.8229.0</Version>
+      <Architecture>Neutral</Architecture>
+      <FrameworkIdentity>Name=Microsoft.WinJS.0.6.Debug, MinVersion=0.6.8229.0</FrameworkIdentity>
+      <AppxLocation>C:\Program Files (x86)\Microsoft SDKs\Windows\v8.0\ExtensionSDKs\Microsoft.WinJS\0.6\Microsoft.WinJS.0.6.Debug.appx</AppxLocation>
+    </ResolvedSDKReference>
+  </ItemGroup>
+</Project>

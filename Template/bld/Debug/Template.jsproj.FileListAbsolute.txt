@@ -1,0 +1,13 @@
+C:\Users\Ali\Documents\msdev\template\Template\Template\bin\Debug\resources.pri
+C:\Users\Ali\Documents\msdev\template\Template\Template\bin\Debug\AppxManifest.xml
+C:\Users\Ali\Documents\msdev\template\Template\Template\bin\Debug\Template.build.appxrecipe
+C:\Users\Ali\Documents\msdev\template\Template\Template\bld\Debug\priconfig.xml
+C:\Users\Ali\Documents\msdev\template\Template\Template\bld\Debug\layout.resfiles
+C:\Users\Ali\Documents\msdev\template\Template\Template\bld\Debug\resources.resfiles
+C:\Users\Ali\Documents\msdev\template\Template\Template\bld\Debug\pri.resfiles
+C:\Users\Ali\Documents\msdev\template\Template\Template\bld\Debug\LanguageQualifiers.txt
+C:\Users\Ali\Documents\msdev\template\Template\Template\bld\Debug\ProjectArchitectures.txt
+C:\Users\Ali\Documents\msdev\template\Template\Template\bld\Debug\priconfig.xml.intermediate
+C:\Users\Ali\Documents\msdev\template\Template\Template\bld\Debug\layout.resfiles.intermediate
+C:\Users\Ali\Documents\msdev\template\Template\Template\bld\Debug\resources.resfiles.intermediate
+C:\Users\Ali\Documents\msdev\template\Template\Template\bld\Debug\pri.resfiles.intermediate
