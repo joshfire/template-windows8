@@ -42,11 +42,19 @@
 
     // Add a privacy policy, support link / email and about page in the settings
     app.onsettings = function (e) {
-        e.detail.applicationcommands = {
-            "support": { title: "Support", href: "/pages/settings/support.html" },
-            "privacy": { title: "Privacy policy", href: "/pages/settings/privacy.html" },
-            "about"  : { title: "About", href: "/pages/settings/about.html" }
-        };
+
+        var settingPages = {};
+        if (Joshfire.factory.config.template.options.supporthtml) {
+            settingPages["support"] = { title: "Support", href: "/pages/settings/support.html" };
+        }
+        if (Joshfire.factory.config.template.options.privacyhtml) {
+            settingPages["privacy"] = { title: "Privacy policy", href: "/pages/settings/privacy.html" };
+        }
+        if (Joshfire.factory.config.template.options.abouthtml) {
+            settingPages["about"] = { title: "About", href: "/pages/settings/about.html" };
+        }
+
+        e.detail.applicationcommands = settingPages;
         WinJS.UI.SettingsFlyout.populateSettings(e);
     };
 

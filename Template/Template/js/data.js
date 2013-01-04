@@ -107,7 +107,9 @@
                         setTimeout(function () {
                             var loadingControl = document.getElementById('loadingControl');
                             Data.dataloaded = true;
-                            loadingControl.style.display = 'none';
+                            if (loadingControl) {
+                                loadingControl.style.display = 'none';
+                            }
                         }, 1400);
                     }
 

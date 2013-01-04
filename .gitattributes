@@ -7,3 +7,9 @@ Template/Template/Template.jsproj export-ignore
 Template/Template/Template.jsproj.user export-ignore
 Template/Template/Template_TemporaryKey.pfx export-ignore
 Template/Template/package.appxmanifest export-ignore
+Template/Template/js/bootstrap.js export-ignore
+Template/Template/js/bootstrap.js export-ignore
+Template/Template/images/logo.png export-ignore
+Template/Template/images/smalllogo.png export-ignore
+Template/Template/images/splashscreen.png export-ignore
+Template/Template/images/storelogo.png export-ignore

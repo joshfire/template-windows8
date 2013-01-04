@@ -182,11 +182,14 @@
     }
 
     function videoRenderer(itemPromise, currentItem, recycled) {
-
         var tplSelect = document.querySelector('.videoDetailTemplate').winControl;
         tplSelect = tplSelect.renderItem(itemPromise, recycled);
         var data = currentItem.data;
         var elem = tplSelect.element._value;
+
+        // iframe cannot be directly binded using WinJS.Binding.Template, it throws a WinJS.Utilities.requireSupportedForProcessing exception.
+        var iframe = elem.querySelector('.item-video');
+        iframe.src = data.embedURL;
 
         var iauthor = elem.querySelector('.authorname');
         if (iauthor && data.author.length) {

@@ -3,11 +3,31 @@
     var Joshfire = window.Joshfire || {};
     Joshfire.factory = {
         globalConfig: { "DATAVERSION": "1", "DATAHOSTPORT": "api.datajs.com", "STATSHOSTPORT": "localhost:40023", "HOSTPORT": "localhost:40021" },
-        config: { "app": { "id": "5009251059d8720000000189", "icon": null, "logo": { "height": 352, "width": 1072, "encodingFormat": "png", "contentSize": 13855, "contentURL": "http://static.platform.joshfire.com.s3.amazonaws.com/f4/f3cbb3030d91b8689f982b2d812a12/TEDx_logo_place_RGB_CS5-1line-K-01.png", "itemType": "ImageObject", "name": "TEDx_logo_place_RGB_CS5-1line-K-01.png", "url": "/transloadit/f4f3cbb3030d91b8689f982b2d812a12" }, "name": "TEDxParis", "version": "1.0" }, "template": { "id": "4ff2b3b2b04f076cff000192", "name": "sleek", "version": "1.1.18", "options": { "tabs": ["Feed", "2011 Videos", "Photos 2011"], "color": "gray" }, "hooks": [] } },
+        config: {
+            "app": { "id": "5009251059d8720000000189", "icon": null, "logo": { "height": 352, "width": 1072, "encodingFormat": "png", "contentSize": 13855, "contentURL": "http://static.platform.joshfire.com.s3.amazonaws.com/f4/f3cbb3030d91b8689f982b2d812a12/TEDx_logo_place_RGB_CS5-1line-K-01.png", "itemType": "ImageObject", "name": "TEDx_logo_place_RGB_CS5-1line-K-01.png", "url": "/transloadit/f4f3cbb3030d91b8689f982b2d812a12" }, "name": "TEDxParis", "version": "1.0" },
+            "template": {
+                "id": "4ff2b3b2b04f076cff000192",
+                "name": "sleek", "version": "1.1.18",
+                "options": {
+                    "tabs": ["Feed", "2011 Videos", "Photos 2011"],
+                    "color": "gray",
+                    "supporthtml": "<h3>Contact email</h3><p>Send an email to the creator of the application <a href='mailto:support@joshfire.com'>support@joshfire.com</a></p><h3>Windows 8 support</h3><p>Get and and support about the usage of Windows 8 on the official <a href='http://windows.microsoft.com'>Windows 8 website</a>.</p>",
+                    "privacyhtml": "Privacy text",
+                    "abouthtml": "<h3>About TEDxParis</h3><p>TEDxParis a été fondé en avril 2009 par Michel Levy-Provençal. TEDxParis est la première conférence TEDx européenne et fait partie des 3 premières conférences TEDx mondiale a avoir été créée. Elle n’a cessé au fil des ans de se développer dans un esprit d’ouverture et de partage. L’équipe organisatrice est également secondée par les membres de la communauté et de nombreux contributeurs. De cette façon, TEDxParis est créé dans une double exigence de professionnalisme et de passion.</p>"
+                },
+                "hooks": []
+            }
+        },
         device: { "type": "phone" }
     };
     Joshfire.factory.config.deploy = { "env": "dev", "type": "local", "id": "" };
-    Joshfire.factory.config.datasources = { "main": [{ "name": "Blog", "db": "feed", "col": "rss", "query": { "filter": { "url": "http://www.tedxparis.com/" }, "options": {} }, "runatclient": false, "missingKeys": [], "outputType": "BlogPosting", "runtime": "hosted" }, { "name": "Vidéos 2011", "db": "youtube", "col": "videos", "query": { "filter": { "playlist": "http://www.youtube.com/playlist?list=PLEB4E907286FE3EC2" }, "options": {} }, "missingKeys": [], "outputType": "VideoObject", "runtime": "win8" }, { "name": "Photos 2011", "db": "flickr", "col": "photos", "query": { "filter": { "search": "tedxparis 2011" } }, "missingKeys": ["api_key"], "outputType": "ImageObject", "runtime": "win8" }] };
+    Joshfire.factory.config.datasources = {
+        "main": [
+            { "name": "Blog", "db": "feed", "col": "rss", "query": { "filter": { "url": "http://www.tedxparis.com/" }, "options": {} }, "runatclient": false, "missingKeys": [], "outputType": "BlogPosting", "runtime": "hosted" },
+            { "name": "Vidéos 2011", "db": "youtube", "col": "videos", "query": { "filter": { "playlist": "http://www.youtube.com/playlist?list=PLEB4E907286FE3EC2" }, "options": {} }, "missingKeys": [], "outputType": "VideoObject", "runtime": "win8" },
+            { "name": "Photos 2011", "db": "flickr", "col": "photos", "query": { "filter": { "search": "tedxparis 2011" } }, "missingKeys": ["api_key"], "outputType": "ImageObject", "runtime": "win8" }
+        ]
+    };
     Joshfire.factory.config.addons = [];
     window.Joshfire = Joshfire;
 
