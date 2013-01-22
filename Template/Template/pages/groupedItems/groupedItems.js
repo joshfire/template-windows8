@@ -6,7 +6,7 @@
     var nav = WinJS.Navigation;
     var ui = WinJS.UI;
     var utils = WinJS.Utilities;
-    
+
     var cellW = 175,
         cellH = 250,
         cellRowSpan = 2,
@@ -103,23 +103,26 @@
         });
     }
 
+    function setThumb(currentItem, tplSelect) {
+        // Get the first item and grab its image if it has one. Display it as BG.
+        var thethumb = Data.getImageFromGroup(currentItem);
+
+        var img = tplSelect.element._value.querySelector('.tilebackground');
+        var src = (thethumb && typeof thethumb !== 'undefined' && thethumb.contentURL) ? thethumb.contentURL : '/images/' + currentItem.data['@type'] + 'Placeholder.png';
+
+        img.src = src;
+        if (thethumb && typeof thethumb !== 'undefined')
+            img.style.top = -(thethumb.height - 120);
+        img.width = '100%';
+
+        return tplSelect.element;
+    }
+
     function listTemplateHandler(itemPromise) {
         return itemPromise.then(function (currentItem, recycled) {
             var tplSelect = document.querySelector('.listitemtemplate').winControl;
             tplSelect = tplSelect.renderItem(itemPromise, recycled);
-
-            // Get the first item and grab its image if it has one. Display it as BG.
-            var thethumb = Data.getImageFromGroup(currentItem);
-
-            var img = tplSelect.element._value.querySelector('.tilebackground');
-            var src = (thethumb && typeof thethumb !== 'undefined' && thethumb.contentURL) ? thethumb.contentURL : '/images/' + currentItem.data['@type'] + 'Placeholder.png';
-
-            img.src = src;
-            if (thethumb && typeof thethumb !== 'undefined')
-                img.style.top = -(thethumb.height - 120);
-            img.width = '100%';
-
-            return tplSelect.element;
+            return setThumb(currentItem, tplSelect);
         });
     }
 
@@ -127,16 +130,7 @@
         return itemPromise.then(function (currentItem, recycled) {
             var tplSelect = document.querySelector('#zoomedOutItemTemplate').winControl;
             tplSelect = tplSelect.renderItem(itemPromise, recycled);
-
-            // Get the first item and grab its image if it has one. Display it as BG.
-            var thethumb = Data.getImageFromGroup(currentItem);
-
-            var img = tplSelect.element._value.querySelector('.tilebackground');
-            img.src = thethumb.contentURL || '/images/' + currentItem.data['@type'] + 'Placeholder.png';
-            img.style.top = -(thethumb.height - 120);
-            img.width = '100%';
-
-            return tplSelect.element;
+            return setThumb(currentItem, tplSelect);
         });
     }
 
