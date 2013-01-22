@@ -192,7 +192,7 @@
         iframe.src = data.embedURL;
 
         var iauthor = elem.querySelector('.authorname');
-        if (iauthor && data.author.length) {
+        if (iauthor && data.author && data.author.length) {
             iauthor.textContent = data.author[0].name;
         }
 
