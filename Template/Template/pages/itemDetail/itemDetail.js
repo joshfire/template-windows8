@@ -141,13 +141,15 @@
         if (idate && data.datePublished) {
             idate.textContent = toReadableDate(data.datePublished);
         }
+
+        if (!data.articleBody) data.articleBody = '';
+
         /* 
         * The render is called several times ans we only want the first image to be removed (as it
         * is grabbed by the factory and set on the left). So we set an empty image that'll be caught by the regexp next time.
         */
         data.articleBody = data.articleBody.replace(/<img[^>]+\>/i, '<img style="display:none">');
-        //data.articleBody = data.articleBody.replace(/<br[^>]+\>/ig, '');
-
+        
         var iimg = elem.querySelector('.mask img');
         if (data.image) {
             iimg.src = data.image.contentURL;
