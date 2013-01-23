@@ -42,7 +42,6 @@
     margin-top: 25px;
 }
 
-
     #loadingControl progress {
         color: white;
         vertical-align: bottom;
@@ -52,8 +51,6 @@
     .largeitem {
         width: 545px!important;
         height: 510px;
-        -ms-grid-columns: 3fr;
-        -ms-grid-rows: 0;
         background: #000;
         text-align: center;
         position: relative;
@@ -69,12 +66,10 @@
     .regularitem {
         width: 175px!important;
         height: 250px;
-        display: -ms-grid;
-        -ms-grid-columns: 1fr;
-        -ms-grid-rows: 1fr;
         background: #000;
         text-align: center;
         position: relative;
+        -ms-grid-row-span: 3;
     }
 
         .regulatitem .thumbnailViewer {
@@ -90,7 +85,49 @@
                 -ms-interpolation-mode: bicubic;
                 position: absolute;
             }
-    
+
+    .statusitem {
+        width: 545px!important;
+        height: 120px;
+        background: rgba(0, 0, 0, 0.6);
+        text-align: left;
+        position: relative;
+    }
+
+        .statusitem .status-cartouche {
+            position:absolute;
+            bottom: 10px;
+            top: 10px;
+            left: 130px;
+            right: 10px;
+            z-index: 10;
+        }
+
+        .statusitem .status-tweet {
+            font-size: 1.2em;
+            margin: 0 0 5px 0
+        }
+
+        .statusitem .status-date {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            margin: 0;
+        }
+
+        .statusitem .status-avatar {
+            margin: 10px;
+            width: 100px;
+            height: 100px;
+            display: block;
+            float: left;
+        }
+
+            .statusitem .status-avatar img {
+                width: 100%;
+                height: 100%;
+            }
+
     .groupeditemspage .groupeditemslist .win-groupheader {
         margin-top: 5px;
         margin-left: 70px;

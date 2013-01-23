@@ -34,7 +34,7 @@
             </div>
         </div>
     </div>
-
+    
     <!-- Template for large item in main list -->
     <div class="largeitemtemplate" data-win-control="WinJS.Binding.Template">
         <div class="largeitem">
@@ -56,6 +56,19 @@
         </div>
     </div>
     
+    <!-- Template for small item in main list -->
+    <div class="statustemplate" data-win-control="WinJS.Binding.Template">
+        <div class="statusitem">
+            <div class="status-avatar">
+                <img class="thumbnail" src="#" data-win-bind="alt: authorName; src: authorAvatar" />
+            </div>
+            <div class="status-cartouche">
+                <p class="status-tweet" data-win-bind="textContent: name"></p>
+                <p class="status-date win-type-ellipsis" data-win-bind="textContent: datePublished"></p>
+            </div>
+        </div>
+    </div>
+        
     <!-- Template for snap view group items -->
     <div class="listitemtemplate" data-win-control="WinJS.Binding.Template">
         <img class = "tilebackground" src = "#" />
@@ -79,7 +92,8 @@
                 <!-- The zoomed-in view. --> 
                 <div class="groupeditemslist" aria-label="List of first items of every groups" data-win-control="WinJS.UI.ListView" data-win-options="{ selectionMode: 'none',
                         itemDataSource: Data.items.dataSource, 
-                        groupDataSource: Data.groups.dataSource }">
+                        groupDataSource: Data.groups.dataSource,
+                        maxRoxs: 6 }">
                 </div>
 
                 <!--- The zoomed-out view. -->

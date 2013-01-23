@@ -13,17 +13,91 @@
         cellRowSpan = 2,
         cellColSpan = 3;
 
-    function templateHandler(itemPromise) {
-        return itemPromise.then(function (currentItem, recycled) {
+    function getTemplateName(itemIndex, itemType) {
+        var isLarge = (itemIndex === 0),
+            tplName = '.';
 
-            var tplSelect,
-                isLarge = (currentItem.data.innerIndex == 0);
-            if (isLarge) {
-                tplSelect = document.querySelector('.largeitemtemplate').winControl;
+        if (isLarge)
+            tplName += 'large';
+
+        switch (itemType) {
+            case 'articlestatus':
+                tplName = '.status';
+                break;
+            default:
+                tplName += 'item';
+                break;
+        }
+
+        tplName += 'template';
+        return tplName;
+    }
+
+    function setBestImageCover(currentItem, img, isLarge) {
+        if ((currentItem.data.thumbnail && currentItem.data.thumbnail.length) || currentItem.data.image) {
+            var thumbs = currentItem.data.thumbnail,
+                thethumb = { height: 0, width: 0 };
+            /* Find the best thumb */
+            for (var k in thumbs) {
+                if (thumbs.hasOwnProperty(k)) {
+                    /* The first one which has one dimension above cell size */
+                    if (!isLarge && (thumbs[k].height >= cellH || thumbs.width >= cellW)) {
+                        thethumb = thumbs[k];
+                        break;
+                    }
+                        /* Biggest one or biggest one with both dimensions above cell size */
+                    else if (isLarge && (
+                        (thumbs[k].height >= (cellH * cellRowSpan) || thumbs.width >= (cellW * cellColSpan)) ||
+                        (thumbs[k].height > thethumb.height || thumbs[k].width > thethumb.width)
+                        )) {
+                        thethumb = thumbs[k];
+                    }
+                }
+            }
+
+            if (thethumb.height == 0 && thethumb.width == 0)
+                thethumb = currentItem.data.image;
+
+            /* Set the URL */
+            img.src = thethumb.contentURL;
+            if (img.src.indexOf('http://') < 0) {
+                img.src = '/images/placeholders/' + currentItem.simpleType + 'Placeholder.png';
+                img.style.left = -((545 - cellW) / 2) + 'px';
+                img.style.top = -((510 - cellH) / 2) + 'px';
+            }
+
+            /* Set the image tag's dimentions and its position behind its mask */
+            if (!thethumb.height || !thethumb.width || (thethumb.height - cellH) < (thethumb.width - cellW)) {
+                img.height = cellH;
+                // center the image
+                var newW = thethumb.width * (cellH / thethumb.height);
+                if ((newW - cellW) > 0 && !isLarge)
+                    img.style.left = -((newW - cellW) / 2) + 'px';
             }
             else {
-                tplSelect = document.querySelector('.itemtemplate').winControl;
+                img.width = cellW;
+                // center
+                var newH = thethumb.height * (cellW / thethumb.width);
+                if ((newH - cellH) > 0 && !isLarge)
+                    img.style.top = -((newH - cellH) / 2) + 'px';
             }
+
+        }
+        else {
+            img.src = '/images/placeholders/' + currentItem.data.simpleType + 'Placeholder.png';
+            if (!isLarge) {
+                /* Set the image tag's dimentions and its position behind its mask */
+                img.style.left = -((545 - cellW) / 2) + 'px';
+                img.style.top = -((510 - cellH) / 2) + 'px';
+            }
+        }
+    }
+
+    function templateHandler(itemPromise) {
+        return itemPromise.then(function (currentItem, recycled) {
+            var tplName = getTemplateName(currentItem.data.innerIndex, currentItem.data.simpleType);
+            var tplSelect = document.querySelector(tplName).winControl,
+                isLarge = (currentItem.data.innerIndex === 0);
 
             if (!currentItem.data.name)
                 currentItem.data.name = 'No name';
@@ -31,74 +105,27 @@
             if (!currentItem.data.description)
                 currentItem.data.description = 'No description';
 
+            if (!currentItem.data.datePublished)
+                currentItem.data.datePublished = 'No Date';
 
-            tplSelect = tplSelect.renderItem(itemPromise, recycled);
-            var img = tplSelect.element._value.querySelector('.thumbnail');
+            switch (currentItem.data.simpleType) {
 
-            if ((currentItem.data.thumbnail && currentItem.data.thumbnail.length) || currentItem.data.image) {
-                var thumbs = currentItem.data.thumbnail,
-                    thethumb = { height: 0, width: 0 };
-                /* Find the best thumb */
-                for (var k in thumbs) {
-                    if (thumbs.hasOwnProperty(k)) {
-                        /* The first one which has one dimension above cell size */
-                        if (!isLarge && (thumbs[k].height >= cellH || thumbs.width >= cellW)) {
-                            thethumb = thumbs[k];
-                            break;
-                        }
-                            /* Biggest one or biggest one with both dimensions above cell size */
-                        else if (isLarge && (
-                            (thumbs[k].height >= (cellH * cellRowSpan) || thumbs.width >= (cellW * cellColSpan)) ||
-                            (thumbs[k].height > thethumb.height || thumbs[k].width > thethumb.width)
-                            )) {
-                            thethumb = thumbs[k];
-                        }
-                    }
-                }
+                case 'articlestatus':
+                    console.dir(currentItem);
 
-                if (thethumb.height == 0 && thethumb.width == 0)
-                    thethumb = currentItem.data.image;
+                    currentItem.data.authorName = currentItem.data.author[0].name;
+                    currentItem.data.authorAvatar = currentItem.data.author[0].image.contentURL;
 
-                /* Set the URL */
-                img.src = thethumb.contentURL;
-                if (img.src.indexOf('http://') < 0) {
-                    img.src = '/images/placeholders/' + currentItem.data['@type'] + 'Placeholder.png';
-                    img.style.left = -((545 - cellW) / 2) + 'px';
-                    img.style.top = -((510 - cellH) / 2) + 'px';
-                }
-
-                /* Set the image tag's dimentions and its position behind its mask */
-                if (!thethumb.height || !thethumb.width || (thethumb.height - cellH) < (thethumb.width - cellW)) {
-                    img.height = cellH;
-                    // center the image
-                    var newW = thethumb.width * (cellH / thethumb.height);
-                    if ((newW - cellW) > 0 && !isLarge)
-                        img.style.left = -((newW - cellW) / 2) + 'px';
-                }
-                else {
-                    img.width = cellW;
-                    // center
-                    var newH = thethumb.height * (cellW / thethumb.width);
-                    if ((newH - cellH) > 0 && !isLarge)
-                        img.style.top = -((newH - cellH) / 2) + 'px';
-                }
+                    tplSelect = tplSelect.renderItem(itemPromise, recycled);
+                    break;
+                default:
+                    tplSelect = tplSelect.renderItem(itemPromise, recycled);
+                    var coverImage = tplSelect.element._value.querySelector('.thumbnail');
+                    setBestImageCover(currentItem, coverImage, isLarge);
+                    break;
 
             }
-            else {
-                img.src = '/images/placeholders/' + currentItem.data['@type'] + 'Placeholder.png';
-                if (isLarge) {
-                    //img.style.left = "10px";
-                    //img.style.top = "5px";
-                }
-                else {
-                    /* Set the image tag's dimentions and its position behind its mask */
-                    //img.height = cellH;
-                    //var newW = 525 * (cellH / 500);
-                    img.style.left = -((545 - cellW) / 2) + 'px';
-                    img.style.top = -((510 - cellH) / 2) + 'px';
-                }
-            }
-
+            
             return tplSelect.element;
 
         });
@@ -109,7 +136,7 @@
         var thethumb = Data.getImageFromGroup(currentItem);
 
         var img = tplSelect.element._value.querySelector('.tilebackground');
-        var src = (thethumb && typeof thethumb !== 'undefined' && thethumb.contentURL) ? thethumb.contentURL : '/images/' + currentItem.data['@type'] + 'Placeholder.png';
+        var src = (thethumb && typeof thethumb !== 'undefined' && thethumb.contentURL) ? thethumb.contentURL : '/images/placeholders/' + currentItem.data.simpleType + 'Placeholder.png';
 
         img.src = src;
         if (thethumb && typeof thethumb !== 'undefined')
@@ -139,7 +166,7 @@
         return {
             enableCellSpanning: true,
             cellWidth: 175,
-            cellHeight: 250
+            cellHeight: 120
         };
     }
 
