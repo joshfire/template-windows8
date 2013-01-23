@@ -1,7 +1,7 @@
 {
   "name": "window8",
   "fullName": "Windows 8 Metro",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "A template to generate a Metro-styled Windows 8 application. It only works with the Windows 8 deploy",
   "keywords": [
     "windows",
