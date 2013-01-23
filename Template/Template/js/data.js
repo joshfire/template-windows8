@@ -118,10 +118,10 @@
                     g.length = data.entries.length;
                     data.entries.forEach(function (item) {
                         item.group = g;
+                        item.simpleType = item['@type'].replace('/', '').toLocaleLowerCase() || 'thing';
                         // index inside its datasource
                         item.innerIndex = k;
                         list.push(item);
-
                         k++;
                     });
                 };
