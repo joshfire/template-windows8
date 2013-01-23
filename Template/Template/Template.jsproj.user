@@ -3,4 +3,7 @@
   <PropertyGroup>
     <ReferenceCachePath>C:\Users\Josh\AppData\Local\Temp\Template_refcache</ReferenceCachePath>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DebuggerFlavor>AppHostSimulatorDebugger</DebuggerFlavor>
+  </PropertyGroup>
 </Project>
