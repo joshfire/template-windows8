@@ -1,6 +1,7 @@
 ﻿(function () {
     "use strict";
 
+    WinJS.Binding.optimizeBindingReferences = true;
     var ui = WinJS.UI,
         utils = WinJS.Utilities,
         _currentItem = null,

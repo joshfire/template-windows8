@@ -1,6 +1,7 @@
 ﻿(function () {
     "use strict";
 
+    WinJS.Binding.optimizeBindingReferences = true;
     var appViewState = Windows.UI.ViewManagement.ApplicationViewState;
     var nav = WinJS.Navigation;
     var ui = WinJS.UI;
