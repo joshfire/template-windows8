@@ -2,38 +2,23 @@
     /* This bootstrap script is documented at http://developer.joshfire.com/ */
     var Joshfire = window.Joshfire || {};
     Joshfire.factory = {
-        globalConfig: { "DATAVERSION": "1", "DATAHOSTPORT": "api.datajs.com", "STATSHOSTPORT": "localhost:40023", "HOSTPORT": "localhost:40021" },
-        config: {
-            "app": { "id": "5009251059d8720000000189", "icon": null, "logo": { "height": 352, "width": 1072, "encodingFormat": "png", "contentSize": 13855, "contentURL": "http://static.platform.joshfire.com.s3.amazonaws.com/f4/f3cbb3030d91b8689f982b2d812a12/TEDx_logo_place_RGB_CS5-1line-K-01.png", "itemType": "ImageObject", "name": "TEDx_logo_place_RGB_CS5-1line-K-01.png", "url": "/transloadit/f4f3cbb3030d91b8689f982b2d812a12" }, "name": "TEDxParis", "version": "1.0" },
-            "template": {
-                "id": "4ff2b3b2b04f076cff000192",
-                "name": "sleek", "version": "1.1.18",
-                "options": {
-                    "tabs": ["Feed", "2011 Videos", "Photos 2011"],
-                    "color": "gray",
-                    "supporthtml": "<h3>Contact email</h3><p>Send an email to the creator of the application <a href='mailto:support@joshfire.com'>support@joshfire.com</a></p><h3>Windows 8 support</h3><p>Get and and support about the usage of Windows 8 on the official <a href='http://windows.microsoft.com'>Windows 8 website</a>.</p>",
-                    "privacyhtml": "Privacy text",
-                    "abouthtml": "<h3>About TEDxParis</h3><p>TEDxParis a été fondé en avril 2009 par Michel Levy-Provençal. TEDxParis est la première conférence TEDx européenne et fait partie des 3 premières conférences TEDx mondiale a avoir été créée. Elle n’a cessé au fil des ans de se développer dans un esprit d’ouverture et de partage. L’équipe organisatrice est également secondée par les membres de la communauté et de nombreux contributeurs. De cette façon, TEDxParis est créé dans une double exigence de professionnalisme et de passion.</p>"
-                },
-                "hooks": []
-            }
-        },
-        device: { "type": "phone" }
+        globalConfig: { "DATAVERSION": "1", "DATAHOSTPORT": "localhost:40020", "STATSHOSTPORT": "localhost:40023", "HOSTPORT": "localhost:40021" },
+        config: { "app": { "id": "50f9524f2fdf4ce2a2000001", "icon": null, "logo": null, "name": "Win8 debug", "version": "1.0" }, "template": { "name": "window8", "version": "1.0.1", "options": { "abouthtml": "<p>This application was generated with the <a href='http://factory.joshfire.com'>Joshfire Factory</a></p>", "theme": "dark" }, "hooks": [] } },
+        device: { "type": "tablet-windows8" },
+        addons: {}
     };
-    Joshfire.factory.config.deploy = { "env": "dev", "type": "local", "id": "" };
+    Joshfire.factory.config.deploy = { "env": "dev", "type": "local", "flags": { "web": true }, "id": "" };
     Joshfire.factory.config.datasources = {
         "main": [
-            { "name": "Blog", "db": "feed", "col": "rss", "query": { "filter": { "url": "http://www.tedxparis.com/" }, "options": {} }, "runatclient": false, "missingKeys": [], "outputType": "BlogPosting", "runtime": "hosted" },
-            { "name": "Vidéos 2011", "db": "youtube", "col": "videos", "query": { "filter": { "playlist": "http://www.youtube.com/playlist?list=PLEB4E907286FE3EC2" }, "options": {} }, "missingKeys": [], "outputType": "VideoObject", "runtime": "win8" },
-            { "name": "Photos 2011", "db": "flickr", "col": "photos", "query": { "filter": { "search": "tedxparis 2011" } }, "missingKeys": ["api_key"], "outputType": "ImageObject", "runtime": "win8" }
-        ]
+            { "name": "Twitter", "db": "operator", "col": "updatelinks", "query": { "filter": { "datasources": { "main": { "name": "Twitter", "db": "twitter", "col": "tweets", "query": { "filter": { "user": "Notch" }, "options": {} }, "missingKeys": [], "outputType": "Article/Status", "runtime": "win8" } }, "action": "addtarget" } }, "outputType": "Article/Status", "runtime": "browser" },
+            { "name": "Youtube", "db": "operator", "col": "updatelinks", "query": { "filter": { "datasources": { "main": { "name": "Youtube", "db": "youtube", "col": "videos", "query": { "filter": { "search": "Because I Can" } }, "missingKeys": [], "outputType": "VideoObject", "runtime": "win8" } }, "action": "addtarget" } }, "outputType": "VideoObject", "runtime": "browser" }]
     };
-    Joshfire.factory.config.addons = [];
+    Joshfire.factory.config.addons = [{ "name": "splashscreen", "options": { "web-mode": "factory" }, "hooks": ["loaded"] }];
     window.Joshfire = Joshfire;
 
 })();
 (function () {
-    (function (a) { a.factory.ready = !1; var b = []; a.factory.onReady = function (c) { if (a.factory.ready) return c(); b.push(c) }; var c = function (a) { if (typeof cordova != "undefined") document.addEventListener("deviceready", a, !1); else if (window.addEventListener) window.addEventListener("load", a, !1); else if (document.addEventListener) document.addEventListener("load", a, !1); else if (window.attachEvent) window.attachEvent("onload", a); else if (typeof window.onload != "function") window.onload = a; else { var b = window.onload; window.onload = function () { b(), a() } } }; c(function () { a.factory.ready = !0; for (var c = 0, d = b.length; c < d; c++) b.pop()(); var e = function () { var b = 0; if (a.factory.config && a.factory.config.template && a.factory.config.template.hooks) { b = a.factory.config.template.hooks; for (c = 0; c < b.length; c++) if (b[c] === "loaded") return !1 } return !0 }(); e && a.factory.getAddOns("loaded").run(), typeof cordova != "undefined" && cordova.exec(null, null, "SplashScreen", "hide", []) }, !1) })(Joshfire);
+    (function (a) { a.factory.ready = !1; var b = []; a.factory.onReady = function (c) { if (a.factory.ready) return c(); b.push(c) }, a.factory.onDeviceReady = a.factory.onReady; var c = function (a) { if (typeof blackberry != "undefined") document.addEventListener("webworksready", a, !1); else if (typeof cordova != "undefined") document.addEventListener("deviceready", a, !1); else if (window.addEventListener) window.addEventListener("load", a, !1); else if (document.addEventListener) document.addEventListener("load", a, !1); else if (window.attachEvent) window.attachEvent("onload", a); else if (typeof window.onload != "function") window.onload = a; else { var b = window.onload; window.onload = function () { b(), a() } } }; c(function () { a.factory.ready = !0; for (var c = 0, d = b.length; c < d; c++) try { b.pop()() } catch (e) { } var f = function () { var b = 0; if (a.factory.config && a.factory.config.template && a.factory.config.template.hooks) { b = a.factory.config.template.hooks; for (c = 0; c < b.length; c++) if (b[c] === "loaded") return !1 } return !0 }(); try { f && a.factory.getAddOns("loaded").run() } catch (e) { } typeof cordova != "undefined" && cordova.exec(null, null, "SplashScreen", "hide", []) }, !1) })(Joshfire);
     (function (a, b, c) { var d = "http://" + c.globalConfig.STATSHOSTPORT, e = function () { return }, f = function (a) { var b = []; for (var c in a) a.hasOwnProperty(c) && b.push(c + "=" + encodeURIComponent(a[c])); var f = new Image(1, 1); f.src = d + "/pixel.gif?" + b.join("&"), f.onload = function () { e() } }, g = function () { return { tz: (new Date).getTimezoneOffset(), url: b.location.toString(), ref: a.referrer, app: c.config.app.id, appv: c.config.app.version, tpl: c.config.template.id, dev: c.device.type, env: (c.config.deploy || {}).env || "preview", dp: (c.config.deploy || {}).id, dpr: (c.config.deploy || {}).type, id: "" } }; c.stats = {}, c.stats.event = function (a) { var b = g(); b.type = a, f(b) }, c.stats.event("open"), a.addEventListener && a.addEventListener("resume", function () { c.stats.event("resume") }, !1) })(document, window, Joshfire.factory);
 
     /**
@@ -203,11 +188,11 @@
                     if (depName === "require") {
                         args[i] = makeRequire(name);
                     } else if (depName === "exports") {
-                            //CommonJS module spec 1.1
+                        //CommonJS module spec 1.1
                         args[i] = defined[name] = {};
                         usingExports = true;
                     } else if (depName === "module") {
-                            //CommonJS module spec 1.1
+                        //CommonJS module spec 1.1
                         cjsModule = args[i] = {
                             id: name,
                             uri: '',
@@ -232,13 +217,13 @@
                     if (cjsModule && cjsModule.exports !== undef) {
                         defined[name] = cjsModule.exports;
                     } else if (!usingExports) {
-                            //Use the return value from the function.
+                        //Use the return value from the function.
                         defined[name] = ret;
                     }
                 }
             } else if (name) {
-                    //May just be an object definition for the module. Only
-                    //worry about defining if have a module name.
+                //May just be an object definition for the module. Only
+                //worry about defining if have a module name.
                 defined[name] = callback;
             }
         };
@@ -252,8 +237,8 @@
                 //Normalize module name, if it contains . or ..
                 return callDep(makeMap(deps, callback).f);
             } else if (!deps.splice) {
-                    //deps is a config object, not an array.
-                    //Drop the config stuff on the ground.
+                //deps is a config object, not an array.
+                //Drop the config stuff on the ground.
                 if (callback.splice) {
                     //callback is an array, which means it is a dependency list.
                     //Adjust args if there are dependencies
@@ -330,248 +315,6 @@
                 load(value);
             });
         }
-    });
-    define('runtime-win8/http', [], function () {
-        // Windows 8 style
-
-        // Used to generate unique number for JSON callback function name
-        var callbackSeed = (new Date()).getTime();
-
-        return {
-            "request": function (params, callback) {
-                // Ensure parameters are correct
-                if (!params || !params.url) {
-                    return callback("No URI to request");
-                }
-
-                // Ensure URL starts with http:// or https://
-                if (params.url.search(/^http(s?)\:\/\//i) === -1) {
-                    return callback("URI to request does not start with 'http://' or 'https://'.");
-                }
-
-                // Setting callback parameter when JSONP requested,
-                // using user-defined parameters or default conventions
-                // (the hash mimics the one generated in jQuery)
-                if (params.dataType === 'jsonp') {
-                    var jsonp = params.jsonp || "callback";
-                    var jsonCallback = params.jsonCallback ||
-                      "datajslib_" + (Math.random().toString()).replace(/\D/g, "") + (callbackSeed++);
-                    params.url += (/\?/.test(params.url) ? "&" : "?") + jsonp + "=" + jsonCallback;
-                }
-
-                WinJS.xhr(params).then(
-                  // success
-                  function (ret) {
-                      var body = ret.responseText;
-
-                      if (params.dataType == 'json' ||
-                        params.dataType == 'text json' ||
-                        params.dataType == 'jsonp') {
-                          var tmp_json;
-
-                          try {
-                              // Strip out JSONP function
-                              if (params.dataType === "jsonp") {
-                                  // replace the last parenthethis
-                                  body = body.replace(/\)$/, "").replace(/\)\;$/, "");
-                                  // replace before the first patenthethis
-                                  body = body.replace(/^[^\(]+\(/, "");
-                              }
-                              tmp_json = JSON.parse(body);
-                          } catch (e) {
-                              // console.warn('Invalid JSON received: ', body);
-                              return callback("Could not parse the response received as JSON.\n" +
-                                "Possible causes:\n" +
-                                "- the provider did not wrap the object in a JSONP function" +
-                                " (ensure the jsonp parameter is the right one)\n" +
-                                "- the JSON is invalid (not much to do in that case)\n" +
-                                "Exception triggered: " + e);
-                          }
-                          return callback(null, tmp_json);
-                      } else {
-                          return callback(null, body);
-                      }
-                  },
-                  // error
-                  function (err) {
-                      callback(err);
-                  });
-
-                return true;
-            }
-        };
-
-    });
-    /*
-     * @fileoverview Collection factory that creates the appropriate collection
-     * object to request the data server to run the given datasource.
-     *
-     * This version use the http library, instead of re-defining the JSONP function.
-     */
-
-    define('runtime-win8/collection.proxy', ["datajslib!http"], function (http) {
-        // TODO: find some way to get that information differently,
-        // as this code must not rely on a Factory context!
-        var globalConfig = Joshfire.factory.globalConfig;
-        var config = Joshfire.factory.config;
-
-        /**
-         * Copies all of the properties in the source objects over to the destination
-         * object. It's in-order, so the last source will override properties of the
-         * same name in previous arguments.
-         * Same code as Underscore.js extend function
-         * @see http://documentcloud.github.com/underscore/#extend
-         */
-        var _extend = function (obj1, obj2) {
-            for (var key in obj2) {
-                if (obj2.hasOwnProperty(key)) {
-                    obj1[key] = obj2[key];
-                }
-            }
-            return obj1;
-        };
-
-        /**
-         * Datasource collection object that exposes a 'find' method to retrieve
-         * feed items from the data proxy.
-         *
-         * @class
-         * @param {String} db The datasource provider
-         * @param {String} colname The collection in the provider's catalog
-         * @param {Object} options Common query options (e.g. filtering options)
-         * @returns {Collection} The collection that matches the given parameter.
-         */
-        var collection = function (datasource) {
-            var options = datasource.query || {};
-            var db = datasource.db;
-            var colname = datasource.col;
-
-            /**
-             * Sends a request to the data proxy to fetch collection feed items
-             * @function
-             * @param {Object} query Query parameters (search field, query filters...)
-             * @param {function} callback Callback method that receives a potential
-             *  error and the list of data entries as an object. The returned object
-             *  includes an 'entries' property that contains the list of items.
-             */
-            this.find = function (query, callback) {
-                var self = this,
-                  finalQuery = {},
-                  uri = null;
-
-                // Clone default options
-                _extend(finalQuery, options);
-                _extend(finalQuery, query);
-
-                // Add API key
-                finalQuery.apikey = config.app.id;
-
-                // TODO: json2.js for maximum compatibility?
-                if (finalQuery.filter) {
-                    finalQuery.filter = JSON.stringify(finalQuery.filter);
-                }
-
-                uri = 'http://' + globalConfig.DATAHOSTPORT +
-                  '/api/' + globalConfig.DATAVERSION +
-                  '/' + db + '/' + colname + '?flag=0';
-
-                // do we really need to do this ?
-                for (var k in finalQuery) {
-                    if (typeof finalQuery[k] == 'Object')
-                        finalQuery[k] = JSON.stringify(finalQuery[k]);
-                    uri += '&' + k + '=' + encodeURIComponent(finalQuery[k]);
-                }
-
-                http.request({ type: 'GET', dataType: 'jsonp', url: uri, data: finalQuery, timeout: 30 }, function (err, data) {
-                    if (data && !data.name && self.name) {
-                        // Propagate datasource title to the returned feed
-                        // if not already set
-                        data.name = self.name;
-                    }
-                    callback(err, data);
-                });
-            };
-
-            /**
-             * Gets the description of the datasource.
-             *
-             * The description is a JSON object that details the collection
-             * parameters. The returned object is usually the collection's
-             * "desc" property, but may be more precise depending on the
-             * query options (typically the outputType may be adjusted for
-             * a more precise one for the given query).
-             *
-             * @function
-             * @param {function} callback Callback function called with the error
-             *  and the description.
-             */
-            this.getDesc = function (callback) {
-                client.getCollectionDesc(db, colname, options, callback);
-            };
-        };
-
-
-        /**
-         * API exposed in Joshfire.datajs
-         */
-        var client = {
-            /**
-             * Creates a new datasource collection object.
-             *
-             * Feed items are not fetched at this stage. Call the 'find' method
-             * on the returned object to retrieve the feed.
-             *
-             * @function
-             * @param {String} db The datasource provider
-             * @param {String} colname The collection in the provider's catalog
-             * @param {Object} options Common query options (e.g. filtering options)
-             * @returns {Collection} The collection
-             */
-            getCollection: function (datasource, callback) {
-                var col = new collection(datasource);
-                return callback(null, col);
-            },
-
-            /**
-             * Gets the description of the datasource collection
-             * from the data proxy.
-             *
-             * The description is a JSON object that details the collection
-             * parameters.
-             *
-             * @function
-             * @param {String} db The datasource provider
-             * @param {String} colname The collection in the provider's catalog
-             * @param {Object} options Common query options (e.g. filtering options)
-             * @param {function} callback Callback function called with the error
-             *  and the description.
-             */
-            getCollectionDesc: function (db, colname, options, callback) {
-                var self = this,
-                  finalQuery = {},
-                  uri = null;
-
-                if (options) _extend(finalQuery, options);
-                if (finalQuery.filter) {
-                    finalQuery.filter = JSON.stringify(finalQuery.filter);
-                }
-
-                uri = 'http://' + globalConfig.DATAHOSTPORT +
-                  '/api/' + globalConfig.DATAVERSION +
-                  '/' + db + '/' + colname + '/_desc';
-
-                // do we really need to do this ?
-                for (var k in finalQuery) {
-                    if (typeof finalQuery[k] == 'Object')
-                        finalQuery[k] = JSON.stringify(finalQuery[k]);
-                    uri += '&' + k + '=' + encodeURIComponent(finalQuery[k]);
-                }
-
-                http.request({ type: 'GET', dataType: 'jsonp', url: uri, data: finalQuery, timeout: 30 }, callback);
-            }
-        };
-
-        return client;
     });
     /**
      * @fileoverview Defines the current runtime environment.
@@ -985,6 +728,548 @@
         return collectionFactory;
     });
     /**
+     * @fileoverview Represents and executes queries against a datasource defined
+     * as an oriented graph.
+     *
+     * Each node in the graph takes zero, one or more inputs that connect the node
+     * to other nodes in the graph. Each node either generates a data feed
+     * (no input case), or performs an atomic operation on the data feeds received
+     * as inputs.
+     *
+     * The inputs of an operator are formally described in its description.
+     *
+     * TODO: return error instead of throwing errors
+     */
+
+    /*global define*/
+
+    define('runtime-win8/collection.graph', [
+      'datajslib!collection',
+      'datajslib!runtime'
+    ], function (collectionFactory, runtime) {
+        // The code makes use _.keys, _.isArray, _.each, _.isObject and async.map
+        // To avoid having to include the whole Underscore and Async libraries,
+        // these functions are copied here
+        // TODO: think about that some more, operators and datasources are likely
+        // to depend on (at least) Underscore anyway, so this could actually end up
+        // duplicating code instead of saving lines of code...
+        var breaker = {};
+        var _keys = Object.keys || function (obj) {
+            if (obj !== Object(obj)) throw new TypeError('Invalid object');
+            var keys = [];
+            for (var key in obj) if (hasOwnProperty.call(obj, key)) keys[keys.length] = key;
+            return keys;
+        };
+        var _isArray = Array.isArray || function (obj) {
+            return toString.call(obj) == '[object Array]';
+        };
+        var _each = function (obj, iterator, context) {
+            if (obj == null) return;
+            if (Array.prototype.forEach && obj.forEach === Array.prototype.forEach) {
+                obj.forEach(iterator, context);
+            } else if (obj.length === +obj.length) {
+                for (var i = 0, l = obj.length; i < l; i++) {
+                    if (i in obj && iterator.call(context, obj[i], i, obj) === breaker) return;
+                }
+            } else {
+                for (var key in obj) {
+                    if (hasOwnProperty.call(obj, key)) {
+                        if (iterator.call(context, obj[key], key, obj) === breaker) return;
+                    }
+                }
+            }
+        };
+        var _isObject = function (obj) {
+            return obj === Object(obj);
+        };
+
+        // Extract async.map from the async library
+        var asyncMap = (function () {
+            var _forEach = function (arr, iterator) {
+                if (arr.forEach) {
+                    return arr.forEach(iterator);
+                }
+                for (var i = 0; i < arr.length; i += 1) {
+                    iterator(arr[i], i, arr);
+                }
+            };
+
+            var _map = function (arr, iterator) {
+                if (arr.map) {
+                    return arr.map(iterator);
+                }
+                var results = [];
+                _forEach(arr, function (x, i, a) {
+                    results.push(iterator(x, i, a));
+                });
+                return results;
+            };
+
+            var forEach = function (arr, iterator, callback) {
+                if (!arr.length) {
+                    return callback();
+                }
+                var completed = 0;
+                _forEach(arr, function (x) {
+                    iterator(x, function (err) {
+                        if (err) {
+                            callback(err);
+                            callback = function () { };
+                        }
+                        else {
+                            completed += 1;
+                            if (completed === arr.length) {
+                                callback();
+                            }
+                        }
+                    });
+                });
+            };
+
+            var doParallel = function (fn) {
+                return function () {
+                    var args = Array.prototype.slice.call(arguments);
+                    return fn.apply(null, [forEach].concat(args));
+                };
+            };
+
+            var _asyncMap = function (eachfn, arr, iterator, callback) {
+                var results = [];
+                arr = _map(arr, function (x, i) {
+                    return { index: i, value: x };
+                });
+                eachfn(arr, function (x, callback) {
+                    iterator(x.value, function (err, v) {
+                        results[x.index] = v;
+                        callback(err);
+                    });
+                }, function (err) {
+                    callback(err, results);
+                });
+            };
+
+            return doParallel(_asyncMap);
+        })();
+
+
+        /**
+         * Represents an arbitrary complex datasource within a list of datasources.
+         *
+         * The class exposes a "find" function that can be used to retrieve the feed
+         * entries of the datasource by running the graph it is connected to.
+         *
+         * @class
+         * @param {Object} datatsource The datasource that we're interested in.
+         */
+        var Graph = function (datasource) {
+            var self = this;
+
+            this.counter = 0;
+            this.nodes = {};
+
+            // Recurse through the list of connected inputs and build the graph
+            // The "ds" parameter must be an object that describes a datasource.
+            // The inputs of this datasource should be in ds.query.filter.datasources,
+            // which can either be:
+            // - a datasource
+            // - a reference to a datasource
+            // - an array whose items are either a datasource or a reference to
+            // a datasource
+            // (reference names must be unique across the graph!)
+            var buildGraph = function (name, ds) {
+                // console.log('buildGraph', ds.db, ds.col);
+                // No need to process the same unique name twice
+                if (self.nodes[name]) return self.nodes[name];
+
+                // Create a node for the current datasource
+                var node = new GraphNode(name, ds, self.nodes);
+                self.nodes[name] = node;
+
+                // No need to go any further up in the graph if it runs client-side
+                // and if the current node is to run server-side.
+                if ((runtime.name !== 'hosted') &&
+                  !ds.runatclient &&
+                  (!ds.runtime || (ds.runtime === 'hosted'))) {
+                    return node;
+                }
+
+                // Recurse through the list of connected inputs for the datasource
+                if (!ds.query || !ds.query.filter) return node;
+                _each(ds.query.filter.datasources, function (inputDatasource, inputName) {
+                    var refName = null;
+                    var refNode = null;
+                    if (_isArray(inputDatasource)) {
+                        // The input is a multiple datasource
+                        node.inputNodes[inputName] = [];
+                        _each(inputDatasource, function (subDatasource, index) {
+                            var subName = '_:' + (++self.counter);
+                            var subNode = null;
+                            if (_isObject(subDatasource)) {
+                                // The subdatasource is defined in place,
+                                // build the graph node for the subdatasource
+                                subNode = buildGraph(subName, subDatasource);
+                                node.inputNodes[inputName].push(subNode);
+                            }
+                            else {
+                                // The subdatasource is a reference to a datasource,
+                                // replace the reference by a link to the datasource and
+                                // build the graph node unless already done
+                                subName = subDatasource;
+                                subNode = self.nodes[subName];
+                                if (subNode) {
+                                    subDatasource = subNode.datasource;
+                                }
+                                else {
+                                    subDatasource = ds.query.filter.datasources[subName] ||
+                                      datasource.query.filter.datasources[subName] ||
+                                      (datasource.query.graph ? datasource.query.graph[subName] : null);
+                                    if (!subDatasource) {
+                                        throw new Error('Missing datasource "' + subName + '" detected');
+                                    }
+                                    subNode = buildGraph(subName, subDatasource);
+                                }
+                                inputDatasource[index] = subDatasource;
+                                node.inputNodes[inputName].push(subNode);
+                            }
+                        });
+                    }
+                    else if (_isObject(inputDatasource)) {
+                        // The input defines a datasource,
+                        // build the graph node for the datasource
+                        refName = '_:' + (++self.counter);
+                        node.inputNodes[inputName] = buildGraph(refName, inputDatasource);
+                    }
+                    else {
+                        // The input is a reference to a datasource,
+                        // replace the reference by a link to the datasource and
+                        // build the graph node unless already done
+                        refName = inputDatasource;
+                        refNode = self.nodes[refName];
+                        if (!refNode) {
+                            inputDatasource = ds.query.filter.datasources[refName] ||
+                              datasource.query.filter.datasources[refName] ||
+                              (datasource.query.graph ? datasource.query.graph[refName] : null);
+                            if (!inputDatasource) {
+                                throw new Error('Missing datasource "' + refName + '" detected');
+                            }
+                            ds.query.filter.datasources[inputName] = inputDatasource;
+                            refNode = buildGraph(refName, inputDatasource);
+                        }
+                        node.inputNodes[inputName] = refNode;
+                    }
+                });
+                return node;
+            };
+
+            // Initialize the structure of the graph
+            // (this will create all the additional nodes in this.nodes)
+            // Note the clone of the initial query as buildGraph is likely going to
+            // change the structure in place.
+            this.finalNode = buildGraph('_:final', JSON.parse(JSON.stringify(datasource)));
+        };
+
+
+        /**
+         * Retrieves the collection feed, running all operators that are connected
+         * to the inputs of this collection as necessary.
+         *
+         * @function
+         * @param {Object} options Request parameters
+         * @param {function(string,Object)} callback The callback function to call
+         *  once done
+         * @public
+         */
+        Graph.prototype.find = function (options, callback) {
+            var self = this;
+
+            if (!this.finalNode) {
+                return callback('No data source to retrieve');
+            }
+
+            // Step 1: reset all nodes in the graph
+            _each(this.nodes, function (node) {
+                node.reset();
+            });
+
+            // Only keep generic options, query filters are already scattered across
+            // the graph and have already been adjusted for execution
+            // (typically references to datasources have been expanded to include
+            // datasources definition)
+            var queryOptions = {};
+            _each(options, function (optionValue, optionName) {
+                if ((optionName === 'graph') || (optionName === 'filter')) return;
+                queryOptions[optionName] = optionValue;
+            });
+
+            // Step 2: parse the graph and compute the number of times each node
+            // ends up being connected to the final node.
+            this.finalNode.prepare();
+
+            // Step 3: execute the final node
+            this.finalNode.find(queryOptions, function (err, values) {
+                // Step 4: reset all nodes in the graph to release memory
+                _each(self.nodes, function (node) {
+                    node.reset();
+                });
+
+                // Final step: pass results back to the caller
+                return callback(err, values);
+            });
+        };
+
+
+        /**
+         * Object that performs an atomic operation on one or more outputs
+         * produced by other nodes of the underlying graph that are connected
+         * to this node.
+         *
+         * @class
+         * @param {string} id The id of the datasource in the graph
+         * @param {Object} ds The datasource definition
+         * @param {Object} dsNodes Pointer to the list of nodes in the graph
+         */
+        var GraphNode = function (id, ds, graphNodes) {
+            // Clone the node definition, that's our starting point
+            this.id = id;
+            this.graphNodes = graphNodes;
+            this.datasource = ds;
+            this.inputNodes = {};
+            this.reset();
+        };
+
+
+        /**
+         * Resets node properties to free up resources and allow reuse
+         *
+         * @function
+         */
+        GraphNode.prototype.reset = function () {
+            this.err = null;
+            this.data = null;
+            this.running = false;
+            this.occurrences = 0;
+            this.doneCallbacks = [];
+            this.collection = null;
+        };
+
+
+        /**
+         * Connects the outputs of the other nodes of the graph to the inputs
+         * of this node, as appropriate
+         *
+         * @class
+         */
+        GraphNode.prototype.prepare = function () {
+            var self = this;
+
+            // Increment the maximum number of times the node will take part in the
+            // execution of the graph
+            this.occurrences += 1;
+
+            // Prepare the underlying collection
+            if (this.occurrences === 1) {
+                // console.log('prepare', JSON.stringify(this.datasource, null, 2));
+                this.collection = collectionFactory.getCollection(this.datasource, true);
+            }
+
+            // Infinite loop check
+            if (this.occurrences > 1000) {
+                throw new Error('Infinite loop detected while preparing datasource execution');
+            }
+
+            // Recurse through the list of connected inputs
+            // Note the query has been updated inline at graph creation phase
+            // to ensure that all inputs can only "reference" a datasource
+            // or a list of datasources. In other words, inputs can never define
+            // a datasource on their own.
+            _each(this.inputNodes, function (inputNode) {
+                if (_isArray(inputNode)) {
+                    // Input is a multiple input
+                    _each(inputNode, function (subNode) {
+                        subNode.prepare();
+                    });
+                }
+                else {
+                    inputNode.prepare();
+                }
+            });
+        };
+
+
+        /**
+         * Runs the given function when the operation is done processing.
+         * @function
+         * @param {function} f Callback function to execute
+         * @public
+         */
+        GraphNode.prototype.onDone = function (callback) {
+            this.doneCallbacks.push(callback);
+        };
+
+
+        /**
+         * Runs the graph node, fetching the node's inputs as necessary.
+         *
+         * @function
+         * @public
+         */
+        GraphNode.prototype.find = function (options, callback) {
+            var self = this;
+
+            // Finish the execution of the node and trigger the "done" event
+            var finishExecution = function (err, values) {
+                self.running = false;
+
+                // Temporarily save errors and results
+                self.err = err;
+                self.data = values;
+
+                // Trigger "done" event, passing copies of errors and results
+                // (except when it is the last time the node is to be called)
+                _each(self.doneCallbacks, function (doneCallback) {
+                    var values = null;
+                    if (self.occurrences > 1) {
+                        values = JSON.parse(JSON.stringify(self.data));
+                    }
+                    else {
+                        values = self.data;
+                    }
+                    doneCallback(self.err, values);
+                });
+                self.doneCallbacks = [];
+
+                if (self.occurrences === 0) {
+                    self.err = null;
+                    self.data = null;
+                }
+            };
+
+            // Short async function that retrieves an input for the current graph node
+            var findInput = function (inputName, cb) {
+                var graphNode = self.inputNodes[inputName];
+                if (_isArray(graphNode)) {
+                    // The input is actually a list of inputs, run all subnodes
+                    asyncMap(graphNode, function (subNode, innerCb) {
+                        self.collection.updateInputOptions(options, function (err, inputOptions) {
+                            if (err) return innerCb(err, null);
+                            subNode.find(inputOptions, innerCb);
+                        });
+                    }, cb);
+                }
+                else {
+                    self.collection.updateInputOptions(options, function (err, inputOptions) {
+                        if (err) return cb(err);
+                        graphNode.find(inputOptions, cb);
+                    });
+                }
+            };
+
+            // Register the callback function as a "done" event handler
+            this.onDone(function (err, values) {
+                self.occurrences -= 1;
+                return callback(err, values);
+            });
+
+            // Return if the node is already running
+            // (the callback function will get called once processing is over)
+            if (this.running) {
+                // Sanity check: the number of occurrences must be greater
+                // than 1 in that case
+                if (this.occurrences <= 1) {
+                    throw new Error('Node is executed more than expected');
+                }
+                return;
+            }
+
+            // Report the results if the node has already been run through
+            // another path in the graph
+            if (this.err || this.data) {
+                return finishExecution(this.err, this.data);
+            }
+
+            // If we're still around, it means the node has not yet been run,
+            // time to flag it as "running" and do the work.
+            this.running = true;
+
+            if (this.datasource.db === "operator") {
+                // The collection is an operator.
+                // Let it fetch its inputs if wants to, in other words if it has inputs
+                // and defines a "fetch" method. Fetch its inputs otherwise.
+                // Then call "process" with the list of inputs.
+                // console.log('collection.graph', this.datasource.db, this.datasource.col, 'find');
+                if (!this.inputNodes) return finishExecution(null, { entries: [] });
+                this.collection.fetch(options, function (err, inputs) {
+                    if (err) return finishExecution(err);
+                    if (inputs !== null) {
+                        // All inputs are available, time to run the operator!
+                        self.collection.process(inputs, options, function (err, values) {
+                            // Propagate the inputs' maxAge property (keeping the minimum)
+                            if (values && !values.maxAge) {
+                                _each(inputs, function (input) {
+                                    if (input.maxAge &&
+                                      (!values.maxAge || (input.maxAge < values.maxAge))) {
+                                        values.maxAge = input.maxAge;
+                                    }
+                                });
+                            }
+                            return finishExecution(err, values);
+                        });
+                    }
+                    else {
+                        // Operator does not implement a "fetch" method, let's do it on our own
+                        asyncMap(_keys(self.inputNodes), findInput, function (err, values) {
+                            // Final callback called when all inputs have been processed
+                            if (err) return finishExecution(err);
+
+                            // Link input results back to input names
+                            // console.log('inputNodes', JSON.stringify(_keys(self.inputNodes), null, 2));
+                            // console.log('values', JSON.stringify(values, null, 2));
+                            var inputs = {};
+                            _each(_keys(self.inputNodes), function (key, idx) {
+                                inputs[key] = values[idx];
+                            });
+
+                            // All inputs are available, time to run the operator!
+                            self.collection.process(inputs, options, function (err, values) {
+                                // Propagate the inputs' maxAge property (keeping the minimum)
+                                if (values && !values.maxAge) {
+                                    _each(inputs, function (input) {
+                                        if (input && input.maxAge &&
+                                          (!values.maxAge || (input.maxAge < values.maxAge))) {
+                                            values.maxAge = input.maxAge;
+                                        }
+                                    });
+                                }
+                                return finishExecution(err, values);
+                            });
+                        });
+                    }
+                });
+            }
+            else {
+                // The collection is a "pure" datasource,
+                // or it needs to run server-side
+                // console.log('collection.graph', this.datasource.db, this.datasource.col, 'find');
+                this.collection.find(options, finishExecution);
+            }
+        };
+
+
+        return {
+            /**
+             * Creates a new Collection instance for the final node given as parameter
+             *
+             * @function
+             * @function {Object} datasource The datasource we're interested in
+             * @function {function} callback Callback function
+             */
+            "getCollection": function (datasource, callback) {
+                var collection = new Graph(datasource);
+                return callback(null, collection);
+            }
+        };
+    });
+    /**
      * @fileoverview The JSON Form "defaults" library exposes a setDefaultValues
      * method that extends the object passed as argument so that it includes
      * values for all required fields of the JSON schema it is to follow that
@@ -1049,11 +1334,11 @@
                         return;
                     }
                     else if ((schemaItem.type === 'object') || schemaItem.properties) {
-                            // Item is a required object
+                        // Item is a required object
                         defaults[path] = {};
                     }
                     else if ((schemaItem.type === 'array') || schemaItem.items) {
-                            // Item is a required array
+                        // Item is a required array
                         defaults[path] = [];
                     }
                     else if (schemaItem.type === 'string') {
@@ -1071,10 +1356,10 @@
                     }
                 }
                 else if (schemaItem['default'] && includeOptionalValues) {
-                        // Item is not required but defines a default value and the
-                        // include optional values flag is set, so let's use it.
-                        // No need to continue in that case, we have the default value
-                        // for the whole subtree starting at schemaItem.
+                    // Item is not required but defines a default value and the
+                    // include optional values flag is set, so let's use it.
+                    // No need to continue in that case, we have the default value
+                    // for the whole subtree starting at schemaItem.
                     defaults[path] = schemaItem['default'];
                     return;
                 }
@@ -1286,7 +1571,7 @@
             });
         }
         else if ((typeof module !== 'undefined') && module.exports) {
-                // Node.js module
+            // Node.js module
             module.exports = {
                 setDefaultValues: setDefaultValues
             };
@@ -1351,6 +1636,172 @@
             }
         };
     });
+    /**
+     * @fileoverview The "Update links" operator updates links it finds
+     * in the "articleBody" and/or the "content" property of feed items.
+     * 
+     * Depending on the operation requested, the operator either removes
+     * the links or adds a target="_blank" attribute to force the links
+     * to open in a new browser window.
+      *
+     * For the sake of simplifying the amount of code shipped to the client
+     * and the amount of processing needed, the operator uses regular
+     * expressions to search and replace links in the HTML fragments.
+     * By essence, this approach is doomed to fail in some cases
+     * (regular expressions cannot account for comments, nested structures
+     * or with the use of '>' as attribute values for instance).
+     * The solution to do things properly would be to use a real HTML parser.
+     */
+    define('databases/operator/updatelinks', [], function () {
+
+        /**
+         * Regular expression used to detect the start-tag of a link
+         */
+        var reLinkStart = /<a\s[^>]*>/gi;
+
+        /**
+         * Regular expression used to detect the end-tag of a link
+         */
+        var reLinkEnd = /<\/a\s*>/gi;
+
+        return {
+            /**
+             * Description of the datasource for the factory
+             */
+            desc: {
+                "datasources": {
+                    "main": {
+                        "title": "Input",
+                        "multiple": false
+                    }
+                },
+                "options": {
+                    "action": {
+                        "type": "string",
+                        "title": "Requested action",
+                        "default": "addtarget",
+                        "enum": [
+                          "addtarget",
+                          "remove"
+                        ]
+                    }
+                },
+                "form": [
+                  "datasources.main",
+                  {
+                      "key": "action",
+                      "titleMap": {
+                          "addtarget": "Force links to open in a new window",
+                          "remove": "Remove links (keeping link titles)"
+                      }
+                  }
+                ],
+                "runtimes": [
+                  "hosted",
+                  "browser",
+                  "nodejs",
+                  "win8"
+                ]
+            },
+
+
+            /**
+             * Applies the operator, updating links that appear in the articleBody
+             * and content properties of all items.
+             *
+             * @function
+             * @param {Object} data The feed associated with the "main" input.
+             *  The feed is updated in place, meaning the feed's "entries" property
+             *  is directly updated.
+             * @param {Object} query Query parameters.
+             * @param {function(Object, Object)} callback Callback function.
+             *   The second argument of the callback is the data object given as argument.
+             *   Its "entries" property contains the sorted feed.
+             */
+            process: function (data, query, callback) {
+                var action = null;
+                var i = 0;
+                query = query || {};
+
+                // Sanity checks
+                if (data && data.main) {
+                    data = data.main;
+                }
+                if (!data || !data.entries || !data.entries.length) {
+                    return callback(null, { "entries": [] });
+                }
+
+                // Remove links or force them to open in a new window based on requested
+                // action (default is to force them to open in a new window)
+                action = this.desc.options.action['default'];
+                if (query.filter && query.filter.action) {
+                    action = query.filter.action;
+                }
+
+                // Update feed items
+                for (i = 0; i < data.entries.length; i++) {
+                    this.updateItemLinks(data.entries[i], action);
+                }
+
+                // Send updated feed to the callback method
+                callback(null, data);
+            },
+
+
+            /**
+             * Updates the links that appear in the item's articleBody and content
+             * properties, removing them or adding a target="_blank" attribute as
+             * needed.
+             *
+             * Properties are updated in place.
+             *
+             * @function
+             * @param {Object} item The item to update
+             * @param {String} action The action to perform on links
+             */
+            updateItemLinks: function (item, action) {
+                if (!item) return;
+                if (item.articleBody) {
+                    item.articleBody = this.updateHtml(item.articleBody, action);
+                }
+                if (item.content) {
+                    item.content = this.updateHtml(item.content, action);
+                }
+            },
+
+
+            /**
+             * Updates links that appear in the given HTML content as requested
+             * by the given action and returns the updated HTML fragment.
+             *
+             * See file overview for warning about the use of regular expressions
+             *
+             * @function
+             * @param {String} html The HTML fragment to update
+             * @param {String} action The action to perform
+             *  (one of "addtarget" or "remove")
+             */
+            updateHtml: function (html, action) {
+                if (action === 'remove') {
+                    html = html.replace(reLinkStart, '');
+                    html = html.replace(reLinkEnd, '');
+                }
+                else {
+                    html = html.replace(reLinkStart, function (match, p1, offset, string) {
+                        if (match.toLowerCase().indexOf('target=') !== -1) {
+                            return match;
+                        }
+                        else {
+                            return '<a target="_blank" ' + match.substring(3);
+                        }
+                    });
+                }
+                return html;
+            }
+        };
+    });
+
+
     // IMPORTANT: Same code as the original Underscore lib except code gets
     // exported as an AMD module and lines 58 and following have been commented
     // out not to leak '_' to the global scope
@@ -2418,59 +2869,110 @@
         return _;
 
     });
-    define('databases/youtube/lib/api', ['datajslib!http', 'datajslib!underscore'], function (http, _) {
+    define('runtime-win8/http', [], function () {
+        // Windows 8 style
 
-        var api = {};
+        // Used to generate unique number for JSON callback function name
+        var callbackSeed = (new Date()).getTime();
 
+        return {
+            "request": function (params, callback) {
+                // Ensure parameters are correct
+                if (!params || !params.url) {
+                    return callback("No URI to request");
+                }
 
-        // Options: handle mongo's like options
+                // Ensure URL starts with http:// or https://
+                if (params.url.search(/^http(s?)\:\/\//i) === -1) {
+                    return callback("URI to request does not start with 'http://' or 'https://'.");
+                }
 
-        api.options = function (query) {
-            var ret = {};
-            if (query.skip) ret["start-index"] = query.skip + 1;
-            if (query.limit) ret['max-results'] = query.limit;
+                if (!params.data) params.data = {};
 
-            return ret;
-        };
+                // Setting callback parameter when JSONP requested,
+                // using user-defined parameters or default conventions
+                // (the hash mimics the one generated in jQuery)
+                if (params.dataType === 'jsonp') {
+                    var jsonp = params.jsonp || "callback";
+                    var jsonCallback = params.jsonCallback ||
+                      "datajslib_" + (Math.random().toString()).replace(/\D/g, "") + (callbackSeed++);
+                    params.data[jsonp] = jsonCallback;
+                }
 
+                var type = (params.type || 'get').toLowerCase();
 
-        // Generate final URL 
+                // Depending of the method of the request, we either append
+                // to the URL or create formdata.
+                if (type === "post") {
+                    var fd = new FormData();
+                    for (var j in params.data) {
+                        if (params.data.hasOwnProperty(j))
+                            fd.append(j, params.data[j]);
+                    }
+                    params.data = fd;
+                } else if (type === "put") {
 
-        api.generateUrl = function (url, params) {
-            for (var param in params) {
-                var newUrl = url.replace(new RegExp(':' + param), params[param]);
-                if (newUrl != url)
-                    url = newUrl;
-                else
-                    url += ((url.indexOf('?') == -1) ? '?' : '&') + param + (params[param] ? ('=' + params[param]) : '');
+                } else if (type === "delete") {
+
+                } else {
+                    // Stringify the query data that should be sent to the
+                    // server in the event of a GET query. This is something
+                    // that's usually done by http modules (jquery and such)
+                    // but is not done by WinJS's xhr() which expects
+                    // the formatted querystring in params.data
+                    var finalQs = '';
+                    for (var k in params.data) {
+                        if (params.data.hasOwnProperty(k)) {
+                            finalQs += encodeURIComponent(k) + '=' + encodeURIComponent(params.data[k]) + '&';
+                        }
+                    }
+                    finalQs = finalQs.substr(0, finalQs.length - 1) || "";
+                    params.url += (/\?/.test(params.url) ? "&" : "?") + finalQs;
+                }
+
+                WinJS.xhr(params).then(
+                  // success
+                  function (ret) {
+                      var body = ret.responseText;
+
+                      if (params.dataType == 'json' ||
+                        params.dataType == 'text json' ||
+                        params.dataType == 'jsonp') {
+                          var tmp_json;
+
+                          try {
+                              // Strip out JSONP function
+                              if (params.dataType === "jsonp") {
+                                  // replace the last parenthethis
+                                  body = body.replace(/\)$/, "").replace(/\)\;$/, "");
+                                  // replace before the first patenthethis
+                                  body = body.replace(/^[^\(]+\(/, "");
+                              }
+                              tmp_json = JSON.parse(body);
+                          } catch (e) {
+                              // console.warn('Invalid JSON received: ', body);
+                              return callback("Could not parse the response received as JSON.\n" +
+                                "Possible causes:\n" +
+                                "- the provider did not wrap the object in a JSONP function" +
+                                " (ensure the jsonp parameter is the right one)\n" +
+                                "- the JSON is invalid (not much to do in that case)\n" +
+                                "Exception triggered: " + e);
+                          }
+                          return callback(null, tmp_json);
+                      } else {
+                          return callback(null, body);
+                      }
+                  },
+                  // error
+                  function (err) {
+                      callback(err);
+                  });
+
+                return true;
             }
-            return url;
         };
-
-
-        // Call API 
-
-        api.request = function (url, cb) {
-
-            var baseUrl = 'http://gdata.youtube.com/feeds/api/';
-
-            // We add default parameter
-            url = baseUrl + api.generateUrl(url, { alt: 'json-in-script', v: 2 });
-
-            // console.log("url",url);
-            http.request({
-                'url': url,
-                'dataType': 'jsonp'
-            }, cb);
-        };
-
-
-        // Export --------------------------------------------------------------------
-
-        return api;
 
     });
-
     /**
      * @fileoverview ISO8601 conversion functions.
      *
@@ -2744,11 +3246,1701 @@
 
 
     });
-    define('databases/youtube/videos', [
-      './lib/api',
+    /**
+     * @fileoverview The JSON Form lang field library exposes a getLangField method
+     * that returns the appropriate JSON Form description object to generate a
+     * dropdown box that lists common languages.
+     *
+     * The two-letter ISO 639-1 language code of the selected language gets passed
+     * to the schema upon form submission:
+     * http://www.loc.gov/standards/iso639-2/php/code_list.php
+     */
+
+    define('runtime-win8/jsonform-langfield', [], function () {
+
+        /**
+         * Taken from:
+         * http://stackoverflow.com/questions/3217492/list-of-language-codes-in-yaml-or-json
+         *
+         * @author Phil Teare
+         * using wikipedia data
+         */
+        /*var isoLangs = {
+          "ab":{
+            "name":"Abkhaz",
+            "nativeName":"аҧсуа"
+          },
+          "aa":{
+            "name":"Afar",
+            "nativeName":"Afaraf"
+          },
+          "af":{
+            "name":"Afrikaans",
+            "nativeName":"Afrikaans"
+          },
+          "ak":{
+            "name":"Akan",
+            "nativeName":"Akan"
+          },
+          "sq":{
+            "name":"Albanian",
+            "nativeName":"Shqip"
+          },
+          "am":{
+            "name":"Amharic",
+            "nativeName":"አማርኛ"
+          },
+          "ar":{
+            "name":"Arabic",
+            "nativeName":"العربية"
+          },
+          "an":{
+            "name":"Aragonese",
+            "nativeName":"Aragonés"
+          },
+          "hy":{
+            "name":"Armenian",
+            "nativeName":"Հայերեն"
+          },
+          "as":{
+            "name":"Assamese",
+            "nativeName":"অসমীয়া"
+          },
+          "av":{
+            "name":"Avaric",
+            "nativeName":"авар мацӀ, магӀарул мацӀ"
+          },
+          "ae":{
+            "name":"Avestan",
+            "nativeName":"avesta"
+          },
+          "ay":{
+            "name":"Aymara",
+            "nativeName":"aymar aru"
+          },
+          "az":{
+            "name":"Azerbaijani",
+            "nativeName":"azərbaycan dili"
+          },
+          "bm":{
+            "name":"Bambara",
+            "nativeName":"bamanankan"
+          },
+          "ba":{
+            "name":"Bashkir",
+            "nativeName":"башҡорт теле"
+          },
+          "eu":{
+            "name":"Basque",
+            "nativeName":"euskara, euskera"
+          },
+          "be":{
+            "name":"Belarusian",
+            "nativeName":"Беларуская"
+          },
+          "bn":{
+            "name":"Bengali",
+            "nativeName":"বাংলা"
+          },
+          "bh":{
+            "name":"Bihari",
+            "nativeName":"भोजपुरी"
+          },
+          "bi":{
+            "name":"Bislama",
+            "nativeName":"Bislama"
+          },
+          "bs":{
+            "name":"Bosnian",
+            "nativeName":"bosanski jezik"
+          },
+          "br":{
+            "name":"Breton",
+            "nativeName":"brezhoneg"
+          },
+          "bg":{
+            "name":"Bulgarian",
+            "nativeName":"български език"
+          },
+          "my":{
+            "name":"Burmese",
+            "nativeName":"ဗမာစာ"
+          },
+          "ca":{
+            "name":"Catalan; Valencian",
+            "nativeName":"Català"
+          },
+          "ch":{
+            "name":"Chamorro",
+            "nativeName":"Chamoru"
+          },
+          "ce":{
+            "name":"Chechen",
+            "nativeName":"нохчийн мотт"
+          },
+          "ny":{
+            "name":"Chichewa; Chewa; Nyanja",
+            "nativeName":"chiCheŵa, chinyanja"
+          },
+          "zh":{
+            "name":"Chinese",
+            "nativeName":"中文 (Zhōngwén), 汉语, 漢語"
+          },
+          "cv":{
+            "name":"Chuvash",
+            "nativeName":"чӑваш чӗлхи"
+          },
+          "kw":{
+            "name":"Cornish",
+            "nativeName":"Kernewek"
+          },
+          "co":{
+            "name":"Corsican",
+            "nativeName":"corsu, lingua corsa"
+          },
+          "cr":{
+            "name":"Cree",
+            "nativeName":"ᓀᐦᐃᔭᐍᐏᐣ"
+          },
+          "hr":{
+            "name":"Croatian",
+            "nativeName":"hrvatski"
+          },
+          "cs":{
+            "name":"Czech",
+            "nativeName":"česky, čeština"
+          },
+          "da":{
+            "name":"Danish",
+            "nativeName":"dansk"
+          },
+          "dv":{
+            "name":"Divehi; Dhivehi; Maldivian;",
+            "nativeName":""
+          },
+          "nl":{
+            "name":"Dutch",
+            "nativeName":"Nederlands, Vlaams"
+          },
+          "en":{
+            "name":"English",
+            "nativeName":"English"
+          },
+          "eo":{
+            "name":"Esperanto",
+            "nativeName":"Esperanto"
+          },
+          "et":{
+            "name":"Estonian",
+            "nativeName":"eesti, eesti keel"
+          },
+          "ee":{
+            "name":"Ewe",
+            "nativeName":"Eʋegbe"
+          },
+          "fo":{
+            "name":"Faroese",
+            "nativeName":"føroyskt"
+          },
+          "fj":{
+            "name":"Fijian",
+            "nativeName":"vosa Vakaviti"
+          },
+          "fi":{
+            "name":"Finnish",
+            "nativeName":"suomi, suomen kieli"
+          },
+          "fr":{
+            "name":"French",
+            "nativeName":"français, langue française"
+          },
+          "ff":{
+            "name":"Fula; Fulah; Pulaar; Pular",
+            "nativeName":"Fulfulde, Pulaar, Pular"
+          },
+          "gl":{
+            "name":"Galician",
+            "nativeName":"Galego"
+          },
+          "ka":{
+            "name":"Georgian",
+            "nativeName":"ქართული"
+          },
+          "de":{
+            "name":"German",
+            "nativeName":"Deutsch"
+          },
+          "el":{
+            "name":"Greek, Modern",
+            "nativeName":"Ελληνικά"
+          },
+          "gn":{
+            "name":"Guaraní",
+            "nativeName":"Avañeẽ"
+          },
+          "gu":{
+            "name":"Gujarati",
+            "nativeName":"ગુજરાતી"
+          },
+          "ht":{
+            "name":"Haitian; Haitian Creole",
+            "nativeName":"Kreyòl ayisyen"
+          },
+          "ha":{
+            "name":"Hausa",
+            "nativeName":"Hausa, هَوُسَ"
+          },
+          "he":{
+            "name":"Hebrew (modern)",
+            "nativeName":"עברית"
+          },
+          "hz":{
+            "name":"Herero",
+            "nativeName":"Otjiherero"
+          },
+          "hi":{
+            "name":"Hindi",
+            "nativeName":"हिन्दी, हिंदी"
+          },
+          "ho":{
+            "name":"Hiri Motu",
+            "nativeName":"Hiri Motu"
+          },
+          "hu":{
+            "name":"Hungarian",
+            "nativeName":"Magyar"
+          },
+          "ia":{
+            "name":"Interlingua",
+            "nativeName":"Interlingua"
+          },
+          "id":{
+            "name":"Indonesian",
+            "nativeName":"Bahasa Indonesia"
+          },
+          "ie":{
+            "name":"Interlingue",
+            "nativeName":"Originally called Occidental; then Interlingue after WWII"
+          },
+          "ga":{
+            "name":"Irish",
+            "nativeName":"Gaeilge"
+          },
+          "ig":{
+            "name":"Igbo",
+            "nativeName":"Asụsụ Igbo"
+          },
+          "ik":{
+            "name":"Inupiaq",
+            "nativeName":"Iñupiaq, Iñupiatun"
+          },
+          "io":{
+            "name":"Ido",
+            "nativeName":"Ido"
+          },
+          "is":{
+            "name":"Icelandic",
+            "nativeName":"Íslenska"
+          },
+          "it":{
+            "name":"Italian",
+            "nativeName":"Italiano"
+          },
+          "iu":{
+            "name":"Inuktitut",
+            "nativeName":"ᐃᓄᒃᑎᑐᑦ"
+          },
+          "ja":{
+            "name":"Japanese",
+            "nativeName":"日本語 (にほんご／にっぽんご)"
+          },
+          "jv":{
+            "name":"Javanese",
+            "nativeName":"basa Jawa"
+          },
+          "kl":{
+            "name":"Kalaallisut, Greenlandic",
+            "nativeName":"kalaallisut, kalaallit oqaasii"
+          },
+          "kn":{
+            "name":"Kannada",
+            "nativeName":"ಕನ್ನಡ"
+          },
+          "kr":{
+            "name":"Kanuri",
+            "nativeName":"Kanuri"
+          },
+          "ks":{
+            "name":"Kashmiri",
+            "nativeName":"कश्मीरी, كشميري‎"
+          },
+          "kk":{
+            "name":"Kazakh",
+            "nativeName":"Қазақ тілі"
+          },
+          "km":{
+            "name":"Khmer",
+            "nativeName":"ភាសាខ្មែរ"
+          },
+          "ki":{
+            "name":"Kikuyu, Gikuyu",
+            "nativeName":"Gĩkũyũ"
+          },
+          "rw":{
+            "name":"Kinyarwanda",
+            "nativeName":"Ikinyarwanda"
+          },
+          "ky":{
+            "name":"Kirghiz, Kyrgyz",
+            "nativeName":"кыргыз тили"
+          },
+          "kv":{
+            "name":"Komi",
+            "nativeName":"коми кыв"
+          },
+          "kg":{
+            "name":"Kongo",
+            "nativeName":"KiKongo"
+          },
+          "ko":{
+            "name":"Korean",
+            "nativeName":"한국어 (韓國語), 조선말 (朝鮮語)"
+          },
+          "ku":{
+            "name":"Kurdish",
+            "nativeName":"Kurdî, كوردی‎"
+          },
+          "kj":{
+            "name":"Kwanyama, Kuanyama",
+            "nativeName":"Kuanyama"
+          },
+          "la":{
+            "name":"Latin",
+            "nativeName":"latine, lingua latina"
+          },
+          "lb":{
+            "name":"Luxembourgish, Letzeburgesch",
+            "nativeName":"Lëtzebuergesch"
+          },
+          "lg":{
+            "name":"Luganda",
+            "nativeName":"Luganda"
+          },
+          "li":{
+            "name":"Limburgish, Limburgan, Limburger",
+            "nativeName":"Limburgs"
+          },
+          "ln":{
+            "name":"Lingala",
+            "nativeName":"Lingála"
+          },
+          "lo":{
+            "name":"Lao",
+            "nativeName":"ພາສາລາວ"
+          },
+          "lt":{
+            "name":"Lithuanian",
+            "nativeName":"lietuvių kalba"
+          },
+          "lu":{
+            "name":"Luba-Katanga",
+            "nativeName":""
+          },
+          "lv":{
+            "name":"Latvian",
+            "nativeName":"latviešu valoda"
+          },
+          "gv":{
+            "name":"Manx",
+            "nativeName":"Gaelg, Gailck"
+          },
+          "mk":{
+            "name":"Macedonian",
+            "nativeName":"македонски јазик"
+          },
+          "mg":{
+            "name":"Malagasy",
+            "nativeName":"Malagasy fiteny"
+          },
+          "ms":{
+            "name":"Malay",
+            "nativeName":"bahasa Melayu, بهاس ملايو‎"
+          },
+          "ml":{
+            "name":"Malayalam",
+            "nativeName":"മലയാളം"
+          },
+          "mt":{
+            "name":"Maltese",
+            "nativeName":"Malti"
+          },
+          "mi":{
+            "name":"Māori",
+            "nativeName":"te reo Māori"
+          },
+          "mr":{
+            "name":"Marathi (Marāṭhī)",
+            "nativeName":"मराठी"
+          },
+          "mh":{
+            "name":"Marshallese",
+            "nativeName":"Kajin M̧ajeļ"
+          },
+          "mn":{
+            "name":"Mongolian",
+            "nativeName":"монгол"
+          },
+          "na":{
+            "name":"Nauru",
+            "nativeName":"Ekakairũ Naoero"
+          },
+          "nv":{
+            "name":"Navajo, Navaho",
+            "nativeName":"Diné bizaad, Dinékʼehǰí"
+          },
+          "nb":{
+            "name":"Norwegian Bokmål",
+            "nativeName":"Norsk bokmål"
+          },
+          "nd":{
+            "name":"North Ndebele",
+            "nativeName":"isiNdebele"
+          },
+          "ne":{
+            "name":"Nepali",
+            "nativeName":"नेपाली"
+          },
+          "ng":{
+            "name":"Ndonga",
+            "nativeName":"Owambo"
+          },
+          "nn":{
+            "name":"Norwegian Nynorsk",
+            "nativeName":"Norsk nynorsk"
+          },
+          "no":{
+            "name":"Norwegian",
+            "nativeName":"Norsk"
+          },
+          "ii":{
+            "name":"Nuosu",
+            "nativeName":"ꆈꌠ꒿ Nuosuhxop"
+          },
+          "nr":{
+            "name":"South Ndebele",
+            "nativeName":"isiNdebele"
+          },
+          "oc":{
+            "name":"Occitan",
+            "nativeName":"Occitan"
+          },
+          "oj":{
+            "name":"Ojibwe, Ojibwa",
+            "nativeName":"ᐊᓂᔑᓈᐯᒧᐎᓐ"
+          },
+          "cu":{
+            "name":"Old Church Slavonic, Church Slavic, Church Slavonic, Old Bulgarian, Old Slavonic",
+            "nativeName":"ѩзыкъ словѣньскъ"
+          },
+          "om":{
+            "name":"Oromo",
+            "nativeName":"Afaan Oromoo"
+          },
+          "or":{
+            "name":"Oriya",
+            "nativeName":"ଓଡ଼ିଆ"
+          },
+          "os":{
+            "name":"Ossetian, Ossetic",
+            "nativeName":"ирон æвзаг"
+          },
+          "pa":{
+            "name":"Panjabi, Punjabi",
+            "nativeName":"ਪੰਜਾਬੀ, پنجابی‎"
+          },
+          "pi":{
+            "name":"Pāli",
+            "nativeName":"पाऴि"
+          },
+          "fa":{
+            "name":"Persian",
+            "nativeName":"فارسی"
+          },
+          "pl":{
+            "name":"Polish",
+            "nativeName":"polski"
+          },
+          "ps":{
+            "name":"Pashto, Pushto",
+            "nativeName":"پښتو"
+          },
+          "pt":{
+            "name":"Portuguese",
+            "nativeName":"Português"
+          },
+          "qu":{
+            "name":"Quechua",
+            "nativeName":"Runa Simi, Kichwa"
+          },
+          "rm":{
+            "name":"Romansh",
+            "nativeName":"rumantsch grischun"
+          },
+          "rn":{
+            "name":"Kirundi",
+            "nativeName":"kiRundi"
+          },
+          "ro":{
+            "name":"Romanian, Moldavian, Moldovan",
+            "nativeName":"română"
+          },
+          "ru":{
+            "name":"Russian",
+            "nativeName":"русский язык"
+          },
+          "sa":{
+            "name":"Sanskrit (Saṁskṛta)",
+            "nativeName":"संस्कृतम्"
+          },
+          "sc":{
+            "name":"Sardinian",
+            "nativeName":"sardu"
+          },
+          "sd":{
+            "name":"Sindhi",
+            "nativeName":"सिन्धी, سنڌي، سندھی‎"
+          },
+          "se":{
+            "name":"Northern Sami",
+            "nativeName":"Davvisámegiella"
+          },
+          "sm":{
+            "name":"Samoan",
+            "nativeName":"gagana faa Samoa"
+          },
+          "sg":{
+            "name":"Sango",
+            "nativeName":"yângâ tî sängö"
+          },
+          "sr":{
+            "name":"Serbian",
+            "nativeName":"српски језик"
+          },
+          "gd":{
+            "name":"Scottish Gaelic; Gaelic",
+            "nativeName":"Gàidhlig"
+          },
+          "sn":{
+            "name":"Shona",
+            "nativeName":"chiShona"
+          },
+          "si":{
+            "name":"Sinhala, Sinhalese",
+            "nativeName":"සිංහල"
+          },
+          "sk":{
+            "name":"Slovak",
+            "nativeName":"slovenčina"
+          },
+          "sl":{
+            "name":"Slovene",
+            "nativeName":"slovenščina"
+          },
+          "so":{
+            "name":"Somali",
+            "nativeName":"Soomaaliga, af Soomaali"
+          },
+          "st":{
+            "name":"Southern Sotho",
+            "nativeName":"Sesotho"
+          },
+          "es":{
+            "name":"Spanish; Castilian",
+            "nativeName":"español, castellano"
+          },
+          "su":{
+            "name":"Sundanese",
+            "nativeName":"Basa Sunda"
+          },
+          "sw":{
+            "name":"Swahili",
+            "nativeName":"Kiswahili"
+          },
+          "ss":{
+            "name":"Swati",
+            "nativeName":"SiSwati"
+          },
+          "sv":{
+            "name":"Swedish",
+            "nativeName":"svenska"
+          },
+          "ta":{
+            "name":"Tamil",
+            "nativeName":"தமிழ்"
+          },
+          "te":{
+            "name":"Telugu",
+            "nativeName":"తెలుగు"
+          },
+          "tg":{
+            "name":"Tajik",
+            "nativeName":"тоҷикӣ, toğikī, تاجیکی‎"
+          },
+          "th":{
+            "name":"Thai",
+            "nativeName":"ไทย"
+          },
+          "ti":{
+            "name":"Tigrinya",
+            "nativeName":"ትግርኛ"
+          },
+          "bo":{
+            "name":"Tibetan Standard, Tibetan, Central",
+            "nativeName":"བོད་ཡིག"
+          },
+          "tk":{
+            "name":"Turkmen",
+            "nativeName":"Türkmen, Түркмен"
+          },
+          "tl":{
+            "name":"Tagalog",
+            "nativeName":"Wikang Tagalog"
+          },
+          "tn":{
+            "name":"Tswana",
+            "nativeName":"Setswana"
+          },
+          "to":{
+            "name":"Tonga (Tonga Islands)",
+            "nativeName":"faka Tonga"
+          },
+          "tr":{
+            "name":"Turkish",
+            "nativeName":"Türkçe"
+          },
+          "ts":{
+            "name":"Tsonga",
+            "nativeName":"Xitsonga"
+          },
+          "tt":{
+            "name":"Tatar",
+            "nativeName":"татарча, tatarça, تاتارچا‎"
+          },
+          "tw":{
+            "name":"Twi",
+            "nativeName":"Twi"
+          },
+          "ty":{
+            "name":"Tahitian",
+            "nativeName":"Reo Tahiti"
+          },
+          "ug":{
+            "name":"Uighur, Uyghur",
+            "nativeName":"Uyƣurqə, ئۇيغۇرچە‎"
+          },
+          "uk":{
+            "name":"Ukrainian",
+            "nativeName":"українська"
+          },
+          "ur":{
+            "name":"Urdu",
+            "nativeName":"اردو"
+          },
+          "uz":{
+            "name":"Uzbek",
+            "nativeName":"zbek, Ўзбек, أۇزبېك‎"
+          },
+          "ve":{
+            "name":"Venda",
+            "nativeName":"Tshivenḓa"
+          },
+          "vi":{
+            "name":"Vietnamese",
+            "nativeName":"Tiếng Việt"
+          },
+          "vo":{
+            "name":"Volapük",
+            "nativeName":"Volapük"
+          },
+          "wa":{
+            "name":"Walloon",
+            "nativeName":"Walon"
+          },
+          "cy":{
+            "name":"Welsh",
+            "nativeName":"Cymraeg"
+          },
+          "wo":{
+            "name":"Wolof",
+            "nativeName":"Wollof"
+          },
+          "fy":{
+            "name":"Western Frisian",
+            "nativeName":"Frysk"
+          },
+          "xh":{
+            "name":"Xhosa",
+            "nativeName":"isiXhosa"
+          },
+          "yi":{
+            "name":"Yiddish",
+            "nativeName":"ייִדיש"
+          },
+          "yo":{
+            "name":"Yoruba",
+            "nativeName":"Yorùbá"
+          },
+          "za":{
+            "name":"Zhuang, Chuang",
+            "nativeName":"Saɯ cueŋƅ, Saw cuengh"
+          }
+        };*/
+
+        // Only keep most common ones
+        var isoLangs = {
+            "af": {
+                "name": "Afrikaans",
+                "nativeName": "Afrikaans"
+            },
+            "ar": {
+                "name": "Arabic",
+                "nativeName": "العربية"
+            },
+            "hy": {
+                "name": "Armenian",
+                "nativeName": "Հայերեն"
+            },
+            "be": {
+                "name": "Belarusian",
+                "nativeName": "Беларуская"
+            },
+            "bg": {
+                "name": "Bulgarian",
+                "nativeName": "български език"
+            },
+            "ca": {
+                "name": "Catalan",
+                "nativeName": "Català"
+            },
+            "zh": {
+                "name": "Chinese",
+                "nativeName": "中文 (Zhōngwén), 汉语, 漢語"
+            },
+            "hr": {
+                "name": "Croatian",
+                "nativeName": "hrvatski"
+            },
+            "cs": {
+                "name": "Czech",
+                "nativeName": "česky, čeština"
+            },
+            "da": {
+                "name": "Danish",
+                "nativeName": "dansk"
+            },
+            "nl": {
+                "name": "Dutch",
+                "nativeName": "Nederlands, Vlaams"
+            },
+            "en": {
+                "name": "English",
+                "nativeName": "English"
+            },
+            "eo": {
+                "name": "Esperanto",
+                "nativeName": "Esperanto"
+            },
+            "et": {
+                "name": "Estonian",
+                "nativeName": "eesti, eesti keel"
+            },
+            "tl": {
+                "name": "Filipino",
+                "nativeName": "Wikang Tagalog"
+            },
+            "fi": {
+                "name": "Finnish",
+                "nativeName": "suomi, suomen kieli"
+            },
+            "fr": {
+                "name": "French",
+                "nativeName": "français"
+            },
+            "de": {
+                "name": "German",
+                "nativeName": "Deutsch"
+            },
+            "el": {
+                "name": "Greek",
+                "nativeName": "Ελληνικά"
+            },
+            "he": {
+                "name": "Hebrew (modern)",
+                "nativeName": "עברית"
+            },
+            "hi": {
+                "name": "Hindi",
+                "nativeName": "हिन्दी, हिंदी"
+            },
+            "hu": {
+                "name": "Hungarian",
+                "nativeName": "Magyar"
+            },
+            "is": {
+                "name": "Icelandic",
+                "nativeName": "Íslenska"
+            },
+            "id": {
+                "name": "Indonesian",
+                "nativeName": "Bahasa Indonesia"
+            },
+            "it": {
+                "name": "Italian",
+                "nativeName": "Italiano"
+            },
+            "ja": {
+                "name": "Japanese",
+                "nativeName": "日本語 (にほんご／にっぽんご)"
+            },
+            "ko": {
+                "name": "Korean",
+                "nativeName": "한국어 (韓國語), 조선말 (朝鮮語)"
+            },
+            "lv": {
+                "name": "Latvian",
+                "nativeName": "latviešu valoda"
+            },
+            "lt": {
+                "name": "Lithuanian",
+                "nativeName": "lietuvių kalba"
+            },
+            "no": {
+                "name": "Norwegian",
+                "nativeName": "Norsk"
+            },
+            "fa": {
+                "name": "Persian",
+                "nativeName": "فارسی"
+            },
+            "pl": {
+                "name": "Polish",
+                "nativeName": "polski"
+            },
+            "pt": {
+                "name": "Portuguese",
+                "nativeName": "Português"
+            },
+            "ro": {
+                "name": "Romanian",
+                "nativeName": "română"
+            },
+            "ru": {
+                "name": "Russian",
+                "nativeName": "русский язык"
+            },
+            "sr": {
+                "name": "Serbian",
+                "nativeName": "српски језик"
+            },
+            "sk": {
+                "name": "Slovak",
+                "nativeName": "slovenčina"
+            },
+            "sl": {
+                "name": "Slovenian",
+                "nativeName": "slovenščina"
+            },
+            "es": {
+                "name": "Spanish",
+                "nativeName": "español, castellano"
+            },
+            "sw": {
+                "name": "Swahili",
+                "nativeName": "Kiswahili"
+            },
+            "sv": {
+                "name": "Swedish",
+                "nativeName": "svenska"
+            },
+            "th": {
+                "name": "Thai",
+                "nativeName": "ไทย"
+            },
+            "tr": {
+                "name": "Turkish",
+                "nativeName": "Türkçe"
+            },
+            "uk": {
+                "name": "Ukrainian",
+                "nativeName": "українська"
+            },
+            "vi": {
+                "name": "Vietnamese",
+                "nativeName": "Tiếng Việt"
+            }
+        };
+
+        /**
+         * Most common codes.
+         */
+        var commonIsoLangCodes = [
+          "af", "ar", "hy", "be", "bg", "ca", "zh", "hr", "cs", "da", "nl", "en", "eo",
+          "et", "tl", "fi", "fr", "de", "el", "he", "hi", "hu", "is", "id", "it", "ja",
+          "ko", "lv", "lt", "no", "fa", "pl", "pt", "ro", "ru", "sr", "sk", "sl",
+          "es", "sw", "sv", "th", "tr", "uk", "vi"
+        ];
+
+        /**
+         * Returns the JSON Form object that describes a language select field
+         * based on the given information
+         *
+         * @param {String} key The name of the schema key (dotted notation possible)
+         *  linked to the select field. The key will receive the ISO 639.1 value of
+         *  the selected language upon form submission.
+         * @param {String} title The title of the field in the form
+         * @param {Boolean} all Whether to add an "Any" choice to the list of
+         *  languages (defaults to true). The schema key is set to "" when the
+         *  "Any" choice is selected.
+         * @param {Array} include A list of language codes to include
+         *  (defaults to a list of "common" languages)
+         * @returns {Object} A JSON Form description that generates the appropriate
+         *  select field. The object should be set in the JSON Form "form" section
+         *  of the form.
+         */
+        var getLangField = function (key, title, all, include) {
+            key = key || "language";
+            title = title || "Language";
+            if (all !== false) all = true;
+            include = include || commonIsoLangCodes;
+
+            var enumeration = [];
+            var length = include.length;
+            var code;
+            var lang;
+
+            if (all) {
+                enumeration.push({
+                    "title": "All",
+                    "value": ""
+                });
+            }
+
+            for (var i = 0; i < length; i++) {
+                code = include[i];
+
+                if (isoLangs.hasOwnProperty(code)) {
+                    lang = isoLangs[code];
+                    enumeration.push({
+                        "title": lang.name + " (" + lang.nativeName + ")",
+                        "value": code
+                    });
+                }
+            }
+
+            return {
+                "key": key,
+                "title": title,
+                "type": "select",
+                "options": enumeration
+            };
+        };
+
+        return {
+            getLangField: getLangField
+        };
+    });
+
+    define('databases/twitter/tweets', [
+      'datajslib!underscore',
+      'datajslib!http',
+      'datajslib!iso8601',
+      'datajslib!jsonform-langfield'
+    ], function (_, http, iso8601, langfield) {
+
+        var reAvatarUrl = /_normal\.(jpg|JPG|png|PNG|jpeg|JPEG|gif|GIF)$/;
+
+        return {
+            /**
+             * Description of the datasource for the factory
+             */
+            desc: {
+                "options": {
+                    "schema": {
+                        "user": {
+                            "type": "string",
+                            "title": "Username"
+                        },
+                        "search": {
+                            "type": "string",
+                            "title": "Search text"
+                        },
+                        "excluderetweets": {
+                            "title": "Exclude retweets",
+                            "type": "boolean"
+                        },
+                        "excludereplies": {
+                            "title": "Exclude replies",
+                            "type": "boolean"
+                        },
+                        "language": {
+                            "type": "string",
+                            "title": "Restrict language"
+                        }
+                    },
+                    "form": [
+                      {
+                          "type": "selectfieldset",
+                          "title": "Search by",
+                          "items": [
+                            {
+                                "type": "optionfieldset",
+                                "legend": "Text",
+                                "items": [
+                                  "search",
+                                  langfield.getLangField('language', 'Restrict language')
+                                ]
+                            },
+                            {
+                                "type": "optionfieldset",
+                                "legend": "Username",
+                                "items": [
+                                  "user"
+                                ]
+                            }
+                          ]
+                      },
+                      {
+                          "key": "excluderetweets",
+                          "inlinetitle": "Exclude retweets",
+                          "type": "checkbox",
+                          "notitle": true
+                      },
+                      {
+                          "key": "excludereplies",
+                          "inlinetitle": "Exclude replies",
+                          "type": "checkbox",
+                          "notitle": true
+                      }
+                    ]
+                },
+                "runtimes": ["browser", "nodejs", "win8"], //Because twitter has IP-based API limits
+                "outputType": "Article/Status"
+            },
+
+
+            /**
+             * Fetches feed items from the source provider.
+             * @function
+             * @param {Object} query Query parameters. Must define a 'filter' property
+             *   with a 'url' property that contains the absolute URL to the page.
+             * @param {function(Object, Object)} callback Callback function.
+             *   Returns a text.
+             */
+            fetch: function (query, callback) {
+                // See https://dev.twitter.com/
+                var filter = (query && query.filter) ? query.filter : {};
+                var finalqs = {};
+                var apiUrl, cntParamName, cntMax;
+
+                var apiQuery = function (url, qs, cb) {
+                    http.request({
+                        'url': url,
+                        'data': qs,
+                        'dataType': 'jsonp'
+                    }, function (err, data) {
+                        if (err || !data) return cb(err || "empty data");
+                        if (typeof data[0] == "string") return cb(data[0]); // Usually, rate limit exceeded. TODO what format w/ search queries?
+                        return cb(null, data);
+                    });
+                };
+
+                if (!query.limit) query.limit = 20;
+                if (!query.skip) query.skip = 0;
+
+                //This could be optimized by making simple queries (without metadata and all)
+                var totalToFetch = query.limit + query.skip;
+
+                var fetchedItems = [];
+
+                if (filter.search) {
+                    apiUrl = 'https://search.twitter.com/search.json';
+                    cntParamName = "rpp";
+                    cntMax = 100;
+
+                    //page:Math.floor(((query.skip||0)/(query.limit||20))+1) });
+
+                    finalqs = {
+                        q: filter.search,
+                        include_entities: "1"
+                    };
+
+                    if (filter.language) {
+                        finalqs.lang = filter.language;
+                    }
+
+                } else if (filter.user) {
+                    apiUrl = 'https://api.twitter.com/1/statuses/user_timeline.json';
+                    cntParamName = "count";
+                    cntMax = 200;
+
+                    finalqs = {
+                        screen_name: filter.user,
+                        include_entities: "1",
+                        include_rts: (filter.excluderetweets ? "0" : "1"),
+                        exclude_replies: (filter.excludereplies ? "1" : "0")
+                    };
+                } else {
+                    callback(null, { "entries": [] });
+                    return;
+                }
+
+                var fetchMore = function (max_id, stillToFetch, cb) {
+                    var qs = _.clone(finalqs);
+                    qs[cntParamName] = Math.max(2, Math.min(cntMax, stillToFetch));
+                    if (max_id) {
+                        qs.max_id = max_id;
+                    }
+                    apiQuery(apiUrl, qs, function (err, data) {
+                        if (err) return cb(err, fetchedItems);
+                        if (data && typeof data.error == "string") return cb(data.error, fetchedItems);
+                        if (data.results) data = data.results;
+
+                        //Twitter's max_id is >= but it should be >.
+                        if (max_id && data.length > 0) data = data.slice(1);
+                        fetchedItems = fetchedItems.concat(data);
+
+                        if (data.length < stillToFetch && data.length > 0) {
+                            //console.log("need to fetch ",stillToFetch-data.length,"more");
+                            fetchMore(fetchedItems[fetchedItems.length - 1].id_str, stillToFetch - data.length, cb);
+                        } else {
+                            cb(null);
+                        }
+                    });
+
+                };
+
+                fetchMore(false, totalToFetch, function (err) {
+                    return callback(err, { "entries": fetchedItems.slice(query.skip, query.skip + query.limit) });
+                });
+
+            },
+
+
+            /**
+             * Normalizes the data received from the source provider.
+             * @function
+             * @param {Object} data The data that was received
+             *(typically the object given to the callback method at the end of a "fetch")
+             * @param {Object} query Query parameters (which could include filtering options)
+             * @param {function(Object, Object)} callback Callback function.
+             *   The second argument of the callback is an object with an "entries" property
+             *   that contains the list of items normalized according to the schema.org hierarchy.
+             */
+            process: function (data, query, callback) {
+                var filter = (query && query.filter) ? query.filter : {};
+
+                // Helper function that extracts the first image from
+                // the list of entities returned by Twitter
+                var findImage = function (el) {
+                    if (el.entities && el.entities.media) {
+                        //look for the first photo
+                        for (var y = 0, m = null; y < el.entities.media.length; y++) {
+                            m = el.entities.media[y];
+                            if (m.type == "photo") {
+                                return m.media_url;
+                            }
+                        }
+                        //TODO we discard other metadata?
+                    }
+                    return false;
+                };
+
+                /**
+                 * Returns the avatar image object of a Twitter user, replacing
+                 * the image sent by Twitter by default (48x48) by a bigger version
+                 * (73x73).
+                 * There is no long-term guarantee that this "hack" will work, the
+                 * right way to do it would be to issue the right API call with
+                 * a "size=bigger" parameter:
+                 *  https://dev.twitter.com/docs/api/1/get/users/profile_image/:screen_name
+                 * Note that the "_reasonably_small" suffix seems to work and return
+                 * a 128x128 but dates back from an older version of Twitter, so
+                 * probably safer to avoid it.
+                 * The original image is also available, but there's no way to tell
+                 * its dimensions.
+                 * @function
+                 * @param {string} url URL of the avatar image returned by Twitter
+                 * @returns
+                 */
+                var getAuthorImage = function (url) {
+                    if (!url) {
+                        return null;
+                    }
+                    return {
+                        "@type": "ImageObject",
+                        "itemType": "ImageObject",
+                        "contentURL": url.replace(reAvatarUrl, "_bigger.$1"),
+                        "width": 73,
+                        "height": 73
+                    };
+                };
+
+                // Helper function that returns the contentLocation property of the tweet
+                // if possible. The position is approximative if a place is given.
+                var getContentLocation = function (el) {
+                    var geo = null;
+                    var place = null;
+                    var sum = null;
+
+                    geo = el.geo || el.coordinates;
+                    if (!geo && !el.place) {
+                        // No location defined
+                        return null;
+                    }
+
+                    place = {
+                        '@type': 'Place',
+                        'itemType': 'Place'
+                    };
+
+                    if (el.place) {
+                        place.name = el.place.name;
+                        place.url = el.place.url;
+                    }
+
+                    if (geo && (geo.type === 'Point') && geo.coordinates) {
+                        place.geo = {
+                            '@type': 'GeoCoordinates',
+                            'itemType': 'GeoCoordinates',
+                            'latitude': geo.coordinates[0],
+                            'longitude': geo.coordinates[1]
+                        };
+                    }
+                    else if (el.place && el.place.bounding_box && el.place.bounding_box &&
+                      (el.place.bounding_box.type === 'Polygon') &&
+                      el.place.bounding_box.coordinates &&
+                      el.place.bounding_box.coordinates[0] &&
+                      (el.place.bounding_box.coordinates[0].length > 0)) {
+                        // Approximate the position as the 'center' of the first bounding box
+                        sum = _.reduce(el.place.bounding_box.coordinates[0], function (memo, item) {
+                            return [
+                              memo[0] + item[0],
+                              memo[1] + item[1]
+                            ];
+                        }, [0, 0]);
+                        place.geo = {
+                            '@type': 'GeoCoordinates',
+                            'itemType': 'GeoCoordinates',
+                            'latitude': sum[0] / el.place.bounding_box.coordinates[0].length,
+                            'longitude': sum[1] / el.place.bounding_box.coordinates[0].length
+                        };
+                    }
+
+                    return place;
+                };
+
+                var apiType = 'default';
+                if (filter.search) {
+                    apiType = 'search';
+                }
+                var i, l, el, e;
+                if (apiType == 'default') {
+                    for (i = 0, l = data.entries.length; i < l; i++) {
+                        el = data.entries[i];
+
+                        data.entries[i] = {
+                            '@type': 'Article/Status',
+                            'itemType': 'Article/Status',
+                            'url': 'http://twitter.com/' + el.user.screen_name + '/status/' + el.id,
+                            'publisher': {
+                                '@type': 'Organization',
+                                'itemType': 'Organization',
+                                'url': 'http://twitter.com/',
+                                'name': 'Twitter'
+                            },
+                            'author': [ // TODO: twitter returns much more information about the user
+                              {
+                                  '@type': 'Person',
+                                  'itemType': 'Person',
+                                  'url': 'http://twitter.com/' + el.user.screen_name,
+                                  'name': el.user.name,
+                                  'foaf:nick': el.user.screen_name,
+                                  'image': getAuthorImage(el.user.profile_image_url)
+                              }
+                            ],
+                            // twitter dates are RFC822 dates, e.g. "Mon Jun 27 19:32:19 2011 +0000"
+                            'datePublished': iso8601.fromString(el.created_at),
+                            'name': el.text,
+                            'contentLocation': getContentLocation(el)
+                        };
+
+                        if (findImage(el)) {
+                            data.entries[i].image = {
+                                '@type': 'ImageObject',
+                                'itemType': 'ImageObject',
+                                'contentURL': findImage(el)
+                            };
+                        }
+                    }
+                }
+                else {
+                    var finalData = [];
+                    for (i = 0, l = data.entries.length, e = null, el = null; i < l; i++) {
+                        el = data.entries[i];
+
+                        if (filter.excludereplies && el.to_user_id) {
+                            continue;
+                        }
+                        if (filter.excluderetweets && el.text.substring(0, 4) == "RT @") {
+                            continue;
+                        }
+
+                        e = {
+                            '@type': 'Article/Status',
+                            'itemType': 'Article/Status',
+                            'url': 'http://twitter.com/' + el.from_user + '/status/' + el.id,
+                            'publisher': {
+                                '@type': 'Organization',
+                                'itemType': 'Organization',
+                                'url': 'http://twitter.com/',
+                                'name': 'Twitter'
+                            },
+                            'author': [
+                              {
+                                  '@type': 'Person',
+                                  'itemType': 'Person',
+                                  'url': 'http://twitter.com/' + el.from_user,
+                                  'name': el.from_user_name,
+                                  'foaf:nick': el.from_user,
+                                  'image': getAuthorImage(el.profile_image_url)
+                              }
+                            ],
+                            'datePublished': iso8601.fromString(el.created_at),
+                            'name': el.text,
+                            'contentLocation': getContentLocation(el)
+                        };
+
+                        if (findImage(el)) {
+                            e.image = {
+                                '@type': 'ImageObject',
+                                'itemType': 'ImageObject',
+                                'contentURL': findImage(el)
+                            };
+                        }
+                        finalData.push(e);
+                    }
+                    data.entries = finalData;
+                }
+
+                if (filter.user && apiType == "search") {
+                    data.entries = _.select(data, function (el) {
+                        if (el.author && el.author["foaf:nick"] && (el.author["foaf:nick"] === filter.user)) {
+                            return true;
+                        }
+                    });
+                }
+
+                callback(null, data);
+                return;
+            },
+
+
+            /**
+             * Fetches and normalizes the data.
+             * @function
+             * @param {Object} query Query parameters. Feed specific object.
+             * @param {function(Object, Object)} callback Callback function.
+             *   receives the error or the normalized feed.
+             */
+            find: function (query, callback) {
+                // Implementation note: same code as example/news
+                var self = this;
+                self.fetch(query, function (err, data) {
+                    if (err) {
+                        return callback(err, null);
+                    }
+                    else {
+                        self.process(data, query, function (err, convertedData) {
+                            return callback(err, convertedData);
+                        });
+                    }
+                });
+            }
+        };
+    });
+
+    define('databases/youtube/lib/api', ['datajslib!http'], function (http) {
+
+        var api = {};
+
+        // Options: handle mongo's like options
+
+        api.options = function (query) {
+            var ret = {};
+            if (query.skip) ret["start-index"] = query.skip + 1;
+            if (query.limit) ret['max-results'] = query.limit;
+
+            return ret;
+        };
+
+
+        // Generate final URL
+        api.generateUrl = function (url, params) {
+            for (var param in params) {
+                var newUrl = url.replace(new RegExp(':' + param),
+                  encodeURIComponent(params[param]));
+                if (newUrl !== url) {
+                    url = newUrl;
+                }
+                else {
+                    url += ((url.indexOf('?') === -1) ? '?' : '&') +
+                      param + (params[param] ? ('=' + encodeURIComponent(params[param])) : '');
+                }
+            }
+            return url;
+        };
+
+
+        // Call API
+        api.request = function (url, cb) {
+            var baseUrl = 'http://gdata.youtube.com/feeds/api/';
+
+            // We add default parameter
+            url = baseUrl + api.generateUrl(url, { alt: 'json-in-script', v: 2 });
+
+            // console.log("url",url);
+            http.request({
+                'url': url,
+                'dataType': 'jsonp'
+            }, cb);
+        };
+
+
+        // Export --------------------------------------------------------------------
+
+        return api;
+
+    });
+
+    /**
+     * @fileoverview Youtube video to schema.org VideoObject converter function
+     *
+     * Youtube response format description:
+     * https://developers.google.com/youtube/2.0/reference#youtube_data_api_tag_entry
+     *
+     * Youtube video example:
+     * https://gdata.youtube.com/feeds/api/videos/yLsr-P2pmxY?v=2&alt=json
+     */
+
+    define('databases/youtube/lib/convert', [
       'datajslib!underscore',
       'datajslib!iso8601'
-    ], function (api, _, iso8601) {
+    ], function (_, iso8601) {
+
+        /**
+         * Regular expression used to extract the ID of a Youtube video from
+         * its media$content URL
+         */
+        var reVideoUrl = /^https?:\/\/(www\.)?youtube\.com\/v\/([a-z0-9_\-]+).*$/i;
+
+        /**
+         * Regular expression used to extract the inner ID of a Youtube video
+         * from its "id" property
+         */
+        var reVideoId = /^tag:youtube.com.*:video:(.*)$/;
+
+        /**
+         * Converts an incoming Youtube video object to a schema.org compatible
+         * VideoObject.
+         *
+         * @function
+         * @param {Object} video Youtube video object
+         * @return {Object} A VideoObject video or null if the video parameter
+         *  was null
+         */
+        var convert = function convert(video) {
+            var match = null;
+            var videoId = null;
+            var res = {
+                '@type': 'VideoObject',
+                'itemType': 'VideoObject',
+                'publisher': {
+                    '@type': 'Organization',
+                    'itemType': 'Organization',
+                    'url': 'http://www.youtube.com',
+                    'name': 'Youtube'
+                }
+            };
+            var duration = 0;
+
+            if (!video) return null;
+
+            // Extract the unique URL of the video
+            if (video.link && video.link[0] && video.link[0].href) {
+                // Note we remove extra parameters from the URL such as
+                // "&feature=youtube_gdata"
+                res.url = video.link[0].href.replace(/\&.*$/, '');
+            }
+
+            // Set the video title
+            if (video.title && video.title.$t) {
+                res.name = video.title.$t;
+            }
+
+            // Extract the ID of the video
+            // (Note the ID is only extracted from the "id" property when the right
+            // media$content property is not present. Both IDs should match.
+            if (video.media$group &&
+              video.media$group.media$content &&
+              video.media$group.media$content[0] &&
+              video.media$group.media$content[0].url) {
+                match = video.media$group.media$content[0].url.match(reVideoUrl);
+                if (match) {
+                    videoId = match[2];
+                }
+            }
+            if (!videoId && video.id && video.id.$t) {
+                match = video.id.$t.match(reVideoId);
+                if (match) {
+                    videoId = match[1];
+                }
+            }
+
+            if (videoId) {
+                res.playerType = 'iframe';
+                res.embedURL = 'http://www.youtube-nocookie.com/embed/' +
+                  videoId + '?rel=0';
+            }
+
+            if (video.media$group &&
+              video.media$group.media$description &&
+              video.media$group.media$description.$t) {
+                res.description = video.media$group.media$description.$t;
+            }
+
+            if (video.media$group &&
+              video.media$group.media$category &&
+              video.media$group.media$category.$t) {
+                res.genre = video.media$group.media$category.$t;
+            }
+
+            if (video.published && video.published.$t) {
+                res.datePublished = video.published.$t;
+            }
+            else if (video.media$group &&
+              video.media$group.yt$uploaded &&
+              video.media$group.yt$uploaded.$t) {
+                res.datePublished = video.media$group.yt$uploaded.$t;
+            }
+
+            if (video.media$group &&
+              video.media$group.yt$uploaded &&
+              video.media$group.yt$uploaded.$t) {
+                res.uploadDate = video.media$group.yt$uploaded.$t;
+            }
+
+            if (video.media$group &&
+              video.media$group.yt$duration &&
+              video.media$group.yt$duration.seconds) {
+                duration = Number(video.media$group.yt$duration.seconds) * 1000;
+                res.duration = iso8601.fromDuration(duration);
+            }
+
+            // Other possibilities: keywords, license when defined in schema.org.
+            // Add ",'meta': vid" to the above code snipped to view all the information returned by Youtube
+            // Note that video.updated always returns the current date which is not particularly useful, discarded here.
+
+            // Complete the list of authors
+            if (video.author) {
+                res.author = [];
+                for (var k = 0, kl = video.author.length; k < kl; k++) {
+                    if (video.author[k].uri &&
+                      video.author[k].uri.$t &&
+                      video.author[k].name &&
+                      video.author[k].name.$t) {
+                        res.author.push({
+                            '@type': 'Person',
+                            'itemType': 'Person',
+                            'url': video.author[k].uri.$t,
+                            'name': video.author[k].name.$t
+                        });
+                    }
+                }
+            }
+
+            // Complete the list of thumbnails
+            if (video.media$group && video.media$group.media$thumbnail) {
+                res.thumbnail = [];
+                for (var k2 = 0, kl2 = video.media$group.media$thumbnail.length; k2 < kl2; k2++) {
+                    var thumbnail = video.media$group.media$thumbnail[k2];
+                    if (thumbnail &&
+                      thumbnail.url &&
+                      thumbnail.yt$name) {
+                        res.thumbnail.push({
+                            '@type': 'ImageObject',
+                            'itemType': 'ImageObject',
+                            'url': thumbnail.url,
+                            'name': thumbnail.yt$name,
+                            'contentURL': thumbnail.url,
+                            'width': thumbnail.width,
+                            'height': thumbnail.height
+                        });
+                    }
+                }
+                if (res.thumbnail[0]) {
+                    res.image = _.clone(res.thumbnail[0]);
+                }
+            }
+
+            // Location
+            if (video.georss$where &&
+              video.georss$where.gml$Point &&
+              video.georss$where.gml$Point.gml$pos &&
+              video.georss$where.gml$Point.gml$pos.$t) {
+                point = video.georss$where.gml$Point.gml$pos.$t.split(' ');
+                if (point.length === 2) {
+                    res.contentLocation = {
+                        '@type': 'Place',
+                        'itemType': 'Place',
+                        'geo': {
+                            '@type': 'GeoCoordinates',
+                            'itemType': 'GeoCoordinates',
+                            'latitude': parseFloat(point[0], 10),
+                            'longitude': parseFloat(point[1], 10)
+                        }
+                    };
+                }
+            }
+            if (video.yt$location && video.yt$location.$t) {
+                if (!res.contentLocation) {
+                    res.contentLocation = {
+                        '@type': 'Place',
+                        'itemType': 'Place'
+                    };
+                }
+                res.contentLocation.name = video.yt$location.$t;
+            }
+
+            // Aspect ratio
+            // (remains in Youtube namespace since not a standard property)
+            if (video.media$group &&
+              video.media$group.yt$aspectRatio &&
+              video.media$group.yt$aspectRatio.$t) {
+                res['yt:aspectRatio'] = video.media$group.yt$aspectRatio.$t;
+            }
+
+            return res;
+        };
+
+        // Export the "convert" function
+        return convert;
+    });
+    define('databases/youtube/videos', [
+      './lib/api',
+      './lib/convert',
+      'datajslib!underscore',
+      'datajslib!iso8601'
+    ], function (api, convert, _, iso8601) {
 
         return {
             /**
@@ -2863,15 +5055,15 @@
                     //console.warn('playlist ?','input', filter.playlist);
                     if (filter.playlist.length > 16) {
                         //full url ?
-                        var matches = filter.playlist.match(/http(s?):\/\/(www\.?)(youtube\.com\/playlist\?).*(list=)([A-Z0-9]*)/i);
-                        if (matches.length) {
+                        var matches = filter.playlist.match(/http(s?):\/\/(www\.?)(youtube\.com\/playlist\?).*(list=)([A-Z0-9_-]*)/i);
+                        if (matches && matches.length) {
                             filter.playlist = matches.pop();
                         }
                         if (filter.playlist.length > 16) {
                             //strip heading PL ... and any further arguments
-                            filter.playlist = filter.playlist.replace(/^PL/, '').substring(0, 16);
+                            filter.playlist = filter.playlist.replace(/^PL([a-z0-9_-]+).*$/i, '$1');
                         }
-                        //console.warn('playlist !','output', filter.playlist);
+                        // console.warn('playlist !','output', filter.playlist);
                     }
 
                     filter = _.extend({ playlist: filter.playlist }, filter.user ? { author: filter.user } : {});
@@ -2903,123 +5095,15 @@
              */
             process: function (data, query, callback) {
                 if (!data || !data.feed || !data.feed.entry) {
-                    return callback(null, { "entries": [] });
+                    return callback(null, { entries: [] });
                 }
+
                 var videos = data.feed.entry;
-                var point = null;
-                var id = null;
-
                 for (var i = 0, l = videos.length; i < l; i++) {
-                    var vid = videos[i];
-
-                    if (vid.media$group && vid.media$group.media$content) {
-                        var url = vid.media$group.media$content[0].url;
-
-                        var match = url.match(/^https?:\/\/(www\.)?youtube\.com\/v\/([a-z0-9_\-]+).*$/i);
-
-                        if (match) {
-                            id = match[2];
-                        }
-                    }
-
-
-                    videos[i] = {
-                        '@type': 'VideoObject',
-                        'itemType': 'VideoObject',
-                        'url': vid.link[0].href.replace(/\&.*$/, ''), // to remove the extra parameters (&feature=youtube_gdata)
-                        'name': vid.title.$t,
-                        'playerType': id ? 'iframe' : null,
-                        'embedURL': id ? 'http://www.youtube-nocookie.com/embed/' + id + '?rel=0' : null,
-                        'publisher': {
-                            '@type': 'Organization',
-                            'itemType': 'Organization',
-                            'url': 'http://www.youtube.com',
-                            'name': 'Youtube'
-                        },
-                        'description': (vid.media$group && vid.media$group.media$description) ? vid.media$group.media$description.$t : '',
-                        'author': [],
-                        'genre': (vid.media$group && vid.media$group.media$category && vid.media$group.media$category.$t) ? vid.media$group.media$category.$t : '',
-                        'thumbnail': [],
-                        'datePublished': vid.published ? vid.published.$t : (vid.media$group && vid.media$group.yt$uploaded ? vid.media$group.yt$uploaded.$t : ''),
-                        'uploadDate': (vid.media$group && vid.media$group.yt$uploaded) ? vid.media$group.yt$uploaded.$t : '',
-                        'duration': (vid.media$group && vid.media$group.yt$duration) ? iso8601.fromDuration(Number(vid.media$group.yt$duration.seconds) * 1000) : ''
-                    };
-                    // Other possibilities: keywords, license when defined in schema.org.
-                    // Add ",'meta': vid" to the above code snipped to view all the information returned by Youtube
-                    // Note that vid.updated always returns the current date which is not particularly useful, discarded here.
-
-                    // Complete the list of authors
-                    if (vid.author) {
-                        for (var k = 0, kl = vid.author.length; k < kl; k++) {
-                            if (vid.author[k].uri && vid.author[k].name) {
-                                videos[i].author.push({
-                                    '@type': 'Person',
-                                    'itemType': 'Person',
-                                    'url': vid.author[k].uri.$t,
-                                    'name': vid.author[k].name.$t
-                                });
-                            }
-                        }
-                    }
-
-                    // Complete the list of thumbnails
-                    if (vid.media$group && vid.media$group.media$thumbnail) {
-                        for (var k2 = 0, kl2 = vid.media$group.media$thumbnail.length; k2 < kl2; k2++) {
-                            var thumbnail = vid.media$group.media$thumbnail[k2];
-                            videos[i].thumbnail.push({
-                                '@type': 'ImageObject',
-                                'itemType': 'ImageObject',
-                                'url': thumbnail.url,
-                                'name': thumbnail.yt$name,
-                                'contentURL': thumbnail.url,
-                                'width': thumbnail.width,
-                                'height': thumbnail.height
-                            });
-                        }
-                        if (videos[i].thumbnail[0]) {
-                            videos[i].image = _.clone(videos[i].thumbnail[0]);
-                        }
-                    }
-
-                    // Location
-                    if (vid.georss$where &&
-                      vid.georss$where.gml$Point &&
-                      vid.georss$where.gml$Point.gml$pos &&
-                      vid.georss$where.gml$Point.gml$pos.$t) {
-                        point = vid.georss$where.gml$Point.gml$pos.$t.split(' ');
-                        if (point.length === 2) {
-                            videos[i].contentLocation = {
-                                '@type': 'Place',
-                                'itemType': 'Place',
-                                'geo': {
-                                    '@type': 'GeoCoordinates',
-                                    'itemType': 'GeoCoordinates',
-                                    'latitude': parseFloat(point[0], 10),
-                                    'longitude': parseFloat(point[1], 10)
-                                }
-                            };
-                        }
-                    }
-                    if (vid.yt$location && vid.yt$location.$t) {
-                        if (!videos[i].contentLocation) {
-                            videos[i].contentLocation = {
-                                '@type': 'Place',
-                                'itemType': 'Place'
-                            };
-                        }
-                        videos[i].contentLocation.name = vid.yt$location.$t;
-                    }
-
-                    // Aspect ratio
-                    // (remains in Youtube namespace since not a standard property)
-                    if (vid.media$group &&
-                      vid.media$group.yt$aspectRatio &&
-                      vid.media$group.yt$aspectRatio.$t) {
-                        videos[i]['yt:aspectRatio'] = vid.media$group.yt$aspectRatio.$t;
-                    }
+                    videos[i] = convert(videos[i]);
                 }
 
-                callback(null, { "entries": videos });
+                callback(null, { entries: videos });
             },
 
 
@@ -3046,558 +5130,9 @@
             }
         };
     });
-
-    /**
-     * @fileoverview Pagination algorithms
-     * See http://jsfiddle.net/TaxuS/5/ & http://jsfiddle.net/7XKCJ/1/
-     */
-    define('runtime-win8/pagination', [], function () {
-
-        return {
-            /**
-             * Converts skip/limit parameter into page/perPage parameters.
-             *
-             * Our pagination system uses skip/limit but some datasources actually expect
-             * a page number and a number of items per page in their API. This function
-             * returns the page/perPage and the optional number of items to skip in the
-             * returned list to match the initial skip/limit parameters.
-             *
-             * Note that, depending on the maximum number of items per page given as
-             * parameter, the returned parameters may not be "enough", i.e. the caller
-             * may need to send multiple requests to the service provider, using the
-             * returned parameters for the first request, and then incrementing the
-             * page as needed up until it receives enough items.
-             *
-             * Mapping is actually very hard. The function returns "stupid" (but ok!)
-             * results in certain cases.
-             *
-             * @function
-             * @param {Number} skip The number of items to skip
-             * @param {Number} limit The number of items to return
-             * @param {Number} maxPerPage The maximum number of items per page that
-             *  the service provider accepts (optional)
-             * @param {Number} maxPage The maximum number of pages that the service
-             *  provider accepts (optional but maxPerPage must be set when this
-             *  parameter is set)
-             * @param {Boolean} forceLimit Force the number of items per page to "limit"
-             *  (for internal use, calling code should not need to set that parameter)
-             * @return {Object} An object with a "page" property (starting at 1), a
-             *  "perPage" property and a "skip" property that tells the number of items
-             *  to skip in the final list of entries returned by the service provider
-             */
-            paginate: function (skip, limit, maxPerPage, maxPage, forceLimit) {
-                var perPage = 0;
-                if (maxPerPage && (limit > maxPerPage)) {
-                    // No way to accomodate the request as-is, reduce the limit to the
-                    // maximum number of items per page possible
-                    limit = maxPerPage;
-                }
-                var fl = Math.floor(skip / limit);
-                var m = skip % limit;
-                if (fl === 0) {
-                    // Case skip < limit, one request is enough, except when the total number
-                    // of items to fetch exceeds the maximum number of items allowed.
-                    perPage = skip + limit;
-                    if (maxPerPage && (perPage > maxPerPage)) {
-                        perPage = maxPerPage;
-                    }
-                    return {
-                        "page": 1,
-                        "perPage": perPage,
-                        "skip": skip
-                    };
-                } else if (forceLimit) {
-                        // The number of items per page must not change
-                    return {
-                        "page": fl + 1,
-                        "perPage": limit,
-                        "skip": skip - fl * limit
-                    };
-                } else if (m === 0) {
-                        // Skip is a multiple of limit (typical pagination!)
-                    if (maxPage && (fl + 1 > maxPage) &&
-                      maxPerPage && (limit < maxPerPage)) {
-                        // The page number would be too high, let's try again, forcing the
-                        // number of items per page to the maximum allowed to reduce the
-                        // number of pages to a bare minimum
-                        // (not the smartest thing we could do, but that works)
-                        return this.paginate(skip, maxPerPage, maxPerPage, maxPage, true);
-                    }
-                    else {
-                        return {
-                            "page": fl + 1,
-                            "perPage": limit,
-                            "skip": 0
-                        };
-                    }
-                } else {
-                    // Generic case, skip is not a multiple of limit
-                    var p = Math.floor(skip / (limit + fl - 1));
-                    var n = Math.ceil((skip + limit) / (p + 1));
-                    if (maxPage && maxPerPage && (p + 1 > max)) {
-                        // The page number would be too high, let's try again, forcing the
-                        // number of items per page to the maximum allowed to reduce the
-                        // number of pages to a bare minimum
-                        // (again, not the smartest thing we could do, but that works)
-                        return this.paginate(skip, maxPerPage, maxPerPage, maxPage, true);
-                    }
-                    return { "page": p + 1, "perPage": n, "skip": skip - p * n };
-                }
-            }
-
-        };
-
-    });
-    define('databases/flickr/photos', [
-      'datajslib!http',
-      'datajslib!underscore',
-      'datajslib!iso8601',
-      'datajslib!pagination'
-    ], function (http, _, iso8601, Pagination) {
-
-        return {
-            /**
-             * Description of the datasource for the factory
-             */
-            desc: {
-                "options": {
-                    "schema": {
-                        "search": {
-                            "type": "string",
-                            "title": "Search text",
-                            "description": "Latest items are returned first. Keep in mind that the list of photos featured in the final app will be the results of the search when the app is run. Consider using photo sets if you need more consistent results."
-                        },
-                        "set": {
-                            "type": "string",
-                            "title": "Photo set URL",
-                            "description": "You may also directly enter a photo set ID, e.g. 72157628064679334" // also accept photo set ID
-                        },
-                        "api_key": {
-                            "type": "string",
-                            "title": "API key",
-                            "description": "Enter your Flickr API key here. The key is optional to preview your app but required at deployment stage. Follow the instructions on <a href='http://www.flickr.com/services/api/misc.api_keys.html' target='_blank'>Flickr's Web site</a> to obtain an API key.",
-                            "joshfire:requiredFor": ["deploy"]
-                        }
-                    },
-                    "form": [
-                      {
-                          "type": "selectfieldset",
-                          "title": "Search by",
-                          "items": [
-                            {
-                                "type": "optionfieldset",
-                                "legend": "Text",
-                                "items": [
-                                  "search"
-                                ]
-                            },
-                            {
-                                "type": "optionfieldset",
-                                "legend": "Photo set",
-                                "items": [
-                                  "set"
-                                ]
-                            }
-                          ]
-                      },
-                      {
-                          "type": "authfieldset",
-                          "items": [
-                            "api_key"
-                          ]
-                      }
-                    ]
-                },
-                "runtimes": ["browser", "nodejs", "win8"],
-                "outputType": "ImageObject"
-            },
-
-            softLimit: 500,
-
-            generateURL: function (query, pagination) {
-                var url = null;
-
-                // See Flickr API at: http://www.flickr.com/services/api/
-                // We'll use Joshfire's key if no API key is specified
-                var filter = query.filter || {};
-                var api_key = filter.api_key || '5c7b0ae951c10171dc18f69f6572c537';
-                var searchText = null;
-                var setId = null;
-                var extract = null;
-
-                // List of extra fields to return, see extras parameter in:
-                // http://www.flickr.com/services/api/flickr.photos.search.html
-                // Note that there are a couple of others not listed here such as license
-                var extras = 'description,date_upload,date_taken,owner_name,icon_server,' +
-                  'last_update,geo,tags,url_sq,url_t,url_s,url_m,url_z,url_l';
-
-                if (filter.search) {
-                    searchText = encodeURIComponent(filter.search);
-
-                    //hard max = 4000 soft max = 500
-                    //http://www.flickr.com/services/api/flickr.photos.search.html
-                    url = 'http://api.flickr.com/services/rest/?method=flickr.photos.search' +
-                      '&api_key=' + api_key +
-                      '&text=' + searchText +
-                      '&extras=' + extras +
-                      '&page=' + pagination.page +
-                      '&per_page=' + pagination.perPage +
-                      '&format=json';
-                }
-                else if (filter.set) {
-                        // Can we extract ID from a potential URL ?
-                    extract = filter.set.match(/(?:www\.)?flickr\.com\/photos\/[^\/]+\/sets\/([^\/]+)/);
-                    if (extract) {
-                        // The URL looks like:
-                        // http://www.flickr.com/photos/siliconmaniacs/sets/72157626989709433/with/5901439714/
-                        setId = extract[1];
-                    }
-                    else if (filter.set.match(/^[a-z0-9]+$/i)) {
-                            // if not an URL, is it an ID ?
-                        setId = filter.set;
-                    } else {
-                        // TODO: notify the client that the set ID is not correct
-                        return callback(null, null);
-                    }
-                    // soft max = 500
-                    url = 'http://api.flickr.com/services/rest/?method=flickr.photosets.getPhotos' +
-                      '&api_key=' + api_key +
-                      '&photoset_id=' + setId +
-                      '&extras=' + extras +
-                      '&page=' + query.pageResults.page +
-                      '&per_page=' + query.pageResults.perPage +
-                      '&format=json';
-                }
-                return url;
-            },
-
-            /**
-             * Fetches feed items from the source provider.
-             * @function
-             * @param {Object} query Query parameters. Must define a 'filter' property
-             *   with a 'url' property that contains the absolute URL to the page.
-             * @param {function(Object, Object)} callback Callback function.
-             *   Returns a text.
-             */
-            fetch: function (query, callback) {
-                var self = this;
-
-                // How many times the API should be called (1 to do two calls)
-                var totalPage = 0;
-
-                if (!query.skip) query.skip = 0;
-                if (!query.limit) query.limit = 20;
-
-                // Flickr doesn't handle skip limit, but works with per_page and page
-                query.pageResults = Pagination.paginate(query.skip, query.limit);
-
-                // if perPage is more that softLimit, call more pages
-                if (query.pageResults.perPage > self.softLimit) {
-                    totalPage = Math.floor(query.pageResults.perPage / self.softLimit);
-                }
-                // API responses, array because can be called many times.
-                var responseArray = [];
-
-                var doRequest = function (page) {
-
-                    var url = self.generateURL(query, { page: query.pageResults.page + page, perPage: query.pageResults.perPage });
-                    if (!url) {
-                        // TODO: notify the client that a parameter should be given
-                        return callback(null, null);
-                    }
-
-                    http.request({
-                        'url': url,
-                        'jsonp': 'jsoncallback',
-                        'dataType': 'jsonp'
-                    }, function (err, data) {
-                        responseArray.push(data);
-
-                        if (page === totalPage) {
-                            return callback(err, responseArray);
-                        } else {
-                            page++;
-                            doRequest(page);
-                        }
-                    });
-                };
-
-                doRequest(0);
-            },
-
-
-            /**
-             * Normalizes the data received from source provider
-             * @function
-             * @param {Object} data API response or Array of responses
-             *(typically the object given to the callback method at the end of a "fetch")
-             * @param {Object} query Query parameters (which could include filtering options)
-             * @param {function(Object, Object)} callback Callback function.
-             *   The second argument of the callback is an object with an "entries" property
-             *   that contains the list of items normalized according to the schema.org hierarchy.
-             */
-            process: function (data, query, callback) {
-                var self = this;
-                if (!data) {
-                    return callback(null, { "entries": [] });
-                }
-
-                if (data.stat == 'fail') {
-                    if (data.message) {
-                        return callback(data.message, data);
-                    }
-                    else {
-                        return callback("Source provider complained about something", data);
-                    }
-                }
-
-                if (!query.skip) query.skip = 0;
-                if (!query.limit) query.limit = 20;
-                if (!query.pageResults) {
-                    query.pageResults = Pagination.paginate(query.skip, query.limit);
-                }
-
-                // make sure we work with an array
-                if (!_.isArray(data)) {
-                    data = [data];
-                }
-
-                var photos = [];
-                for (var i = 0; i < data.length; i++) {
-                    photos = photos.concat(self.processResponse(data[i], i, query, callback));
-                }
-
-                return callback(null, { 'entries': photos });
-            },
-
-            /**
-             * process a response from the source provider
-             */
-            processResponse: function (data, index, query, callback) {
-                var self = this;
-                var filter = query ? query.filter : null;
-                var dataphotos = null;
-                var owner = null;
-                var ownername = null;
-                var date = null;
-                var photos = [];
-                var pic = null;
-                var photo = null;
-                var purl = null;
-
-                // depending on the URL called, extract the photo objects
-                if (filter) {
-                    if (filter.search) {
-                        // Results of a search
-                        dataphotos = data.photos.photo;
-                    }
-                    else if (filter.set) {
-                            // Photos in a set.
-                            // The owner's NSID is defined at the root level and not repeated
-                            // at the photo level.
-                        dataphotos = data.photoset.photo;
-                        owner = data.photoset.owner;
-                        ownername = data.photoset.ownername;
-                    }
-                }
-                if (!dataphotos) {
-                    callback("Filter search or set ID must be defined.", null);
-                }
-
-                // store the re-formatted photo objects
-
-                // TODO: The list of thumbnails is typically useless without the dimensions
-                // of the images, but Flickr only says that the largest size of the image
-                // is 240, 640 or 1024 depending on the suffix. In particular, we don't
-                // know whether the image is in portrait or landscape mode.
-                // Info about URL generation for buddyicon available at:
-                // http://www.flickr.com/services/api/misc.buddyicons.html
-
-                // if index === 0
-                var indexStart = query.pageResults.skip;
-                var indexEnd = Math.min(dataphotos.length, query.pageResults.skip + query.limit);
-                if (index > 0) {
-                    indexStart = 0;
-                    indexEnd = Math.min(dataphotos.length, query.pageResults.skip + query.limit - index * self.softLimit);
-                }
-
-                for (var i = indexStart; i < indexEnd; i++) {
-                    pic = dataphotos[i];
-                    if (pic.url_l) {
-                        purl = {
-                            'contentURL': pic.url_l,
-                            'width': parseInt(pic.width_l, 10),
-                            'height': parseInt(pic.height_l, 10)
-                        };
-                    }
-                    else if (pic.url_z) {
-                        purl = {
-                            'contentURL': pic.url_z,
-                            'width': parseInt(pic.width_z, 10),
-                            'height': parseInt(pic.height_z, 10)
-                        };
-                    }
-                    else {
-                        purl = {
-                            'contentURL': pic.url_m,
-                            'width': parseInt(pic.width_m, 10),
-                            'height': parseInt(pic.height_m, 10)
-                        };
-                    }
-                    photo = {
-                        '@type': 'ImageObject',
-                        'itemType': 'ImageObject',
-                        'url': 'http://www.flickr.com/photos' +
-                          '/' + (pic.owner || owner) +
-                          '/' + pic.id,
-                        'name': pic.title,
-                        'contentURL': purl.contentURL,
-                        'width': purl.width,
-                        'height': purl.height,
-                        'image': {
-                            '@type': 'ImageObject',
-                            'itemType': 'ImageObject',
-                            'contentURL': pic.url_s,
-                            'width': parseInt(pic.width_s, 10),
-                            'height': parseInt(pic.height_s, 10)
-                        },
-                        'author': [{
-                            '@type': 'Person',
-                            'itemType': 'Person',
-                            'name': pic.ownername || ownername
-                        }],
-                        'thumbnail': [
-                          {
-                              '@type': 'ImageObject',
-                              'itemType': 'ImageObject',
-                              'contentURL': pic.url_sq,
-                              'width': parseInt(pic.width_sq, 10),
-                              'height': parseInt(pic.height_sq, 10)
-                          },
-                          {
-                              '@type': 'ImageObject',
-                              'itemType': 'ImageObject',
-                              'contentURL': pic.url_t,
-                              'width': parseInt(pic.width_t, 10),
-                              'height': parseInt(pic.height_t, 10)
-                          },
-                          {
-                              '@type': 'ImageObject',
-                              'itemType': 'ImageObject',
-                              'contentURL': pic.url_s,
-                              'width': parseInt(pic.width_s, 10),
-                              'height': parseInt(pic.height_s, 10)
-                          },
-                          {
-                              '@type': 'ImageObject',
-                              'itemType': 'ImageObject',
-                              'contentURL': pic.url_m,
-                              'width': parseInt(pic.width_m, 10),
-                              'height': parseInt(pic.height_m, 10)
-                          }
-                        ],
-                        'publisher': {
-                            '@type': 'Organization',
-                            'itemType': 'Organization',
-                            'url': 'http://www.flickr.com',
-                            'name': 'flickr'
-                        }
-                    };
-
-                    if (pic.url_z) {
-                        photo.thumbnail.push({
-                            '@type': 'ImageObject',
-                            'itemType': 'ImageObject',
-                            'contentURL': pic.url_z,
-                            'width': parseInt(pic.width_z, 10),
-                            'height': parseInt(pic.height_z, 10)
-                        });
-                    }
-
-                    if (pic.iconfarm > 0) {
-                        photo.author[0].image = {
-                            '@type': 'ImageObject',
-                            'itemType': 'ImageObject',
-                            'contentURL': 'http://farm' + pic.iconfarm + '.static.flickr.com' +
-                              '/' + pic.iconserver +
-                              '/buddyicons/' + (pic.owner || owner) +
-                              '.jpg',
-                            'width': 48,
-                            'height': 48
-                        };
-                    }
-
-                    if (pic.latitude && pic.longitude && pic.accuracy) {
-                        // Photo contains geo information
-                        // (note the accuracy gets lost during the conversion)
-                        photo.contentLocation = {
-                            '@type': 'Place',
-                            'itemType': 'Place',
-                            'geo': {
-                                '@type': 'GeoCoordinates',
-                                'itemType': 'GeoCoordinates',
-                                'latitude': pic.latitude,
-                                'longitude': pic.longitude
-                            }
-                        };
-                    }
-
-                    if (pic.description && pic.description._content) {
-                        photo.description = pic.description._content;
-                    }
-
-                    if (pic.tags) {
-                        photo.keywords = pic.tags;
-                    }
-
-                    if (pic.datetaken) {
-                        photo.dateCreated = pic.datetaken.replace(/ /, "T") + "Z";
-                    }
-                    if (pic.lastupdate) {
-                        date = new Date(parseInt(pic.lastupdate, 10) * 1000);
-                        photo.dateModified = iso8601.fromDate(date);
-                    }
-                    if (pic.dateupload) {
-                        date = new Date(parseInt(pic.dateupload, 10) * 1000);
-                        photo.datePublished = iso8601.fromDate(date);
-                    }
-                    else if (photo.dateModified) {
-                        photo.datePublished = photos[i].dateModified;
-                    }
-                    else if (photo.dateCreated) {
-                        photo.datePublished = photos[i].dateCreated;
-                    }
-
-                    photos.push(photo);
-                }
-
-                return photos;
-            },
-
-            /**
-             * Fetches and normalizes the data.
-             * @function
-             * @param {Object} query Query parameters. Feed specific object.
-             * @param {function(Object, Object)} callback Callback function.
-             *   receives the error or the normalized feed.
-             */
-            find: function (query, callback) {
-                // Implementation note: same code as example/news
-                var self = this;
-                self.fetch(query, function (err, data) {
-                    if (err) {
-                        return callback(err, null);
-                    }
-                    else {
-                        self.process(data, query, function (err, convertedData) {
-                            return callback(err, convertedData);
-                        });
-                    }
-                });
-            }
-        };
-    });;
     ;
+    ;
+    define("addons/splashscreen/loaded", [], function () { return function (a) { return { generate: function (a, b) { try { var c = document.getElementsByClassName("_joshfire_factory_splashscreen"); c && c.length && (c[0].style.opacity = "0", setTimeout(function () { c[0].style.display = "none" }, 700)) } catch (d) { } b() } } } })
     ; (function (a, b) { var c = function (c) { var d = null, e = null, f = 0; return !c || !a || !a.config || !a.config.datasources || !a.config.datasources[c] ? null : (d = a.config.datasources[c], b(["datajslib!collection"], function (a) { if (Object.prototype.toString.call(d) == "[object Array]") { e = { children: [], find: function (a, b) { var c = d.length, f = !1, g = [], h = 0, i = function (a, d) { c -= 1; if (f) return; a && (f = !0), d && g.push(d); if (a || c === 0) return b(a, { entries: g }) }; for (h = 0; h < e.children.length; h++) e.children[h].find(a, i) } }; for (f = 0; f < d.length; f++) e.children[f] = a.getCollection(d[f]), e.children[f].name = d[f].name, e.children[f].config = d[f] } else e = a.getCollection(d), e.name = d.name, e.config = d }, null, !0), e) }; a.getDataSource = c })(window.Joshfire.factory, require);
-    (function (a, b) { var c = function (a) { return a = a || document.getElementById("body") || document.documentElement, Object.prototype.toString.call(a) === "[object String]" ? document.querySelector ? document.querySelector(a) : document.getElementById(a) : a }, d = function (b) { var d = [], f = null, g, h, i = []; if (!b) return []; d = a.config.addons || []; for (g = 0; g < d.length; g++) { f = d[g]; for (h = 0; h < f.hooks.length; h++) if (b === f.hooks[h]) { i.push(new e(f, b)); break } } return i.run = i.render = function (a, b, d) { var e = 0, f = c(a), g = null; d = d || function () { return }; var h = 0, j = function (a) { a && (g = a), h += 1; if (h === i.length) return d(g) }; b = b || {}, b.replaceContent && delete b.replaceContent; for (e = 0; e < i.length; e++) i[e].render(f, b, j) }, i.startActivity = function (a, b, c) { a = a || {}, b = b || function () { return }, c = c || function () { return }; if (i.length > 0) i[0].startActivity(a, b, c); else if (c) return c("No installed add-on for the given intent") }, i }, e = function (a, d) { var e = this, f = !1, g = [], h = function (a) { f ? a() : g.push(a) }; this.config = a, this.intent = a.intent, this.run = this.render = function (a, b, d) { b = b || {}, d = d || function () { return }, h(function () { if (!e.addon) return d("Add-on not available"); if (!e.addon.generate) return d("Invalid add-on, no generate function"); var f = c(a), g = f; e.addon.generate(b, function (a, c) { return a ? d(a) : (c ? (b.replaceContent ? e.setContent(g, c) : (g = document.createElement("div"), e.setContent(g, c), f.appendChild(g)), e.addon.enhance && e.addon.enhance(g, b)) : b.replaceContent && e.setContent(g, ""), d()) }) }) }, this.generate = function (a, b) { a = a || {}, b = b || function () { return }, h(function () { if (!e.addon) return b("Add-on not available"); if (!e.addon.generate) return b("Invalid add-on, no generate function"); e.addon.generate(a, b) }) }, this.setContent = function (a, b) { function e(a, b) { b(a); for (var c in a.childNodes) e(a.childNodes[c], b) } function f(a, b) { return a.nodeName && a.nodeName.toUpperCase() === b.toUpperCase() } function g(a) { var b = a.text || a.textContent || a.innerHTML || "", c = a.getAttribute("src"), d = document.getElementsByTagName("head")[0] || document.documentElement, e = document.createElement("script"); e.type = "text/javascript", c && e.setAttribute("src", c), b && e.appendChild(document.createTextNode(b)), d.insertBefore(e, d.firstChild), a.parentNode && a.parentNode.removeChild(a) } var d = c(a); d.innerHTML = ("" + b).trim(); var h = [], i = null; e(d, function (a) { a.nodeName && a.nodeName.toUpperCase() === "SCRIPT" && (!a.type || a.type === "text/javascript") && h.push(a) }); for (i in h) g(h[i]) }, this.enhance = function (a, b) { b = b || {}; if (!this.addon) return; if (!this.addon.enhance) return; var d = c(a); this.addon.enhance(d, b) }, this.startActivity = function (a, b, c) { a = a || {}, b = b || function () { return }, c = c || function () { return }, h(function () { if (!e.addon) return c("Add-on not available"); if (!e.addon.startActivity) return c("Add-on does not implement a startActivity function"); e.addon.startActivity(a, b, c) }) }, b(["addons/" + this.config.name + "/" + d], function (a) { e.addon = a(e.config.options || {}), f = !0; for (var b = 0, c = g.length; b < c; b++) g.pop()() }) }; a.getAddOns = d })(window.Joshfire.factory, require);
+    (function (a, b) { var c = function (a) { return a = a || document.getElementById("body") || document.documentElement, Object.prototype.toString.call(a) === "[object String]" ? document.querySelector ? document.querySelector(a) : document.getElementById(a) : a }, d = function (b) { var d = [], f = null, g, h, i = []; if (!b) return []; d = a.config.addons || []; for (g = 0; g < d.length; g++) { f = d[g]; for (h = 0; h < f.hooks.length; h++) if (b === f.hooks[h]) { i.push(new e(f, b)); break } } return i.run = i.render = function (a, b, d) { var e = 0, f = c(a), g = null; d = d || function () { return }; var h = 0, j = function (a) { a && (g = a), h += 1; if (h === i.length) return d(g) }; b = b || {}, b.replaceContent && delete b.replaceContent; for (e = 0; e < i.length; e++) i[e].render(f, b, j) }, i.startActivity = function (a, b, c) { a = a || {}, b = b || function () { return }, c = c || function () { return }; if (i.length > 0) i[0].startActivity(a, b, c); else if (c) return c("No installed add-on for the given intent") }, i }, e = function (a, d) { var e = this, f = !1, g = [], h = function (a) { f ? a() : g.push(a) }; this.config = a, this.intent = a.intent, this.run = this.render = function (a, b, d) { b = b || {}, d = d || function () { return }, h(function () { if (!e.addon) return d("Add-on not available"); if (!e.addon.generate) return d("Invalid add-on, no generate function"); var f = c(a), g = f; e.addon.generate(b, function (a, c) { return a ? d(a) : (c ? (b.replaceContent ? e.setContent(g, c) : (g = document.createElement("div"), e.setContent(g, c), f.appendChild(g)), e.addon.enhance && e.addon.enhance(g, b)) : b.replaceContent && e.setContent(g, ""), d()) }) }) }, this.generate = function (a, b) { a = a || {}, b = b || function () { return }, h(function () { if (!e.addon) return b("Add-on not available"); if (!e.addon.generate) return b("Invalid add-on, no generate function"); e.addon.generate(a, b) }) }, this.setContent = function (a, b) { function e(a, b) { b(a); for (var c in a.childNodes) e(a.childNodes[c], b) } function f(a, b) { return a.nodeName && a.nodeName.toUpperCase() === b.toUpperCase() } function g(a) { var b = a.text || a.textContent || a.innerHTML || "", c = a.getAttribute("src"), d = document.getElementsByTagName("head")[0] || document.documentElement, e = document.createElement("script"); e.type = "text/javascript", c && e.setAttribute("src", c), b && e.appendChild(document.createTextNode(b)), d.insertBefore(e, d.firstChild), a.parentNode && a.parentNode.removeChild(a) } var d = c(a); d.innerHTML = ("" + b).trim(); var h = [], i = null; e(d, function (a) { a.nodeName && a.nodeName.toUpperCase() === "SCRIPT" && (!a.type || a.type === "text/javascript") && h.push(a) }); for (i in h) g(h[i]) }, this.enhance = function (a, b) { b = b || {}; if (!this.addon) return; if (!this.addon.enhance) return; var d = c(a); this.addon.enhance(d, b) }, this.startActivity = function (a, b, c) { a = a || {}, b = b || function () { return }, c = c || function () { return }, h(function () { if (!e.addon) return c("Add-on not available"); if (!e.addon.startActivity) return c("Add-on does not implement a startActivity function"); e.addon.startActivity(a, b, c) }) }, b(["addons/" + this.config.name + "/" + d], function (a) { e.addon = a({ options: e.config.options || {}, deploy: Joshfire.factory.config.deploy }), f = !0; for (var b = 0, c = g.length; b < c; b++) g.pop()() }) }; a.getAddOns = d })(window.Joshfire.factory, require);
 })();
