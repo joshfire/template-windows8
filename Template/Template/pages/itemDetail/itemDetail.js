@@ -118,6 +118,9 @@
                     case "BlogPosting":
                         return blogPostingRenderer(itemPromise, currentItem, recycled);
                         break;
+                    case "Article/Status":
+                        return statusRenderer(itemPromise, currentItem, recycled);
+                        break;
                     default:
                         return blogPostingRenderer(itemPromise, currentItem, recycled);
                         break;
@@ -146,7 +149,7 @@
         if (!data.articleBody) data.articleBody = '';
 
         /* 
-        * The render is called several times ans we only want the first image to be removed (as it
+        * The render is called several times and we only want the first image to be removed (as it
         * is grabbed by the factory and set on the left). So we set an empty image that'll be caught by the regexp next time.
         */
         data.articleBody = data.articleBody.replace(/<img[^>]+\>/i, '<img style="display:none">');
@@ -154,6 +157,38 @@
         var iimg = elem.querySelector('.mask img');
         if (data.image) {
             iimg.src = data.image.contentURL;
+        }
+        else {
+            iimg.src = '/images/placeholders/' + currentItem.data['@type'] + 'Placeholder.png';
+        }
+
+        utils.setInnerHTML(elem.querySelector('article'), toStaticHTML(data.articleBody));
+
+        return tplSelect.element;
+    }
+
+    function statusRenderer(itemPromise, currentItem, recycled) {
+
+        var tplSelect = document.querySelector('.statusDetailTemplate').winControl;
+        tplSelect = tplSelect.renderItem(itemPromise, recycled);
+        var data = currentItem.data;
+        var elem = tplSelect.element._value;
+
+        var iauthor = elem.querySelector('.authorname');
+        if (iauthor && data.author && data.author.length) {
+            iauthor.textContent = data.author[0].name;
+        }
+
+        var idate = elem.querySelector('.datepublished');
+        if (idate && data.datePublished) {
+            idate.textContent = toReadableDate(data.datePublished);
+        }
+
+        if (!data.articleBody) data.articleBody = '';
+        
+        var iimg = elem.querySelector('.mask img');
+        if (data.author && data.author.length && data.author[0].image) {
+            iimg.src = data.author[0].image.contentURL;
         }
         else {
             iimg.src = '/images/placeholders/' + currentItem.data['@type'] + 'Placeholder.png';
