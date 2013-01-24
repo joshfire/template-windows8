@@ -127,7 +127,6 @@
                     tplSelect = tplSelect.renderItem(itemPromise, recycled);
                     break;
                 default:
-                    console.dir(currentItem);
                     tplSelect = tplSelect.renderItem(itemPromise, recycled);
                     var coverImage = tplSelect.element._value.querySelector('.thumbnail');
                     setBestImageCover(currentItem, coverImage, isLarge);
