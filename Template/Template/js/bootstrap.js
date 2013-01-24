@@ -3,7 +3,7 @@
     var Joshfire = window.Joshfire || {};
     Joshfire.factory = {
         globalConfig: { "DATAVERSION": "1", "DATAHOSTPORT": "localhost:40020", "STATSHOSTPORT": "localhost:40023", "HOSTPORT": "localhost:40021" },
-        config: { "app": { "id": "50f9524f2fdf4ce2a2000001", "icon": null, "logo": null, "name": "Win8 debug", "version": "1.0" }, "template": { "name": "window8", "version": "1.0.1", "options": { "abouthtml": "<p>This application was generated with the <a href='http://factory.joshfire.com'>Joshfire Factory</a></p>", "theme": "dark" }, "hooks": [] } },
+        config: { "app": { "id": "50f9524f2fdf4ce2a2000001", "icon": null, "logo": null, "name": "Win8 debug", "version": "1.0" }, "template": { "name": "window8", "version": "1.0.1", "options": { "theme": "dark", "abouthtml": "<p>This application was generated with the <a href='http://factory.joshfire.com'>Joshfire Factory</a></p>" }, "hooks": [] } },
         device: { "type": "tablet-windows8" },
         addons: {}
     };
@@ -11,7 +11,11 @@
     Joshfire.factory.config.datasources = {
         "main": [
             { "name": "Twitter", "db": "operator", "col": "updatelinks", "query": { "filter": { "datasources": { "main": { "name": "Twitter", "db": "twitter", "col": "tweets", "query": { "filter": { "user": "Notch" }, "options": {} }, "missingKeys": [], "outputType": "Article/Status", "runtime": "win8" } }, "action": "addtarget" } }, "outputType": "Article/Status", "runtime": "browser" },
-            { "name": "Youtube", "db": "operator", "col": "updatelinks", "query": { "filter": { "datasources": { "main": { "name": "Youtube", "db": "youtube", "col": "videos", "query": { "filter": { "search": "Because I Can" } }, "missingKeys": [], "outputType": "VideoObject", "runtime": "win8" } }, "action": "addtarget" } }, "outputType": "VideoObject", "runtime": "browser" }]
+            { "name": "Youtube", "db": "operator", "col": "updatelinks", "query": { "filter": { "datasources": { "main": { "name": "Youtube", "db": "youtube", "col": "videos", "query": { "filter": { "search": "Because I Can" } }, "missingKeys": [], "outputType": "VideoObject", "runtime": "win8" } }, "action": "addtarget" } }, "outputType": "VideoObject", "runtime": "browser" },
+            { "name": "Static Youtube", "db": "operator", "col": "updatelinks", "query": { "filter": { "datasources": { "main": { "name": "Youtube", "db": "youtube", "col": "video", "query": { "filter": { "url": "http://www.youtube.com/watch?v=T6zDfxZ4NcE" } }, "missingKeys": [], "outputType": "VideoObject", "runtime": "win8" } }, "action": "addtarget" } }, "outputType": "VideoObject", "runtime": "browser" },
+            { "name": "Static Image", "db": "operator", "col": "updatelinks", "query": { "filter": { "datasources": { "main": { "name": "Static", "db": "static", "col": "image", "query": { "filter": { "url": "http://images2.fanpop.com/image/photos/9500000/cowboy-bebop-cowboy-bebop-9502191-1024-768.jpg", "name": "See you, space cowboy..." } }, "missingKeys": [], "outputType": "ImageObject", "runtime": "win8" } }, "action": "addtarget" } }, "outputType": "ImageObject", "runtime": "browser" },
+            { "name": "Static Text", "db": "operator", "col": "updatelinks", "query": { "filter": { "datasources": { "main": { "name": "Static", "db": "static", "col": "post", "query": { "filter": { "articleBody": "<span>As of the&nbsp;<a target=\"_blank\" rel=\"nofollow\" href=\"http://en.wikipedia.org/wiki/Census\">census</a><a target=\"_blank\" rel=\"nofollow\" href=\"http://en.wikipedia.org/wiki/Petersburgh,_New_York#cite_note-GR2-2\">[2]</a>&nbsp;of 2000, there were 1,563 people, 587 households, and 433 families residing in the town. The&nbsp;<a target=\"_blank\" rel=\"nofollow\" href=\"http://en.wikipedia.org/wiki/Population_density\">population density</a>&nbsp;was 37.6 people per square mile (14.5/km²). There were 695 housing units at an average density of 16.7 per square mile (6.5/km²). The racial makeup of t<i>he town was 98.08%&nbsp;</i><a target=\"_blank\" rel=\"nofollow\" href=\"http://en.wikipedia.org/wiki/White_(U.S._Census)\" title=\"Link: http://en.wikipedia.org/wiki/White_(U.S._Census)\"><i>White</i></a><i>, 0.19%&nbsp;</i><a target=\"_blank\" rel=\"nofollow\" href=\"http://en.wikipedia.org/wiki/African_American_(U.S._Census)\"><i>African American</i></a><i>, 0.06%&nbsp;</i><a target=\"_blank\" rel=\"nofollow\" href=\"http://en.wikipedia.org/wiki/Native_American_(U.S._Census)\"><i>Native American</i></a><i>, 0.90%&nbsp;</i><a target=\"_blank\" rel=\"nofollow\" href=\"http://en.wikipedia.org/wiki/Asian_(U.S._Census)\"><i>Asian</i></a><i>, 0.19% from&nbsp;</i><a target=\"_blank\" rel=\"nofollow\" href=\"http://en.wikipedia.org/wiki/Race_(United_States_Census)\"><i>other races</i></a><i>, and 0.58% from two or more races.&nbsp;</i><a target=\"_blank\" rel=\"nofollow\" href=\"http://en.wikipedia.org/wiki/Hispanic_(U.S._Census)\"><i>Hispanic</i></a><i>&nbsp;or&nbsp;</i><a target=\"_blank\" rel=\"nofollow\" href=\"http://en.wikipedia.org/wiki/Latino_(U.S._Census)\"><i>Latino</i></a><i>&nbsp;of any race were 0.45% of the population.</i></span><span><i>There were 587 households out of which 33.9% had children</i> under the age of 18 living with them, 62.9% were&nbsp;<a target=\"_blank\" rel=\"nofollow\" href=\"http://en.wikipedia.org/wiki/Marriage\" title=\"Link: http://en.wikipedia.org/wiki/Marriage\">married couples</a>&nbsp;living together, 7.2% had a female householder with no husband present, and 26.1% were non-families. 21.1% of all households were made up of indiv<b>iduals and 7.8% had someone living alone who was 65 years of age or older. The average household size was 2.66 and the average family size was 3.07.</b></span>", "name": "aouizegaz iueagzoeiuazeb eazueha" } }, "missingKeys": [], "outputType": "BlogPosting", "runtime": "win8" } }, "action": "addtarget" } }, "outputType": "BlogPosting", "runtime": "browser" }
+        ]
     };
     Joshfire.factory.config.addons = [{ "name": "splashscreen", "options": { "web-mode": "factory" }, "hooks": ["loaded"] }];
     window.Joshfire = Joshfire;
@@ -2923,7 +2927,8 @@
                     var finalQs = '';
                     for (var k in params.data) {
                         if (params.data.hasOwnProperty(k)) {
-                            finalQs += encodeURIComponent(k) + '=' + encodeURIComponent(params.data[k]) + '&';
+                            if (params.url.indexOf('&' + encodeURIComponent(k)) == -1)
+                                finalQs += encodeURIComponent(k) + '=' + encodeURIComponent(params.data[k]) + '&';
                         }
                     }
                     finalQs = finalQs.substr(0, finalQs.length - 1) || "";
@@ -5130,7 +5135,450 @@
             }
         };
     });
-    ;
+
+    define('databases/youtube/video', [
+      './lib/api',
+      './lib/convert',
+      'datajslib!underscore',
+      'datajslib!iso8601'
+    ], function (api, convert, _, iso8601) {
+
+        return {
+            /**
+             * Description of the datasource for the factory
+             */
+            desc: {
+                "options": {
+                    "schema": {
+                        "url": {
+                            "type": "string",
+                            "title": "Web address of the Youtube video",
+                            "description": "Copy and paste the URL of the Youtube video you would like to add to your application. For example: <code>http://www.youtube.com/watch?v=yLsr-P2pmxY</code>",
+                            "required": true
+                        }
+                    }
+                },
+                "runtimes": [
+                  "browser",
+                  "nodejs",
+                  "win8"
+                ],
+                "outputType": "VideoObject",
+                "maxItems": 1
+            },
+
+
+            /**
+             * Fetches feed items from the source provider.
+             * @function
+             * @param {Object} query Query parameters. Must define a 'filter' property
+             *   with a 'url' property that contains the absolute URL to the page.
+             * @param {function(Object, Object)} callback Callback function.
+             *   Returns a text.
+             */
+            fetch: function (query, callback) {
+                // See Youtube API at http://code.google.com/apis/youtube/2.0/reference.html
+                var filter = (query && query.filter) ? query.filter : {};
+                var match = null;
+                var videoId = null;
+                var url = 'videos/:video';
+
+                if (!filter.url) {
+                    return callback();
+                }
+
+                // Extract the ID of the video from the entered URL
+                var reVideoUrl = /^(?:https?:\/\/)?(?:www\.)?(?:youtube\.com)?(?:\/?watch\?)(?:.*&)?(?:v=)?([a-z0-9_\-]+).*$/i;
+                match = filter.url.match(reVideoUrl);
+                if (match) {
+                    videoId = match[1];
+                }
+                else {
+                    // Assume the ID is the whole string
+                    videoId = filter.url;
+                }
+
+                // Generate and request the URL on Youtube's data servers
+                url = api.generateUrl('videos/:video', {
+                    video: videoId
+                });
+                api.request(url, function (err, data) {
+                    return callback(err, data);
+                });
+            },
+
+            /**
+             * Normalizes the data received from the source provider.
+             * @function
+             * @param {Object} data The data that was received
+             *(typically the object given to the callback method at the end of a "fetch")
+             * @param {Object} query Query parameters (which could include filtering options)
+             * @param {function(Object, Object)} callback Callback function.
+             *   The second argument of the callback is an object with an "entries" property
+             *   that contains the list of items normalized according to the schema.org hierarchy.
+             */
+            process: function (data, query, callback) {
+                if (!data || !data.entry) {
+                    return callback(null, { entries: [] });
+                }
+
+                var video = data.entry;
+                video = convert(video);
+                return callback(null, { entries: [video] });
+            },
+
+
+            /**
+             * Fetches and normalizes the data.
+             * @function
+             * @param {Object} query Query parameters. Feed specific object.
+             * @param {function(Object, Object)} callback Callback function.
+             *   receives the error or the normalized feed.
+             */
+            find: function (query, callback) {
+                // Implementation note: same code as example/news
+                var self = this;
+                self.fetch(query, function (err, data) {
+                    if (err) {
+                        return callback(err, null);
+                    }
+                    else {
+                        self.process(data, query, function (err, convertedData) {
+                            return callback(err, convertedData);
+                        });
+                    }
+                });
+            }
+        };
+    });
+
+    define('databases/static/image', [
+      'datajslib!iso8601'
+    ], function (iso8601) {
+
+        return {
+            /**
+             * Description of the datasource for the factory
+             */
+            desc: {
+                "options": {
+                    "schema": {
+                        "url": {
+                            "type": "string",
+                            "title": "Web address of the image",
+                            "description": "The URL of the image you would like to show. For example, <code>http://borderlessnewsandviews.com/wp-content/uploads/2012/05/MPj042303000001.jpeg</code>."
+                        },
+                        "name": {
+                            "type": "string",
+                            "title": "Title of the image"
+                        },
+                        "transloadit": {
+                            "type": "object",
+                            "title": "Upload an image"
+                        }
+                    },
+                    "form": [
+                      "name",
+                      {
+                          "type": "selectfieldset",
+                          "title": "Get image from",
+                          "items": [
+                            {
+                                "type": "section",
+                                "legend": "Image URL",
+                                "items": [
+                                  "url"
+                                ]
+                            },
+                            {
+                                "type": "section",
+                                "legend": "Local file",
+                                "items": [
+                                  {
+                                      "key": "transloadit",
+                                      "type": "file-hosted-public"
+                                  }
+                                ]
+                            }
+                          ]
+                      }
+                    ]
+                },
+                "runtimes": [
+                  "browser",
+                  "nodejs",
+                  "win8"
+                ],
+                "outputType": "ImageObject",
+                "maxItems": 1
+            },
+
+            /**
+             * Fetches the image... In practice, the query contains all needed
+             * information.
+             *
+             * A future version could perhaps retrieve the image when requested
+             * to do so to retrieve additional information about the image such
+             * as the image dimensions or encoding format.
+             *
+             * @function
+             * @param {Object} query Query parameters. Feed specific object.
+             * @param {function(Object, Object)} callback Callback function.
+             *   The data type depends on the datasource.
+             */
+            fetch: function (query, callback) {
+                query = query || {};
+                var filter = query.filter || {};
+                return callback(null, filter);
+            },
+
+            /**
+             * Converts the query parameters to an ImageObject
+             */
+            process: function (data, query, callback) {
+                var image = {
+                    '@type': 'ImageObject',
+                    name: data.name
+                };
+                var trans = null;
+                var meta = null;
+                var address = null;
+
+                if (data.url) {
+                    image.url = data.url;
+                    image.contentURL = data.url;
+                }
+                else if (data.transloadit) {
+                    trans = data.transloadit;
+                    image.url = '/transloadit' + trans.id;
+                    image.contentURL = trans.url;
+                    image.contentSize = trans.size;
+
+                    if (trans.mime &&
+                      (trans.mime.indexOf('image/') === 0)) {
+                        image.encodingFormat = trans.mime.substring('image/'.length);
+                    }
+
+                    if (trans.meta) {
+                        meta = trans.meta;
+                        image.width = meta.width;
+                        image.height = meta.height;
+
+                        // Use image title if the user has not entered a proper title
+                        if (meta.title && !image.name) {
+                            image.name = meta.title;
+                        }
+
+                        if (meta.description) {
+                            image.description = meta.description;
+                        }
+
+                        if (meta.date_recorded) {
+                            image.dateCreated = iso8601.fromString(meta.date_recorded);
+                        }
+
+                        if (meta.date_file_created) {
+                            image.datePublished = iso8601.fromString(meta.date_file_created);
+                        }
+
+                        if (meta.date_file_modified) {
+                            image.dateModified = iso8601.fromString(meta.date_file_modified);
+                        }
+
+                        if (meta.location ||
+                          meta.city ||
+                          meta.country ||
+                          meta.country_code) {
+                            image.contentLocation = image.contentLocation || {
+                                '@type': 'Place'
+                            };
+                            image.contentLocation.address = {
+                                '@type': 'PostalAddress'
+                            };
+                            address = image.contentLocation.address;
+                            if (meta.location) address.streetAddress = meta.location;
+                            if (meta.city) address.addressLocality = meta.city;
+                            if (meta.country_code) address.country = meta.country_code;
+                        }
+
+                        if (meta.latitude && meta.longitude) {
+                            image.contentLocation = image.contentLocation || {
+                                '@type': 'Place'
+                            };
+                            image.contentLocation.geo = {
+                                '@type': 'GeoCoordinates',
+                                latitude: meta.latitude,
+                                longitude: meta.longitude
+                            };
+                        }
+                    }
+                }
+
+                return callback(null, {
+                    entries: [
+                      image
+                    ]
+                });
+            },
+
+            /**
+             * Fetches and normalizes the data.
+             * @function
+             * @param {Object} query Query parameters. Feed specific object.
+             * @param {function(Object, Object)} callback Callback function.
+             *   receives the error or the normalized feed.
+             */
+            find: function (query, callback) {
+                var self = this;
+                query.filter = query.filter || {};
+
+                if (!query.filter.url && !query.filter.transloadit) {
+                    return callback(null, { entries: [] });
+                }
+
+                self.fetch(query, function (err, data) {
+                    if (err) {
+                        return callback(err, null);
+                    }
+                    else {
+                        self.process(data, query, function (err, convertedData) {
+                            return callback(err, convertedData);
+                        });
+                    }
+                });
+            }
+        };
+
+    });
+
+
+    /**
+     * @fileoverview Static HTML content data source that outputs a blog post.
+     *
+     * The datasource is intended to match a regular CMS blog post (e.g. what
+     * a Wordpress user sees when he/she edits a post or a page)
+     *
+     * The datasource returns a feed with only one item.
+     */
+
+    /*global define*/
+
+    define('databases/static/post', [], function () {
+
+        return {
+            /**
+             * Description of the datasource for the factory
+             */
+            desc: {
+                "options": {
+                    "schema": {
+                        "name": {
+                            "type": "string",
+                            "title": "Title"
+                        },
+                        "articleBody": {
+                            "type": "string",
+                            "title": "Content"
+                        }
+                    },
+                    "form": [
+                      "name",
+                      {
+                          "type": "wysihtml5",
+                          "key": "articleBody"
+                      }
+                    ]
+                },
+                "runtimes": ["browser", "nodejs", "win8"],
+                "outputType": "BlogPosting",
+                "maxItems": 1
+            },
+
+
+            /**
+             * Fetches the HTML content of the blog post based on the
+             * parameters of the datasource.
+             *
+             * In practice, the function merely returns the parameters but this
+             * function could be overwritten in a derivated datasource to fetch
+             * the actual content from a remote source.
+             *
+             * @function
+             * @param {Object} query Query parameters. Must define a 'name' and
+             *  'articleBody' properties (or one of them)
+             * @param {function(Object, Object)} callback Callback function.
+             *   Returns a text.
+             */
+            fetch: function (query, callback) {
+                var filter = (query && query.filter) ? query.filter : {};
+
+                if (!filter.name && !filter.articleBody) {
+                    return callback('Page is empty');
+                }
+
+                // Note additional properties that caller might have set in the query
+                // filter will be stored in the object returned. That's on purpose to
+                // let templates append additional properties on top of the name and
+                // articleBody properties.
+                return callback(null, filter);
+            },
+
+
+            /**
+             * Normalizes the blog post returned by the fetch method.
+             *
+             * In practice, the function simply clones the content
+             *
+             * @function
+             * @param {Object} data The data that was received, a JSON object that
+             *  should have a name and an articleBody properties, but which may
+             *  define additional properties if needed.
+             * @param {Object} query Query parameters (which could include filtering options)
+             * @param {function(Object, Object)} callback Callback function.
+             *   The second argument of the callback is an object with an "entries" property
+             *   that contains the list of items normalized according to the schema.org hierarchy.
+             */
+            process: function (data, query, callback) {
+                // Clone the filter so that further changes don't affect the
+                // original datasource's parameters.
+                var post = JSON.parse(JSON.stringify(data));
+
+                // Set the output type, unless the caller already chose to set
+                // it to something else.
+                post['@type'] = post['@type'] || 'BlogPosting';
+
+                // Return the post as a single entry feed
+                return callback(null, {
+                    entries: [
+                      post
+                    ]
+                });
+            },
+
+
+            /**
+             * Fetches and normalizes the data.
+             * @function
+             * @param {Object} query Query parameters. Feed specific object.
+             * @param {function(Object, Object)} callback Callback function.
+             *   receives the error or the normalized feed.
+             */
+            find: function (query, callback) {
+                // Implementation note: same code as example/news
+                var self = this;
+                self.fetch(query, function (err, data) {
+                    if (err) {
+                        return callback(err, null);
+                    }
+                    else {
+                        self.process(data, query, function (err, convertedData) {
+                            return callback(err, convertedData);
+                        });
+                    }
+                });
+            }
+        };
+    });;
     ;
     define("addons/splashscreen/loaded", [], function () { return function (a) { return { generate: function (a, b) { try { var c = document.getElementsByClassName("_joshfire_factory_splashscreen"); c && c.length && (c[0].style.opacity = "0", setTimeout(function () { c[0].style.display = "none" }, 700)) } catch (d) { } b() } } } })
     ; (function (a, b) { var c = function (c) { var d = null, e = null, f = 0; return !c || !a || !a.config || !a.config.datasources || !a.config.datasources[c] ? null : (d = a.config.datasources[c], b(["datajslib!collection"], function (a) { if (Object.prototype.toString.call(d) == "[object Array]") { e = { children: [], find: function (a, b) { var c = d.length, f = !1, g = [], h = 0, i = function (a, d) { c -= 1; if (f) return; a && (f = !0), d && g.push(d); if (a || c === 0) return b(a, { entries: g }) }; for (h = 0; h < e.children.length; h++) e.children[h].find(a, i) } }; for (f = 0; f < d.length; f++) e.children[f] = a.getCollection(d[f]), e.children[f].name = d[f].name, e.children[f].config = d[f] } else e = a.getCollection(d), e.name = d.name, e.config = d }, null, !0), e) }; a.getDataSource = c })(window.Joshfire.factory, require);

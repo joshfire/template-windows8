@@ -54,15 +54,14 @@
     </article>
 
     <article class="statusDetailTemplate" data-win-control="WinJS.Binding.Template">
-        <div class="anitem ablogpost">  
+        <div class="anitem astatus">  
             <header>
                 <div class="mask"><img src="#" data-win-bind="" /></div>
-                <div class="metainfo">
-                    <div class="author">Published by <h2 class="authorname"></h2></div>
-                    <div class="date">on the <span class="datepublished"></span></div>
-                </div>
             </header>
-            <article class="content" data-win-bind="textContent: articleBody"></article>
+            <article class="content">
+                <div class="meta"><span class="authorname"></span> <span class="authorhandle"></span> <span class="datepublished"></span></div>
+                <p data-win-bind="innerHTML: name"></p>
+            </article>
         </div>
     </article>
 

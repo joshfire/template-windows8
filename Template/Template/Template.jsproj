@@ -53,6 +53,7 @@
       <SubType>Designer</SubType>
     </AppxManifest>
     <Content Include="images\placeholders\ArticleStatusPlaceholder.png" />
+    <Content Include="js\moment.js" />
     <Content Include="pages\settings\about.js" />
     <Content Include="pages\settings\privacy.js" />
     <Content Include="pages\settings\support.js" />

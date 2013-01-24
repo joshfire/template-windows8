@@ -53,6 +53,21 @@
         }
     };
 
+    var setDetailsTitle = function (item) {
+
+        if (!item || !item.data) return;
+
+        switch (item.data.simpleType) {
+            case 'articlestatus':
+                document.querySelector("header[role=banner] .pagetitle").textContent = 'Tweet';
+                break;
+            case 'blogposting':
+            default:
+                document.querySelector("header[role=banner] .pagetitle").textContent = item.data.name || '';
+        }
+
+    }
+
     var getThumb = function (item) {
         var uri = '';
         if (item.data.thumbnail && item.data.thumbnail.length)
@@ -81,9 +96,9 @@
             // Set a ref to the item for the sharing event
             _currentItem = Data.items.dataSource.itemFromIndex(options.index)._value;
 
+
             // Set the title of the page
-            if(_currentItem && _currentItem.data && _currentItem.data.name)
-                document.querySelector("header[role=banner] .pagetitle").textContent = _currentItem.data.name;
+            setDetailsTitle(_currentItem);
 
             // Listen to share event
             var dtm = Windows.ApplicationModel.DataTransfer.DataTransferManager.getForCurrentView();
@@ -98,7 +113,7 @@
             // Set a ref to the item for the sharing event
             _currentItem = Data.items.dataSource.itemFromIndex(flipView.currentPage)._value;
             // Set the title of the page
-            document.querySelector("header[role=banner] .pagetitle").textContent = _currentItem.data.name;
+            setDetailsTitle(_currentItem)
         },
 
         itemRenderer: function (itemPromise) {
@@ -159,7 +174,7 @@
             iimg.src = data.image.contentURL;
         }
         else {
-            iimg.src = '/images/placeholders/' + currentItem.data['@type'] + 'Placeholder.png';
+            iimg.src = '/images/placeholders/' + currentItem.data.simpleType + 'Placeholder.png';
         }
 
         utils.setInnerHTML(elem.querySelector('article'), toStaticHTML(data.articleBody));
@@ -174,14 +189,17 @@
         var data = currentItem.data;
         var elem = tplSelect.element._value;
 
-        var iauthor = elem.querySelector('.authorname');
-        if (iauthor && data.author && data.author.length) {
-            iauthor.textContent = data.author[0].name;
-        }
+        var iauthorName = elem.querySelector('.authorname');
+        var iauthorHandle = elem.querySelector('.authorhandle');
 
+        if (data.author && data.author.length) {
+            iauthorName.textContent = data.author[0].name;
+            iauthorHandle.textContent = '@' + data.author[0]['foaf:nick'];
+        }
+        
         var idate = elem.querySelector('.datepublished');
         if (idate && data.datePublished) {
-            idate.textContent = toReadableDate(data.datePublished);
+            idate.textContent = moment(data.datePublished).fromNow();
         }
 
         if (!data.articleBody) data.articleBody = '';
@@ -191,11 +209,9 @@
             iimg.src = data.author[0].image.contentURL;
         }
         else {
-            iimg.src = '/images/placeholders/' + currentItem.data['@type'] + 'Placeholder.png';
+            iimg.src = '/images/placeholders/' + currentItem.data.simpleType + 'Placeholder.png';
         }
-
-        utils.setInnerHTML(elem.querySelector('article'), toStaticHTML(data.articleBody));
-
+        
         return tplSelect.element;
     }
 

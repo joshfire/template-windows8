@@ -116,6 +116,72 @@
         width: auto;
         float: left;
     }
+    
+#detailsFlipView .anitem.astatus {
+    position: absolute;
+    height: 140px;
+    top: 40%;
+    margin-top: -70px;
+}
+
+    .astatus header {
+        position: absolute;
+        top: 5px;
+        left: 0;
+        width: 140px;
+        height: 100%;
+    }
+
+        .astatus header .mask {
+            width: 100%;
+            height: 140px;
+        }
+
+            .astatus header .mask img {
+                width: 100%;
+                max-width: none!important;
+            }
+            
+
+.itemdetailpage .astatus .content {
+    text-align: left;
+    padding-top: 10px;
+    position: absolute;
+    top: 0;
+    left: 170px;
+    right: 0;
+    bottom: 0;
+    width: auto;
+}
+
+    .astatus .content p {
+        font-size: 2.5em;
+        text-align: left;
+        margin: 20px 0 0 0;
+    }
+    
+    .astatus .content .meta {
+        position: absolute;
+        top: 0;
+        left: 0;
+    }
+
+    .astatus .content .meta > * {
+        font-size: 1.4em;
+        float: left;
+        margin-right: 10px;
+    }
+    
+        .astatus .content .meta .authorname {
+            font-weight: bold;
+        }
+        .astatus .content .meta .authorhandle {
+            color: #808080;
+        }
+        .astatus .content .meta .datepublished {
+            float: right;
+            color: #808080;
+        }
 
 .itemdetailpage .content {
     -ms-grid-row: 2;
@@ -185,7 +251,65 @@
             .itemdetailpage .content article .item-content {
                 padding-bottom: 60px;
             }
-            
+
+    .itemdetailpage #detailsFlipView .astatus {
+        height: 100%;
+        width: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        margin: 0;
+    }
+
+    .itemdetailpage #detailsFlipView .astatus header {
+        height: 190px;
+        width: 100%;
+        box-sizing: border-box;
+        padding: 5px 65px;    
+    }
+
+        .itemdetailpage #detailsFlipView .astatus header .mask {
+            height: 100%;
+            width: 100%;
+        }
+
+        .itemdetailpage #detailsFlipView .astatus header img {
+            width: 100%;
+            height: 100%;
+        }
+        
+    .itemdetailpage #detailsFlipView .astatus article {
+        position: absolute;
+        top: 200px;
+        left: 10px;
+        right: 10px;
+        bottom: 0;    
+    }
+
+        .itemdetailpage #detailsFlipView .astatus article .meta {
+            float: left;
+            width: 100%;
+            position: relative;
+        }
+
+            .itemdetailpage #detailsFlipView .astatus article .meta > * {
+                display: block;
+                text-align: center;
+                padding: 0px 3px;
+                float: none;
+                clear: both;
+                margin: 0;
+                font-size: 1em;
+            }
+
+        .itemdetailpage #detailsFlipView .astatus article > p {
+            float: left;
+            margin-top: 10px;
+            font-size: 1.5em;
+            box-sizing: border-box;
+            padding: 0 55px;
+        }
+
     #detailsFlipView {
         height: calc(100% - 50px)!important;
     }

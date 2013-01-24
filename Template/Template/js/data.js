@@ -146,6 +146,9 @@
                 }
             }
         }
+        if (firstItem.author && firstItem.author.length && firstItem.author[0].image) {
+            thethumb = firstItem.author[0].image;
+        }
         return thethumb;
     }
 

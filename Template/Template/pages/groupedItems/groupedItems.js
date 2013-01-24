@@ -34,7 +34,7 @@
     }
 
     function setBestImageCover(currentItem, img, isLarge) {
-        if ((currentItem.data.thumbnail && currentItem.data.thumbnail.length) || currentItem.data.image) {
+        if ((currentItem.data.thumbnail && currentItem.data.thumbnail.length) || currentItem.data.image || (currentItem.data.simpleType == 'imageobject' && currentItem.data.contentURL)) {
             var thumbs = currentItem.data.thumbnail,
                 thethumb = { height: 0, width: 0 };
             /* Find the best thumb */
@@ -55,8 +55,16 @@
                 }
             }
 
-            if (thethumb.height == 0 && thethumb.width == 0)
+            if (thethumb.height == 0 && thethumb.width == 0 && currentItem.data.image)
                 thethumb = currentItem.data.image;
+
+            if (thethumb.height == 0 && thethumb.width == 0 && currentItem.data.simpleType == 'imageobject' && currentItem.data.contentURL) {
+                thethumb = {
+                    width: cellW,
+                    height: cellH,
+                    contentURL: currentItem.data.contentURL
+                }
+            }
 
             /* Set the URL */
             img.src = thethumb.contentURL;
@@ -66,7 +74,7 @@
                 img.style.top = -((510 - cellH) / 2) + 'px';
             }
 
-            /* Set the image tag's dimentions and its position behind its mask */
+            /* Set the image tag's dimensions and its position behind its mask */
             if (!thethumb.height || !thethumb.width || (thethumb.height - cellH) < (thethumb.width - cellW)) {
                 img.height = cellH;
                 // center the image
@@ -111,14 +119,15 @@
             switch (currentItem.data.simpleType) {
 
                 case 'articlestatus':
-                    console.dir(currentItem);
 
+                    currentItem.data.name = prettyStatus(currentItem.data.name);
                     currentItem.data.authorName = currentItem.data.author[0].name;
                     currentItem.data.authorAvatar = currentItem.data.author[0].image.contentURL;
 
                     tplSelect = tplSelect.renderItem(itemPromise, recycled);
                     break;
                 default:
+                    console.dir(currentItem);
                     tplSelect = tplSelect.renderItem(itemPromise, recycled);
                     var coverImage = tplSelect.element._value.querySelector('.thumbnail');
                     setBestImageCover(currentItem, coverImage, isLarge);
@@ -131,26 +140,45 @@
         });
     }
 
-    function setThumb(currentItem, tplSelect) {
+    function setBigGroupThumb(currentItem, tplSelect) {
         // Get the first item and grab its image if it has one. Display it as BG.
         var thethumb = Data.getImageFromGroup(currentItem);
 
         var img = tplSelect.element._value.querySelector('.tilebackground');
         var src = (thethumb && typeof thethumb !== 'undefined' && thethumb.contentURL) ? thethumb.contentURL : '/images/placeholders/' + currentItem.data.simpleType + 'Placeholder.png';
+        var resizeRatio = (thethumb && thethumb.width) ? (680 / thethumb.width) : 1;
 
         img.src = src;
         if (thethumb && typeof thethumb !== 'undefined')
-            img.style.top = -(thethumb.height - 120);
-        img.width = '100%';
+            img.style.top = -Math.abs((thethumb.height * resizeRatio - 450) / 2) + 'px';
+
 
         return tplSelect.element;
+    }
+
+    function setSmallGroupThumb(currentItem, tplSelect) {
+        var thethumb = Data.getImageFromGroup(currentItem);
+        var img = tplSelect.element._value.querySelector('.tilebackground');
+        var src = (thethumb && typeof thethumb !== 'undefined' && thethumb.contentURL) ? thethumb.contentURL : '/images/placeholders/' + currentItem.data.simpleType + 'Placeholder.png';
+        img.src = src;
+
+        if (thethumb && typeof thethumb !== 'undefined')
+            img.style.top = -Math.abs((thethumb.height * (265/thethumb.width) - 120) / 2) + 'px';
+
+        return tplSelect.element;
+    }
+
+    var prettyStatus = function (tweet) {
+        var pretty = tweet.replace(/(^|\s)@(\S+)/g, '$1<em>@$2</em>');
+        pretty = pretty.replace(/(^|\s)(http\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?)/g, '$1<a href="$2" target="_blank">$2</a>');
+        return pretty.replace(/(^|\s)#(\S+)/g, '$1<strong>#$2</strong>');
     }
 
     function listTemplateHandler(itemPromise) {
         return itemPromise.then(function (currentItem, recycled) {
             var tplSelect = document.querySelector('.listitemtemplate').winControl;
             tplSelect = tplSelect.renderItem(itemPromise, recycled);
-            return setThumb(currentItem, tplSelect);
+            return setSmallGroupThumb(currentItem, tplSelect);
         });
     }
 
@@ -158,7 +186,7 @@
         return itemPromise.then(function (currentItem, recycled) {
             var tplSelect = document.querySelector('#zoomedOutItemTemplate').winControl;
             tplSelect = tplSelect.renderItem(itemPromise, recycled);
-            return setThumb(currentItem, tplSelect);
+            return setBigGroupThumb(currentItem, tplSelect);
         });
     }
 

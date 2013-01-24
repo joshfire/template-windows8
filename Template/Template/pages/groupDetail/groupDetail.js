@@ -7,27 +7,58 @@
     var ui = WinJS.UI;
     var utils = WinJS.Utilities;
 
+
+    var renderGenericItem = function (itemPromise, currentItem, recycled) {
+
+        var tpl = document.querySelector(".itemtemplate").winControl;
+        tpl = tpl.renderItem(itemPromise, recycled);
+
+        var dateItem = tpl.element._value.querySelector('.item-subtitle');
+        var descItem = tpl.element._value.querySelector('.item-description');
+        var img = tpl.element._value.querySelector('.item-image');
+        dateItem.textContent = toReadableDate(currentItem.data.datePublished);
+
+        if (currentItem.data.description && currentItem.data.description.length > 170)
+            descItem.textContent = currentItem.data.description.substr(0, 170) + '...';
+        else
+            descItem.textContent = currentItem.data.description;
+
+        if (currentItem.data.image && currentItem.data.image.contentURL && currentItem.data.image.contentURL != "")
+            img.src = currentItem.data.image.contentURL;
+        else
+            img.src = '/images/placeholders/' + currentItem.simpleType + 'Placeholder.png';
+
+        return tpl.element;
+    }
+
+    var renderStatusItem = function (itemPromise, currentItem, recycled) {
+
+        var tpl = document.querySelector(".statustemplate").winControl;
+        tpl = tpl.renderItem(itemPromise, recycled);
+        var descItem = tpl.element._value.querySelector('.item-description');
+        var img = tpl.element._value.querySelector('.item-image');
+
+        WinJS.Utilities.setInnerHTML(descItem, currentItem.data.name);
+
+        if (currentItem.data.author && currentItem.data.author[0].image)
+            img.src = currentItem.data.author[0].image.contentURL;
+        else
+            img.src = '/images/placeholders/' + currentItem.simpleType + 'Placeholder.png';
+
+        return tpl.element;
+    }
+
     var templateHandler = function (itemPromise) {
-        return itemPromise.then(function(currentItem, recycled) {
-            var tpl = document.querySelector(".itemtemplate").winControl;
-            tpl = tpl.renderItem(itemPromise, recycled);
-
-            var dateItem = tpl.element._value.querySelector('.item-subtitle');
-            dateItem.textContent = toReadableDate(currentItem.data.datePublished);
-
-            var descItem = tpl.element._value.querySelector('.item-description');
-            if (currentItem.data.description && currentItem.data.description.length > 170)
-                descItem.textContent = currentItem.data.description.substr(0, 170) + '...';
-            else
-                descItem.textContent = currentItem.data.description;
-
-            var img = tpl.element._value.querySelector('.item-image');
-            if (currentItem.data.image && currentItem.data.image.contentURL && currentItem.data.image.contentURL != "")
-                img.src = currentItem.data.image.contentURL;
-            else
-                img.src = '/images/placeholders/' + currentItem.data['@type'] + 'Placeholder.png';
-
-            return tpl.element;
+        return itemPromise.then(function (currentItem, recycled) {
+            switch (currentItem.data.simpleType) {
+                case 'articlestatus':
+                    return renderStatusItem(itemPromise, currentItem, recycled);
+                    break;
+                case 'blogposting':
+                default:
+                    return renderGenericItem(itemPromise, currentItem, recycled);
+                    break;
+            }
         });
     }
 

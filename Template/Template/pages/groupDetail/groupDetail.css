@@ -49,13 +49,37 @@
         }
 
     .groupdetailpage .itemslist .win-item {
-        -ms-grid-columns: 110px 1fr;
-        -ms-grid-rows: 1fr;
-        display: -ms-grid;
+        
+        background: rgba(0, 0, 0, 0.7); 
         height: 120px;
         width: 472px;
-        background: rgba(0, 0, 0, 0.7); 
-        padding: 5px;
+    }
+
+.groupdetailpage .anitem {
+    -ms-grid-columns: 110px 1fr;
+    -ms-grid-rows: 1fr;
+    display: -ms-grid;
+    height: 120px;
+    width: 472px;
+}
+
+.groupdetailpage .astatus {
+    height: 120px;
+    width: 472px;
+}
+
+    .groupdetailpage .astatus .item-image {
+        width: 100px;
+        height: 100px;
+        margin: 10px;
+    }
+
+    .groupdetailpage .astatus .item-description {
+        padding: 10px 10px 10px 0;
+        font-size: 1.4em!important;
+        max-height: none;
+        height: 100%;
+        box-sizing: border-box;
     }
 
         .groupdetailpage .itemslist .win-item .item-info {
@@ -105,8 +129,7 @@
         height: 80px;
         width: 272px;
     }
-
-
+    
         .groupdetailpage .itemslist .win-item .item-info .item-title {
             max-height: 45pt;
             display: block;
@@ -115,11 +138,29 @@
             font-size: 14px;
         }
 
-        .groupdetailpage .itemslist .win-item .item-info .item-description {
+        .groupdetailpage .anitem .item-info .item-description {
             visibility: hidden;
         }
-
-        
+        .groupdetailpage .astatus .item-info {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            bottom: 5px;
+            left: 75px;
+        }
+            .groupdetailpage .astatus .item-info .item-description {
+                font-size: 1em!important;
+                visibility: visible;
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }    
+            .groupdetailpage .astatus .item-image {
+                width: 70px;
+                height: 70px;
+                margin: 5px;
+            }    
         
 }
 
