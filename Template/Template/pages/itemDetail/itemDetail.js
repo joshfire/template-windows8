@@ -154,11 +154,16 @@
         var iauthor = elem.querySelector('.authorname');
         if (iauthor && data.author && data.author.length) {
             iauthor.textContent = data.author[0].name;
+        } else {
+            WinJS.Utilities.empty(elem.querySelector('.author'));
         }
 
         var idate = elem.querySelector('.datepublished');
         if (idate && data.datePublished) {
             idate.textContent = toReadableDate(data.datePublished);
+        }
+        if (idate.textContent.indexOf('NaN') > -1) {
+            WinJS.Utilities.empty(elem.querySelector('.date'));
         }
 
         if (!data.articleBody) data.articleBody = '';
@@ -225,11 +230,16 @@
         var iauthor = elem.querySelector('.authorname');
         if (iauthor && data.author && data.author.length) {
             iauthor.textContent = data.author[0].name;
+        } else {
+            WinJS.Utilities.empty(elem.querySelector('.author'));
         }
 
         var idate = elem.querySelector('.datepublished');
         if (idate && data.datePublished) {
             idate.textContent = toReadableDate(data.datePublished);
+        }
+        if (idate.textContent.indexOf('NaN') > -1) {
+            WinJS.Utilities.empty(elem.querySelector('.date'));
         }
 
         return tplSelect.element;
@@ -248,11 +258,16 @@
         var iauthor = elem.querySelector('.authorname');
         if (iauthor && data.author && data.author.length) {
             iauthor.textContent = data.author[0].name;
+        } else {
+            WinJS.Utilities.empty(elem.querySelector('.author'));
         }
 
         var idate = elem.querySelector('.datepublished');
         if (idate && data.datePublished) {
             idate.textContent = toReadableDate(data.datePublished);
+        }
+        if (idate.textContent.indexOf('NaN') > -1) {
+            WinJS.Utilities.empty(elem.querySelector('.date'));
         }
 
         return tplSelect.element;

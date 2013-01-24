@@ -111,7 +111,7 @@
                 currentItem.data.name = 'No name';
 
             if (!currentItem.data.description)
-                currentItem.data.description = 'No description';
+                currentItem.data.description = '';
 
             if (!currentItem.data.datePublished)
                 currentItem.data.datePublished = 'No Date';
@@ -144,7 +144,7 @@
         var thethumb = Data.getImageFromGroup(currentItem);
 
         var img = tplSelect.element._value.querySelector('.tilebackground');
-        var src = (thethumb && typeof thethumb !== 'undefined' && thethumb.contentURL) ? thethumb.contentURL : '/images/placeholders/' + currentItem.data.simpleType + 'Placeholder.png';
+        var src = (thethumb && typeof thethumb !== 'undefined' && thethumb.contentURL) ? thethumb.contentURL : '/images/placeholders/' + Data.getTypeFromGroup(currentItem) + 'Placeholder.png';
         var resizeRatio = (thethumb && thethumb.width) ? (680 / thethumb.width) : 1;
 
         img.src = src;
@@ -262,7 +262,6 @@
 
             var zoomedOutListView = element.querySelector(".zoomedOutGroupeditemslist").winControl;
             zoomedOutListView.itemTemplate = zoomedOutTemplateHandler;
-            //zoomedOutListView.layout = new ui.ListLayout();
 
             // Listen to the share event and display nothing
             var dtm = Windows.ApplicationModel.DataTransfer.DataTransferManager.getForCurrentView();

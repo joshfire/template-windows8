@@ -3,16 +3,12 @@
 .groupeditemspage .groupeditemslist .win-horizontal.win-viewport .win-surface {
     margin-left: 45px;
     margin-bottom: 60px;
+    padding-right: 70px;
 }
 
 .groupeditemspage .warning-message {
     margin-left: 120px;
     margin-bottom: 15px;
-}
-
-.groupeditemspage .groupeditemslist .win-horizontal.win-viewport .win-surface {
-    margin-left: 45px;
-    margin-bottom: 60px;
 }
 
 .lists {
@@ -172,8 +168,9 @@
             min-height: 50px;
         }
 
-        .groupeditemspage .zoomedOutGroupeditemslist {
-            margin-left: 70px;
+        .groupeditemspage .zoomedOutGroupeditemslist .win-surface {
+            margin-left: 120px;
+            padding-right: 40px;
         }
         
         .zoomedOutItem {

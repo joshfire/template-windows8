@@ -129,6 +129,10 @@
             );
         }
     }
+    /** Get the first item and grab its image if it has one */
+    function getTypeFromGroup(groupItem) {
+        return this.getItemsFromGroup(groupItem).getAt(0).simpleType;
+    }
 
     /** Get the first item and grab its image if it has one */
     function getImageFromGroup(groupItem) {
@@ -149,6 +153,11 @@
         if (firstItem.author && firstItem.author.length && firstItem.author[0].image) {
             thethumb = firstItem.author[0].image;
         }
+        if (firstItem.simpleType == 'imageobject' && firstItem.contentURL) {
+            thethumb = {
+                contentURL: firstItem.contentURL
+            }
+        }
         return thethumb;
     }
 
@@ -157,6 +166,7 @@
         groups: groupedItems.groups,
         getItemsFromGroup: getItemsFromGroup,
         getImageFromGroup: getImageFromGroup,
+        getTypeFromGroup: getTypeFromGroup,
         getItemReference: getItemReference,
         resolveGroupReference: resolveGroupReference,
         resolveItemReference: resolveItemReference,
