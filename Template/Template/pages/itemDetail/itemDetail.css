@@ -411,6 +411,13 @@
 }
 
 @media screen and (-ms-view-state: fullscreen-portrait) {
+    
+    #detailsFlipView .anitem.astatus {
+        position: absolute;
+        height: 250px;
+        top: 40%;
+        margin-top: -70px;
+    }
 
     #detailsFlipView .ablogpost {
         overflow-y: scroll;

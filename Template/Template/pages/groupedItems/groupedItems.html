@@ -18,8 +18,8 @@
     
     <!-- Template for group title in main list -->
     <div class="headerTemplate" data-win-control="WinJS.Binding.Template">
-        <p class="group-title win-type-x-large" data-win-bind="textContent: title; groupKey: key" 
-            onclick="WinJS.Navigation.navigate('/pages/groupDetail/groupDetail.html', { groupKey: event.srcElement.groupKey })" role="link"></p>
+        <p class="grouped-items-header group-title win-type-x-large" data-win-bind="textContent: title; groupKey: key" 
+            onclick="groupHeaderInvoked(event)" role="link"></p>
     </div>
 
     <!-- Template for small item in main list -->

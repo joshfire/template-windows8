@@ -106,7 +106,7 @@
             var tplName = getTemplateName(currentItem.data.innerIndex, currentItem.data.simpleType);
             var tplSelect = document.querySelector(tplName).winControl,
                 isLarge = (currentItem.data.innerIndex === 0);
-
+            
             if (!currentItem.data.name)
                 currentItem.data.name = 'No name';
 
@@ -158,7 +158,7 @@
     function setSmallGroupThumb(currentItem, tplSelect) {
         var thethumb = Data.getImageFromGroup(currentItem);
         var img = tplSelect.element._value.querySelector('.tilebackground');
-        var src = (thethumb && typeof thethumb !== 'undefined' && thethumb.contentURL) ? thethumb.contentURL : '/images/placeholders/' + currentItem.data.simpleType + 'Placeholder.png';
+        var src = (thethumb && typeof thethumb !== 'undefined' && thethumb.contentURL) ? thethumb.contentURL : '/images/placeholders/' + Data.getItemsFromGroup(currentItem.data).getAt(0).simpleType + 'Placeholder.png';
         img.src = src;
 
         if (thethumb && typeof thethumb !== 'undefined')
@@ -195,6 +195,16 @@
             cellWidth: 175,
             cellHeight: 120
         };
+    }
+
+    window.groupHeaderInvoked = function(event) {
+        if (Data.groups.getItemFromKey(event.srcElement.groupKey).data.length <= 1) {
+            var itemIndex = Data.groups.getItemFromKey(event.srcElement.groupKey).firstItemIndexHint;
+            var item = Data.items.getAt(itemIndex);
+            WinJS.Navigation.navigate("/pages/itemDetail/itemDetail.html", { item: Data.getItemReference(item), index: itemIndex });
+        } else {
+            WinJS.Navigation.navigate('/pages/groupDetail/groupDetail.html', { groupKey: event.srcElement.groupKey });
+        }
     }
 
     /**
@@ -241,7 +251,17 @@
             if (appView.value === appViewState.snapped) {
                 // If the page is snapped, the user invoked a group.
                 var group = Data.groups.getAt(args.detail.itemIndex);
-                nav.navigate("/pages/groupDetail/groupDetail.html", { groupKey: group.key });
+
+
+                if (Data.groups.getItemFromKey(group.key).data.length <= 1) {
+                    var itemIndex = Data.groups.getItemFromKey(group.key).firstItemIndexHint;
+                    var item = Data.items.getAt(itemIndex);
+                    WinJS.Navigation.navigate("/pages/itemDetail/itemDetail.html", { item: Data.getItemReference(item), index: itemIndex });
+                } else {
+                    WinJS.Navigation.navigate('/pages/groupDetail/groupDetail.html', { groupKey: group.key });
+                }
+
+                //nav.navigate("/pages/groupDetail/groupDetail.html", { groupKey: group.key });
             } else {
                 // If the page is not snapped, the user invoked an item.
                 var item = Data.homeItems(7).getAt(args.detail.itemIndex),
