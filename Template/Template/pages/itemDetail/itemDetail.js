@@ -173,7 +173,9 @@
         * is grabbed by the factory and set on the left). So we set an empty image that'll be caught by the regexp next time.
         */
         data.articleBody = data.articleBody.replace(/<img[^>]+\>/i, '<img style="display:none">');
-        
+
+        data.articleBody.replace(/\n|\r\n/g,'<br>'); // Add line breaks
+
         var iimg = elem.querySelector('.mask img');
         if (data.image) {
             iimg.src = data.image.contentURL;
@@ -208,7 +210,9 @@
         }
 
         if (!data.articleBody) data.articleBody = '';
-        
+
+        data.articleBody.replace(/\n|\r\n/g,'<br>'); // Add line breaks
+
         var iimg = elem.querySelector('.mask img');
         if (data.author && data.author.length && data.author[0].image) {
             iimg.src = data.author[0].image.contentURL;
