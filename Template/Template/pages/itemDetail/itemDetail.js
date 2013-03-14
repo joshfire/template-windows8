@@ -174,7 +174,7 @@
         */
         data.articleBody = data.articleBody.replace(/<img[^>]+\>/i, '<img style="display:none">');
 
-        data.articleBody.replace(/\n|\r\n/g,'<br>'); // Add line breaks
+        data.articleBody = data.articleBody.replace(/\n|\r\n/g,'<br>'); // Add line breaks
 
         var iimg = elem.querySelector('.mask img');
         if (data.image) {
@@ -211,7 +211,7 @@
 
         if (!data.articleBody) data.articleBody = '';
 
-        data.articleBody.replace(/\n|\r\n/g,'<br>'); // Add line breaks
+        data.articleBody = data.articleBody.replace(/\n|\r\n/g,'<br>'); // Add line breaks
 
         var iimg = elem.querySelector('.mask img');
         if (data.author && data.author.length && data.author[0].image) {
