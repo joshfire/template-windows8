@@ -65,13 +65,13 @@
         },
         "privacyhtml": {
           "title": "Privacy policy",
-          "description": "Copy your privacy policy text or link to an online page. Page is hidden if empty",
+          "description": "Copy your privacy policy text or link to an online page.",
           "type": "string",
           "required": true
         },
         "supporthtml": {
           "title": "Support",
-          "description": "Information about how the users of your application can get support (usually an email address or a link to an online support page). Page is hidden if empty.",
+          "description": "Information about how the users of your application can get support (usually an email address or a link to an online support page).",
           "type": "string",
           "required": true
         }
