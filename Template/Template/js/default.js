@@ -6,6 +6,7 @@
     var app = WinJS.Application;
     var activation = Windows.ApplicationModel.Activation;
     var nav = WinJS.Navigation;
+    WinJS.Binding.optimizeBindingReferences = true;
     WinJS.strictProcessing();
 
     app.onactivated = function (args) {
