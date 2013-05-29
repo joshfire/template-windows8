@@ -1,7 +1,7 @@
 {
   "name": "window8",
   "fullName": "Windows 8 Metro",
-  "version": "1.1.5",
+  "version": "1.1.6",
   "description": "A template to generate a Metro-styled Windows 8 application. It only works with the Windows 8 deploy",
   "keywords": [
     "windows",
@@ -67,14 +67,12 @@
           "title": "Privacy policy",
           "description": "Copy your privacy policy text or link to an online page.",
           "type": "string",
-          "default":"<p><a href=\"http://factory.joshfire.com/privacy\">http://factory.joshfire.com/privacy</a></p>",
           "required": true
         },
         "supporthtml": {
           "title": "Support",
           "description": "Information about how the users of your application can get support (usually an email address or a link to an online support page).",
           "type": "string",
-          "default":"<p><a href=\"https://getsatisfaction.com/joshfire\">https://getsatisfaction.com/joshfire</a>",
           "required": true
         }
       },
