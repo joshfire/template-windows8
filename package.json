@@ -66,12 +66,14 @@
         "privacyhtml": {
           "title": "Privacy policy",
           "description": "Copy your privacy policy text or link to an online page.",
+          "default":"<p><a href=\"http://factory.joshfire.com/privacy\">http://factory.joshfire.com/privacy</a></p>",
           "type": "string",
           "required": true
         },
         "supporthtml": {
           "title": "Support",
           "description": "Information about how the users of your application can get support (usually an email address or a link to an online support page).",
+          "default":"<p><a href=\"https://getsatisfaction.com/joshfire\">https://getsatisfaction.com/joshfire</a>",
           "type": "string",
           "required": true
         }
