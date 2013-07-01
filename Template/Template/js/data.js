@@ -23,7 +23,7 @@
             }
         }
     }
-    
+
 
     // This function returns a WinJS.Binding.List containing only the items
     // that belong to the provided group.
@@ -61,7 +61,7 @@
     };
 
     var getHomeItemReference = function (index) {
-        
+
     };
 
     // Expose the config for general use through the app.
@@ -79,15 +79,15 @@
         // http://msdn.microsoft.com/library/windows/apps/Hh452745
         // http://msdn.microsoft.com/library/windows/apps/Hh465373
 
-        // a counter of the number of datasources asked
+        // a counter of the number of datasources which actually answered
         var queryCompleteCounter = 0;
         // a counter of the number of datasources successfully received from the servers
         var successCounter = 0;
 
-        var dsWaitingForResponse
+        var dsWaitingForResponse;
 
         for (var dsNb = 0; dsNb < datasources.children.length; dsNb++) {
-            var group = { key: "main" + dsNb, title: datasources.children[dsNb].name, index: dsNb, length: 0 };
+            var group = { key: 'main' + dsNb, title: datasources.children[dsNb].name, index: dsNb, length: 0 };
 
             datasources.children[dsNb].find({}, function (g) {
 
@@ -96,14 +96,9 @@
                     if (queryCompleteCounter == datasources.children.length) {
                         Data.dataloading = false;
                     }
-                    if (err) {
-                        console.error(err.toString());
-                        return;
-                    }
 
-                    successCounter++;
                     // If all datasources have been loaded, remove the loading spinner
-                    if (successCounter == datasources.children.length) {
+                    if (queryCompleteCounter == datasources.children.length) {
                         setTimeout(function () {
                             var loadingControl = document.getElementById('loadingControl');
                             Data.dataloaded = true;
@@ -112,6 +107,13 @@
                             }
                         }, 1400);
                     }
+
+                    if (err) {
+                        console.error(err.toString());
+                        return;
+                    }
+
+                    successCounter++;
 
                     // Add received data entries into the data list
                     var k = 0;
